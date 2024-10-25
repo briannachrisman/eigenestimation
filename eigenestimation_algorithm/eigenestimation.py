@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from torch.nn.utils import stateless
-from torch.func import jacrev functional_call
+from torch.func import jacrev, functional_call
 import einops
 from typing import Any, Dict, List, Tuple, Callable
 
