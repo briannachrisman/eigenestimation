@@ -4,7 +4,7 @@ from torch.nn.utils import stateless
 from torch.func import jacrev, functional_call
 import einops
 from typing import Any, Dict, List, Tuple, Callable
-
+import gc
 class EigenEstimation(nn.Module):
     def __init__(self, model: nn.Module, loss: Callable, n_u_vectors: int) -> None:
         super(EigenEstimation, self).__init__()
@@ -108,3 +108,4 @@ class EigenEstimation(nn.Module):
         dH_du: torch.Tensor = self.double_grad_along_u(x, self._parameters)
 
         return dH_du, u_tensor
+        

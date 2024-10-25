@@ -80,7 +80,9 @@ def PrintActivatingExamplesTransformer(
     top_k: int,
     batch_size: int = 10  # Define a batch size for minibatch processing
 ) -> None:
-
+    device = X.device  # Assume the tensor is already on the appropriate device
+    num_samples = X.shape[0]
+    
     # Split X into minibatches
     dH_list: List[torch.Tensor] = []
     
@@ -91,6 +93,7 @@ def PrintActivatingExamplesTransformer(
         # Compute dH for the current minibatch
         dH_batch, _ = eigenmodel(X_batch)
         dH_list.append(dH_batch)
+        
     
     # Concatenate dH results from all minibatches
     dH = torch.cat(dH_list, dim=0)

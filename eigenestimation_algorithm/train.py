@@ -4,6 +4,7 @@ from torch.optim import Optimizer
 from torch.utils.data import DataLoader
 from typing import Any
 import einops
+import gc
 
 def TrainEigenEstimation(
     eigenmodel: nn.Module,
