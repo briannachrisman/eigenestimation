@@ -48,7 +48,7 @@ class EigenEstimation(nn.Module):
                 einops.einsum(
                     grad_f[name],
                     u[name.replace('.', '__')],
-                    'batch i ..., k ... -> batch k',
+                    '... p, k p -> ... k', # (batch),parameters x k,parameters -> (batch),k
                 )
                 for name in grad_f.keys()
             ]
@@ -61,13 +61,14 @@ class EigenEstimation(nn.Module):
         jac: Dict[str, torch.Tensor] = jacrev(self.grad_along_u, argnums=1)(
             x, self.w0, u
         )
-        # Compute the dot product of the Jacobian and u vectors
+
+        # Compute the dot product of the hessian-vector product and u vectors
         return sum(
             [
                 einops.einsum(
-                    jac[name].flatten(2, -1),
-                    u[name.replace('.', '__')].flatten(1, -1),
-                    'batch k u, k u -> batch k',
+                    jac[name],#.flatten(2, -1),
+                    u[name.replace('.', '__')],#.flatten(1, -1),
+                    '... k p, k p -> ... k', # (batch),k_vectors,parameters x k,parameters -> (batch),k
                 )
                 for name in jac.keys()
             ]

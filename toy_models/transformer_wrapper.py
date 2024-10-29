@@ -15,7 +15,7 @@ class TransformerWrapper(nn.Module):
         logits: torch.Tensor = self.transformer(tokenized_X).last_hidden_state
         # Rearrange the output to a flat batch of logits
         probs = logits.softmax(dim=-1)
-        return einops.rearrange(probs, 'batch tokens logits -> (batch tokens) logits')
+        return probs #einops.rearrange(probs, 'batch tokens logits -> (batch tokens) logits')
 
 def DeleteParams(model: nn.Module, attributes_to_delete: List[str]) -> None:
     for attribute_to_delete in attributes_to_delete:
@@ -30,11 +30,12 @@ def DeleteParams(model: nn.Module, attributes_to_delete: List[str]) -> None:
         param = getattr(module, attribute_list[-1])
         delattr(module, attribute_list[-1])
         module.register_buffer(attribute_list[-1], param)
+        param.requires_grad = False
 
 
 
 class KLDivergenceLoss(nn.Module):
-    def __init__(self, reduction: str = 'mean') -> None:
+    def __init__(self, reduction: str = 'none') -> None:
         """
         KL Divergence Loss with a structure similar to MSELoss.
         
@@ -57,11 +58,11 @@ class KLDivergenceLoss(nn.Module):
             torch.Tensor: The computed KL Divergence Loss.
         """
         # Convert preds to log-probabilities
-        preds_log = torch.log_softmax(preds, dim=1)
+        preds_log = torch.log_softmax(preds, dim=-1)
 
         # Compute KL divergence per sample (without reduction)
         kl_divergence = F.kl_div(preds_log, truth, reduction='none')
-        per_sample_kl_div = kl_divergence.sum(dim=1)  # Sum over classes for each sample
+        per_sample_kl_div = kl_divergence.sum(dim=-1)  # Sum over classes for each sample
 
         # Apply reduction
         if self.reduction == 'mean':

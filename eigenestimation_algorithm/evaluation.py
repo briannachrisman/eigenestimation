@@ -98,7 +98,7 @@ def PrintActivatingExamplesTransformer(
     # Concatenate dH results from all minibatches
     dH = torch.cat(dH_list, dim=0)
 
-    feature_vals = einops.rearrange(dH, '(s t) f -> s t f', s=X.shape[0], t=X.shape[1])[:,:,feature_idx]
+    feature_vals = dH[:,:,feature_idx] #einops.rearrange(dH, '(s t) f -> s t f', s=X.shape[0], t=X.shape[1])[:,:,feature_idx]
     # Flatten the tensor to find the top k values globally
     flattened_tensor = feature_vals.flatten()
     
@@ -112,7 +112,7 @@ def PrintActivatingExamplesTransformer(
     # Iterate over the top values and their indices
     for (sample, token, value) in zip(top_idx_sample, top_idx_token, top_values):
         # Rearrange dH for feature extraction
-        feature_vals = einops.rearrange(dH, '(s t) f -> s t f', s=X.shape[0], t=X.shape[1])[:, :, feature_idx]
+        feature_vals = dH[:,:,feature_idx]#einops.rearrange(dH, '(s t) f -> s t f', s=X.shape[0], t=X.shape[1])[:, :, feature_idx]
 
         # Decode the entire sequence of tokens for the current sample as individual tokens
         tokens_list = eigenmodel.model.tokenizer.convert_ids_to_tokens(X[sample].tolist())

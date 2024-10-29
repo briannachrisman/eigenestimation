@@ -42,6 +42,7 @@ def TrainEigenEstimation(
 
             # Forward pass
             dH_du, u_tensor = eigenmodel(x)
+            dH_du = dH_du.flatten(0,-2)
 
             # Compute the loss components
             batch_size = dH_du.shape[0]
