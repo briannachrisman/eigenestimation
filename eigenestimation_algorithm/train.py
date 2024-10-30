@@ -11,7 +11,8 @@ def TrainEigenEstimation(
     dataloader: DataLoader,
     lr: float,
     n_epochs: int,
-    lambda_penalty: float
+    lambda_penalty: float,
+    device: str
 ) -> None:
     n_u_vectors: int = eigenmodel.n_u_vectors
 
@@ -41,7 +42,7 @@ def TrainEigenEstimation(
             optimizer.zero_grad()  # Clear gradients
 
             # Forward pass
-            dH_du, u_tensor = eigenmodel(x)
+            dH_du, u_tensor = eigenmodel(x.to(device))
             dH_du = dH_du.flatten(0,-2)
 
             # Compute the loss components

@@ -12,7 +12,8 @@ def TrainModel(
     criterion: nn.Module,
     learning_rate: float,
     dataloader: DataLoader,
-    n_epochs: int
+    n_epochs: int,
+    device:str
 ) -> Tuple[nn.Module, torch.Tensor, torch.Tensor]:
     
     
@@ -34,8 +35,8 @@ def TrainModel(
         if not done:
             for x_batch, y_batch in dataloader:
                 optimizer.zero_grad()  # Zero the gradients
-                outputs = model(x_batch)  # Forward pass
-                loss = criterion(outputs, y_batch)  # Calculate loss
+                outputs = model(x_batch.to(device))  # Forward pass
+                loss = criterion(outputs, y_batch.to(device))  # Calculate loss
                 loss.backward()  # Backward pass
                 optimizer.step()  # Update weights
 

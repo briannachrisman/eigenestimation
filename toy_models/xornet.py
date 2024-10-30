@@ -27,12 +27,12 @@ def GenerateXORData(n_repeats, batch_size):
     Y_xornet_r = einops.repeat(Y_xornet, 's f -> (s r) f', r=n_repeats)
 
     # Create a DataLoader for the XOR dataset
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    #device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     dataloader_xornet = DataLoader(
         TensorDataset(X_xornet_r, Y_xornet_r), 
         batch_size=batch_size, 
         shuffle=True,
-        generator=torch.Generator(device=device)
+        #generator=torch.Generator(device=device)
     )
 
     return X_xornet, Y_xornet, dataloader_xornet

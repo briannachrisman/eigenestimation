@@ -29,7 +29,8 @@ def GenerateTMSData(
     num_features: int, 
     num_datapoints: int, 
     sparsity: float, 
-    batch_size: int
+    batch_size: int,
+   # device: str
 ) -> Tuple[torch.Tensor, torch.Tensor, DataLoader]:
     
     # Initialize feature vectors with random values
@@ -54,7 +55,7 @@ def GenerateTMSData(
         TensorDataset(X_tms, Y_tms), 
         batch_size=batch_size, 
         shuffle=True, 
-        generator=torch.Generator(device='cuda')
+        #generator=torch.Generator(device=device)
     )
 
     return X_tms, Y_tms, dataloader_tms
