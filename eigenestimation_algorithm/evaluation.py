@@ -78,9 +78,9 @@ def PrintActivatingExamplesTransformer(
     X: torch.Tensor,
     feature_idx: int,
     top_k: int,
-    batch_size: int = 10  # Define a batch size for minibatch processing
+    batch_size: int = 32,  # Define a batch size for minibatch processing,
+    device: str = 'cuda'
 ) -> None:
-    device = X.device  # Assume the tensor is already on the appropriate device
     num_samples = X.shape[0]
     
     # Split X into minibatches
@@ -91,14 +91,13 @@ def PrintActivatingExamplesTransformer(
         X_batch = X[start:end]
 
         # Compute dH for the current minibatch
-        dH_batch, _ = eigenmodel(X_batch)
+        dH_batch = eigenmodel(X_batch.to(device), eigenmodel.u[[feature_idx]])[0]
         dH_list.append(dH_batch)
         
     
     # Concatenate dH results from all minibatches
-    dH = torch.cat(dH_list, dim=0)
+    feature_vals = torch.cat(dH_list, dim=0)
 
-    feature_vals = dH[:,:,feature_idx] #einops.rearrange(dH, '(s t) f -> s t f', s=X.shape[0], t=X.shape[1])[:,:,feature_idx]
     # Flatten the tensor to find the top k values globally
     flattened_tensor = feature_vals.flatten()
     
@@ -111,9 +110,7 @@ def PrintActivatingExamplesTransformer(
 
     # Iterate over the top values and their indices
     for (sample, token, value) in zip(top_idx_sample, top_idx_token, top_values):
-        # Rearrange dH for feature extraction
-        feature_vals = dH[:,:,feature_idx]#einops.rearrange(dH, '(s t) f -> s t f', s=X.shape[0], t=X.shape[1])[:, :, feature_idx]
-
+        #print(sample, token, value)
         # Decode the entire sequence of tokens for the current sample as individual tokens
         tokens_list = eigenmodel.model.tokenizer.convert_ids_to_tokens(X[sample].tolist())
         
@@ -128,5 +125,6 @@ def PrintActivatingExamplesTransformer(
         
         # Print the modified tokens with the bolded token and its value
         print(f"{bolded_tokens} -> {token_of_value} (Value: {value:.3f})")
+
 
 

@@ -1,112 +1,90 @@
+#@title Eigenestimation.py
+
 import torch
 import torch.nn as nn
 from torch.nn.utils import stateless
-from torch.func import jacrev, functional_call
+from torch.func import jacrev, functional_call, jvp, vmap
 import einops
 from typing import Any, Dict, List, Tuple, Callable
 import gc
+from functools import partial 
+
 class EigenEstimation(nn.Module):
-    def __init__(self, model: nn.Module, loss: Callable, n_u_vectors: int) -> None:
+    def __init__(self, model: nn.Module, loss: Callable, n_u_vectors: int, u_chunk_size=10) -> None:
         super(EigenEstimation, self).__init__()
 
         self.model: nn.Module = model
         self.loss: Callable = loss
         self.n_u_vectors: int = n_u_vectors
-        self.w0: Dict[str, nn.Parameter] = dict(model.named_parameters())
+        self.named_parameters = {name: param.detach().clone() for name, param in model.named_parameters()}
+        self.w0 = self.parameters_to_vector(self.named_parameters)
+        self.u = nn.Parameter(torch.randn((n_u_vectors, len(self.w0))).requires_grad_(True))
+        self.u_chunk_size = u_chunk_size
 
-        # Initialize u vectors as parameters
-        u_dict: Dict[str, nn.Parameter] = {
-            name: nn.Parameter(torch.stack([torch.randn_like(param) for _ in range(n_u_vectors)]))
-            for name, param in self.w0.items()
-        }
 
         # Register u vectors as parameters with modified names
-        for name, tensor in u_dict.items():
-            self.register_parameter(name.replace('.', '__'), tensor)
+        #for name, tensor in u_dict.items():
+        #    self.register_parameter(name.replace('.', '__'), tensor)
+
+    def parameters_to_vector(self, named_parameters):
+        return torch.cat([param.view(-1) for name, param in named_parameters.items()])
+
+    # Restore parameters from a vector to the dictionary format
+    def vector_to_parameters(self, vector):
+      # Create an iterator to slice vector based on parameter shapes
+      pointer = 0
+      new_params = {}
+        
+      for name, param in self.named_parameters.items():
+        numel = param.numel()  # Number of elements in this parameter
+        # Slice out `numel` elements from the vector
+        new_params[name] = vector[pointer:pointer + numel].view(param.shape)
+        pointer += numel
+      return new_params
+    
+
 
     def compute_loss(
-        self, x: torch.Tensor, parameters: Dict[str, torch.Tensor]
+        self, x: torch.Tensor, parameters: torch.Tensor
     ) -> torch.Tensor:
         # Perform a stateless functional call to the model with given parameters
-        outputs: torch.Tensor = functional_call(self.model, parameters, (x,))
+        param_dict = self.vector_to_parameters(parameters)
+        outputs: torch.Tensor = functional_call(self.model, param_dict, (x,))
         # Detach outputs to prevent gradients flowing back
         truth: torch.Tensor = outputs.detach()
-        # Compute the loss without reduction
-        return self.loss(reduction='none')(outputs, truth)
 
-    def grad_along_u(
-        self,
-        x: torch.Tensor,
-        w0: Dict[str, torch.Tensor],
-        u: Dict[str, torch.Tensor],
-    ) -> torch.Tensor:
-        # Compute the Jacobian of the loss with respect to parameters
-        grad_f: Dict[str, torch.Tensor] = jacrev(self.compute_loss, argnums=1)(x, w0)
-        # Compute the sum over the einsum operations for each parameter
-        return sum(
-            [
-                einops.einsum(
-                    grad_f[name],
-                    u[name.replace('.', '__')],
-                    '... p, k p -> ... k', # (batch),parameters x k,parameters -> (batch),k
-                )
-                for name in grad_f.keys()
-            ]
-        )
+        # CrossEntropyLoss needs to be of form (_, n_classes, ...)        
+        #outputs = einops.rearrange(outputs, '... c -> c ...').unsqueeze(0)
+        #truth = einops.rearrange(truth, '... c -> c ...').unsqueeze(0)
+
+        # Compute the loss without reduction
+        return self.loss(reduction='none')(outputs, truth)#.squeeze(0)
 
     def double_grad_along_u(
-        self, x: torch.Tensor, u: Dict[str, torch.Tensor]
+        self, x: torch.Tensor, u: torch.Tensor
     ) -> torch.Tensor:
-        # Compute the second derivative (Hessian) along u
-        jac: Dict[str, torch.Tensor] = jacrev(self.grad_along_u, argnums=1)(
-            x, self.w0, u
-        )
 
-        # Compute the dot product of the hessian-vector product and u vectors
-        return sum(
-            [
-                einops.einsum(
-                    jac[name],#.flatten(2, -1),
-                    u[name.replace('.', '__')],#.flatten(1, -1),
-                    '... k p, k p -> ... k', # (batch),k_vectors,parameters x k,parameters -> (batch),k
-                )
-                for name in jac.keys()
-            ]
-        )
+        # Compute the first derivative along u.
+        def inner_jvp(w0):
+          return jvp(
+              partial(self.compute_loss, x), (w0,), (u,)
+              )[1]
+              
+        # Compute the second derivative along u.
+        return jvp(inner_jvp, (self.w0,), (u,))[1]
 
-    def normalize_parameters(self) -> None:
-        # Concatenate all parameters into a single tensor
-        u_tensor: torch.Tensor = self.params_to_vectors(self._parameters)
-        norms: torch.Tensor = u_tensor.norm(dim=1, keepdim=True)  # Norms per batch
+    def vmap_double_grad_along_u(self, x, us):
+      return vmap(self.double_grad_along_u, in_dims=(None, 0), out_dims=0, chunk_size=self.u_chunk_size)(x, us)
 
-        with torch.no_grad():
-            for name, param in self.named_parameters():
-                if 'model' not in name:
-                    # Reshape norms to match the dimensions of param (excluding batch dimension)
-                    param_shape = param.shape[1:]
-                    norms_reshaped: torch.Tensor = norms.view(
-                        -1, *([1] * len(param_shape))
-                    )
-                    # Normalize parameters in-place
-                    param.div_(norms_reshaped)
+    def normalize_parameters(self, eps=1e-6) -> None:
+      # Concatenate all parameters into a single tensor
+      with torch.no_grad():
+        self.u.div_(eps+self.u.norm(keepdim=True, dim=1).detach())
 
-    def params_to_vectors(
-        self, params: Dict[str, torch.Tensor]
-    ) -> torch.Tensor:
-        # Flatten and concatenate all parameters into a single tensor
-        return torch.cat(
-            [param.view(param.size(0), -1) for param in params.values()], dim=1
-        )
 
-    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
-        # Optionally normalize parameters
-        # self.normalize_parameters()
-
-        # Convert u parameters to a single tensor
-        u_tensor: torch.Tensor = self.params_to_vectors(self._parameters)
-
+    def forward(self, x: torch.Tensor, parameters) -> Tuple[torch.Tensor, torch.Tensor]:
         # Compute the double gradient along u
-        dH_du: torch.Tensor = self.double_grad_along_u(x, self._parameters)
+        dH_du: torch.Tensor = self.vmap_double_grad_along_u(x, parameters)
 
-        return dH_du, u_tensor
+        return dH_du
         

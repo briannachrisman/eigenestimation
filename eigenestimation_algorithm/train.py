@@ -8,86 +8,85 @@ import gc
 
 def TrainEigenEstimation(
     eigenmodel: nn.Module,
-    dataloader: DataLoader,
+    x_dataloader: DataLoader,
     lr: float,
     n_epochs: int,
     lambda_penalty: float,
-    device: str
+    u_batch_size = 20,
+    device: str = 'cuda'
 ) -> None:
-    n_u_vectors: int = eigenmodel.n_u_vectors
 
+  
+    u_dataloader = DataLoader(eigenmodel.u, batch_size=u_batch_size, shuffle=True)
     # Create a lower triangular mask for loss computation
     lower_triangular_mask: torch.Tensor = torch.tril(
-        torch.ones(n_u_vectors, n_u_vectors, dtype=torch.bool), diagonal=-1
-    )
+        torch.ones(eigenmodel.n_u_vectors, eigenmodel.n_u_vectors, dtype=torch.bool), diagonal=-1
+    ).to(device)
 
     # Collect parameters to optimize (excluding the model's own parameters)
-    params_to_optimize = [
-        param for name, param in eigenmodel.named_parameters() if "model" not in name
-    ]
+    params_to_optimize = [eigenmodel.u]
+    #    param for name, param in eigenmodel.named_parameters() if name=='u'
+    #]
 
     optimizer: Optimizer = torch.optim.SGD(params_to_optimize, lr=lr)
 
     for epoch in range(n_epochs):
-        basis_losses: float = 0.0
-        high_H_losses: float = 0.0
-        total_losses: float = 0.0
-        n_batches: int = 0
+      basis_losses: float = 0.0
+      high_H_losses: float = 0.0
+      total_losses: float = 0.0
+      n_batches: int = 0
+        
+      for x in x_dataloader:
+        dH_du_list = []
+        u_list = []
+        n_batches += 1
+        for u in u_dataloader:
+          # Normalize parameters at the start of each batch
+          eigenmodel.normalize_parameters()
 
-        for x in dataloader:
-            # Normalize parameters at the start of each batch
-            eigenmodel.normalize_parameters()
+          optimizer.zero_grad()  # Clear gradients
 
-            n_batches += 1
-            optimizer.zero_grad()  # Clear gradients
+          # Forward pass
+          dH_du = eigenmodel(x.to(device), u.to(device))
+            
+          high_H_loss = -1*(dH_du**2).mean()*u.shape[0]/eigenmodel.u.shape[0]#/x.numel()
+      
+      
+          high_H_loss.backward() # Step backward
+          dH_du_list.append(dH_du.detach())
+          u_list.append(u)
+      
 
-            # Forward pass
-            dH_du, u_tensor = eigenmodel(x.to(device))
-            dH_du = dH_du.flatten(0,-2)
+          high_H_losses = high_H_losses + high_H_loss.detach()
+          
+        optimizer.step()
+        optimizer.zero_grad()
+        eigenmodel.normalize_parameters()
+      
+        dH_du_tensor = torch.concat(dH_du_list, dim=0)
+        u_tensor = torch.concat(u_list, dim=0)
+        cosine_sims = u_tensor @ u_tensor.transpose(0,1)
+        prod = einops.einsum(dH_du_tensor, dH_du_tensor, 'k1 ... , k2 ...->... k1 k2')
+        prod_cosin_sims = einops.einsum(prod, cosine_sims, '... k1 k2, k1 k2 ->... k1 k2')
+        #pk = prod_cosin_sims[:,:,lower_triangular_mask]
 
-            # Compute the loss components
-            batch_size = dH_du.shape[0]
-            mask = einops.repeat(
-                lower_triangular_mask, 'k1 k2 -> batch k1 k2', batch=batch_size
-            )
+        # Apply the mask to the last 2 dimensions of prod_cosin_sims
+        basis_loss = lambda_penalty *  prod_cosin_sims[:,:,lower_triangular_mask].norm()/x.numel()
+      
+  
+        basis_loss.backward()
+        optimizer.step()
+        basis_losses = basis_losses + basis_loss.detach()
+        optimizer.zero_grad()
+        eigenmodel.normalize_parameters()
 
-            # Compute cosine similarities between u vectors
-            cosine_sims = u_tensor @ u_tensor.transpose(0, 1)  # Shape: [batch_size, k, k]
-
-            # Compute magnitude products of dH_du
-            mag_products = einops.einsum(
-                dH_du, dH_du, 'batch k1, batch k2 -> batch k1 k2'
-            )
-
-            # Combine cosine similarities and magnitude products
-            cosine_sims_mag = einops.einsum(
-                cosine_sims, mag_products, 'k1 k2, batch k1 k2 -> batch k1 k2'
-            )
-
-            # Compute basis loss and high Hessian loss
-            basis_loss = torch.abs(cosine_sims_mag[mask]).mean()
-            high_H_loss = -(dH_du ** 2).mean()
-
-            # Total loss
-            L = high_H_loss + lambda_penalty * basis_loss
-
-            # Accumulate losses
-            basis_losses += basis_loss.item()
-            high_H_losses += high_H_loss.item()
-            total_losses += L.item()
-
-            # Backpropagation and optimization step
-            L.backward()
-            optimizer.step()
-            optimizer.zero_grad()
-
-        # Logging progress every 10% of total epochs
-        if epoch % max(1, round(n_epochs / 10)) == 0:
-            avg_total_loss = total_losses / n_batches
-            avg_high_H_loss = high_H_losses / n_batches
-            avg_basis_loss = basis_losses / n_batches
-            print(
-                f'Epoch {epoch} - Total Loss: {avg_total_loss:.3f}, '
-                f'High Hessian Loss: {avg_high_H_loss:.3f},  '
-                f'Basis Loss: {avg_basis_loss:.3f}'
-            )
+      # Logging progress every 1% of total epochs
+      if epoch % max(1, round(n_epochs / 100)) == 0:
+        avg_total_loss = (high_H_losses + basis_losses) / n_batches
+        avg_high_H_loss = high_H_losses / n_batches
+        avg_basis_loss = basis_losses / n_batches
+        print(
+            f'Epoch {epoch} : {avg_total_loss:.3f},  '
+            f'High Hessian Loss: {avg_high_H_loss:.3f},  '
+            f'Basis Loss: {avg_basis_loss:.3f}'
+              )
