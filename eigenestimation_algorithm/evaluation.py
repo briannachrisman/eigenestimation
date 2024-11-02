@@ -1,10 +1,11 @@
 import einops
 import torch
+from torch.utils.data import DataLoader
 from typing import Tuple, List
-
+import gc
 def PrintFeatureVals(X: torch.Tensor, eigenmodel: torch.nn.Module) -> None:
     # Compute dH_du and u_tensor from the model
-    dH_du, _ = eigenmodel(X)
+    dH_du, _ = eigenmodel(X).detach()
     
     # Print rounded values of the input features and corresponding outputs
     for x, h in zip(X.detach().cpu().numpy().round(2), dH_du.detach().cpu().numpy().round(2)):
@@ -85,16 +86,17 @@ def PrintActivatingExamplesTransformer(
     
     # Split X into minibatches
     dH_list: List[torch.Tensor] = []
-    
-    for start in range(0, num_samples, batch_size):
-        end = min(start + batch_size, num_samples)
-        X_batch = X[start:end]
+    dataloader_X = DataLoader(X, shuffle=False, batch_size=batch_size)
+    with torch.no_grad():
+        for X_batch in dataloader_X:
+            
+            # Compute dH for the current minibatch
+            dH_batch = eigenmodel(X_batch.to(device), eigenmodel.u[[feature_idx]])[0].detach()
+            dH_list.append(dH_batch)
 
-        # Compute dH for the current minibatch
-        dH_batch = eigenmodel(X_batch.to(device), eigenmodel.u[[feature_idx]])[0]
-        dH_list.append(dH_batch)
+            torch.cuda.empty_cache()
+            gc.collect()
         
-    
     # Concatenate dH results from all minibatches
     feature_vals = torch.cat(dH_list, dim=0)
 
@@ -119,9 +121,10 @@ def PrintActivatingExamplesTransformer(
         
         # Join the tokens back together for displaying
         bolded_tokens = eigenmodel.model.tokenizer.convert_tokens_to_string(tokens_list)
+        bolded_tokens = bolded_tokens.replace("\n", "newline")
 
         # Decode the specific token with the highest value
-        token_of_value = eigenmodel.model.tokenizer.decode(X[sample, token])
+        token_of_value = eigenmodel.model.tokenizer.decode(X[sample, token]).replace("\n", "newline")
         
         # Print the modified tokens with the bolded token and its value
         print(f"{bolded_tokens} -> {token_of_value} (Value: {value:.3f})")

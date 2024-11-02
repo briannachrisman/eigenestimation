@@ -28,7 +28,7 @@ def TrainEigenEstimation(
     #    param for name, param in eigenmodel.named_parameters() if name=='u'
     #]
 
-    optimizer: Optimizer = torch.optim.SGD(params_to_optimize, lr=lr)
+    optimizer: Optimizer = torch.optim.Adam(params_to_optimize, lr=lr)
 
     for epoch in range(n_epochs):
       basis_losses: float = 0.0
@@ -47,7 +47,7 @@ def TrainEigenEstimation(
           optimizer.zero_grad()  # Clear gradients
 
           # Forward pass
-          dH_du = eigenmodel(x.to(device), u.to(device))
+          dH_du = eigenmodel(x.to(device), u)
             
           high_H_loss = -1*(dH_du**2).mean()*u.shape[0]/eigenmodel.u.shape[0]#/x.numel()
       
@@ -79,7 +79,8 @@ def TrainEigenEstimation(
         basis_losses = basis_losses + basis_loss.detach()
         optimizer.zero_grad()
         eigenmodel.normalize_parameters()
-
+        torch.cuda.empty_cache()
+        gc.collect()
       # Logging progress every 1% of total epochs
       if epoch % max(1, round(n_epochs / 100)) == 0:
         avg_total_loss = (high_H_losses + basis_losses) / n_batches

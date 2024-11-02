@@ -12,7 +12,7 @@ class TransformerWrapper(nn.Module):
 
     def forward(self, tokenized_X: torch.Tensor) -> torch.Tensor:
         # Generate model outputs
-        logits: torch.Tensor = self.transformer(tokenized_X).last_hidden_state
+        logits: torch.Tensor = self.transformer(tokenized_X)
         # Rearrange the output to a flat batch of logits
         probs = logits.softmax(dim=-1)
         return probs #einops.rearrange(probs, 'batch tokens logits -> (batch tokens) logits')
@@ -58,11 +58,19 @@ class KLDivergenceLoss(nn.Module):
             torch.Tensor: The computed KL Divergence Loss.
         """
         # Convert preds to log-probabilities
-        preds_log = torch.log_softmax(preds, dim=-1)
+        preds_log = torch.log(preds)
+        truth_log = torch.log(truth)
 
         # Compute KL divergence per sample (without reduction)
+        kl_divergence0 = F.kl_div(truth_log, truth, reduction='none')
+        per_sample_kl_div0 = kl_divergence0.sum(dim=-1)  # Sum over classes for each sample
+
         kl_divergence = F.kl_div(preds_log, truth, reduction='none')
-        per_sample_kl_div = kl_divergence.sum(dim=-1)  # Sum over classes for each sample
+        per_sample_kl_div = kl_divergence.sum(dim=-1) - per_sample_kl_div0  # Sum over classes for each sample
+        
+
+        per_sample_kl_div = per_sample_kl_div - per_sample_kl_div0
+
 
         # Apply reduction
         if self.reduction == 'mean':

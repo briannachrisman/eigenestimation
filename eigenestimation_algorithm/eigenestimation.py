@@ -51,7 +51,8 @@ class EigenEstimation(nn.Module):
         param_dict = self.vector_to_parameters(parameters)
         outputs: torch.Tensor = functional_call(self.model, param_dict, (x,))
         # Detach outputs to prevent gradients flowing back
-        truth: torch.Tensor = outputs.detach()
+        with torch.no_grad():
+            truth: torch.Tensor = self.model(x,)
 
         # CrossEntropyLoss needs to be of form (_, n_classes, ...)        
         #outputs = einops.rearrange(outputs, '... c -> c ...').unsqueeze(0)
