@@ -3,26 +3,26 @@ import torch
 from torch.utils.data import DataLoader
 from typing import Tuple, List
 import gc
-def PrintFeatureVals(X: torch.Tensor, eigenmodel: torch.nn.Module) -> None:
+def PrintFeatureVals(X: torch.Tensor, eigenmodel: torch.nn.Module, device='cuda') -> None:
     # Compute dH_du and u_tensor from the model
-    dH_du, _ = eigenmodel(X).detach()
+    dH_du = eigenmodel(X.to(device), eigenmodel.u.to(device)).detach()
     
     # Print rounded values of the input features and corresponding outputs
-    for x, h in zip(X.detach().cpu().numpy().round(2), dH_du.detach().cpu().numpy().round(2)):
-        print(x, '-->', h)
+    for x, h in zip(X.detach().cpu().numpy().round(2), dH_du.transpose(0,1).detach().cpu().numpy().round(2)):
+        print(x, '-->\n', h)
 
 def ActivatingExamples(
     X: torch.Tensor,
     eigenmodel: torch.nn.Module,
     idx: int,
     k: int,
-    ascending: bool = False
+    ascending: bool = False, device='cuda'
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     # Compute dH_du from the model
-    dH_du, _ = eigenmodel(X)
+    dH_du = eigenmodel(X.to(device), eigenmodel.u.to(device)).detach()
     
     # Select the specific index and convert to numpy
-    dH_du_idx: torch.Tensor = dH_du[:, idx].detach().cpu().numpy()
+    dH_du_idx: torch.Tensor = dH_du[idx,:].detach().cpu().numpy().flatten()
     
     # Sort indices based on values (ascending or descending)
     argidx = dH_du_idx.argsort()
@@ -94,8 +94,8 @@ def PrintActivatingExamplesTransformer(
             dH_batch = eigenmodel(X_batch.to(device), eigenmodel.u[[feature_idx]])[0].detach()
             dH_list.append(dH_batch)
 
-            torch.cuda.empty_cache()
-            gc.collect()
+            #torch.cuda.empty_cache()
+            #gc.collect()
         
     # Concatenate dH results from all minibatches
     feature_vals = torch.cat(dH_list, dim=0)

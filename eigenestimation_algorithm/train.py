@@ -59,9 +59,9 @@ def TrainEigenEstimation(
 
           high_H_losses = high_H_losses + high_H_loss.detach()
           
-        optimizer.step()
-        optimizer.zero_grad()
-        eigenmodel.normalize_parameters()
+        #optimizer.step()
+        #optimizer.zero_grad()
+        #eigenmodel.normalize_parameters()
       
         dH_du_tensor = torch.concat(dH_du_list, dim=0)
         u_tensor = torch.concat(u_list, dim=0)

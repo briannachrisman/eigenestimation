@@ -59,7 +59,7 @@ class EigenEstimation(nn.Module):
         #truth = einops.rearrange(truth, '... c -> c ...').unsqueeze(0)
 
         # Compute the loss without reduction
-        return self.loss(reduction='none')(outputs, truth)#.squeeze(0)
+        return self.loss(outputs, truth)#.squeeze(0)
 
     def double_grad_along_u(
         self, x: torch.Tensor, u: torch.Tensor
