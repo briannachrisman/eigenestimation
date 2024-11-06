@@ -17,7 +17,6 @@ def TrainEigenEstimation(
 ) -> None:
 
   
-    u_dataloader = DataLoader(eigenmodel.u, batch_size=u_batch_size, shuffle=True)
     # Create a lower triangular mask for loss computation
     lower_triangular_mask: torch.Tensor = torch.tril(
         torch.ones(eigenmodel.n_u_vectors, eigenmodel.n_u_vectors, dtype=torch.bool), diagonal=-1
@@ -30,21 +29,23 @@ def TrainEigenEstimation(
 
     optimizer: Optimizer = torch.optim.Adam(params_to_optimize, lr=lr)
 
+    eigenmodel.normalize_parameters()
+
     for epoch in range(n_epochs):
       basis_losses: float = 0.0
       high_H_losses: float = 0.0
       total_losses: float = 0.0
       n_batches: int = 0
-        
+      u_dataloader = DataLoader(eigenmodel.u, batch_size=u_batch_size, shuffle=False)
+
+
       for x in x_dataloader:
         dH_du_list = []
         u_list = []
         n_batches += 1
-        for u in u_dataloader:
-          # Normalize parameters at the start of each batch
-          eigenmodel.normalize_parameters()
 
-          optimizer.zero_grad()  # Clear gradients
+        for u in u_dataloader:
+
 
           # Forward pass
           dH_du = eigenmodel(x.to(device), u)
@@ -53,15 +54,24 @@ def TrainEigenEstimation(
       
       
           high_H_loss.backward() # Step backward
+
+
           dH_du_list.append(dH_du.detach())
           u_list.append(u)
-      
+ 
 
           high_H_losses = high_H_losses + high_H_loss.detach()
-          
-        #optimizer.step()
-        #optimizer.zero_grad()
+
+
+        # Normalize parameters at the start of each batch
         #eigenmodel.normalize_parameters()
+
+        #optimizer.zero_grad()  # Clear gradients
+        
+        optimizer.step()
+        optimizer.zero_grad()
+        
+        eigenmodel.normalize_parameters()
       
         dH_du_tensor = torch.concat(dH_du_list, dim=0)
         u_tensor = torch.concat(u_list, dim=0)
@@ -74,7 +84,8 @@ def TrainEigenEstimation(
         basis_loss = lambda_penalty *  prod_cosin_sims[:,:,lower_triangular_mask].norm()/x.numel()
       
   
-        basis_loss.backward()
+        (basis_loss).backward()
+        
         optimizer.step()
         basis_losses = basis_losses + basis_loss.detach()
         optimizer.zero_grad()

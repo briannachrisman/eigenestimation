@@ -10,17 +10,20 @@ class Autoencoder(nn.Module):
         super(Autoencoder, self).__init__()
 
         # Define parameters for the autoencoder
-        self.W: nn.Parameter = nn.Parameter(torch.randn(hidden_dim, input_dim))
+        self.W_in: nn.Parameter = nn.Parameter(torch.randn(input_dim, hidden_dim))
+        #self.W_out: nn.Parameter = nn.Parameter(torch.randn(hidden_dim, input_dim))
+
         self.b: nn.Parameter = nn.Parameter(torch.zeros(input_dim))
 
         # Initialize W with Xavier normal
-        nn.init.xavier_normal_(self.W)
+        nn.init.xavier_normal_(self.W_in)
+        #nn.init.xavier_normal_(self.W_out)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         # Encoding step
-        h: torch.Tensor = einops.einsum(self.W, x, 'k f, b f -> b k')
+        h: torch.Tensor = einops.einsum(self.W_in, x, 'f h, b f -> b h')
         # Decoding step
-        x_hat: torch.Tensor = einops.einsum(self.W, h, 'k f, b k -> b f')
+        x_hat: torch.Tensor = einops.einsum(self.W_in, h, 'f h, b h -> b f')
         # Add bias and apply ReLU activation
         x_hat = x_hat + self.b
         return torch.relu(x_hat)

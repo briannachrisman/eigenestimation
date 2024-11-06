@@ -49,7 +49,7 @@ We wish to learn a set of u-vectors ($U$) that satisfy these conditions. We will
 To satisfy the first goal we minimize:
 
 $
-L_{\text{low interference}}(x) = \sum_{u}(\nabla^{2}_{u} D(f, x, W_0))^2
+L_{\text{steep hessian}}(x) = \sum_{u}(\nabla^{2}_{u} D(f, x, W_0))^2
 $
 
 To satisfy the second goal, we also want to minimize:
@@ -115,7 +115,7 @@ We train a TMS (autoencoder 5 features, 2 hidden dimensions, Relu activation, wi
 
 ### Transformers
 
-
+We use the tiny-stories-1M transformer.
 
 ## Results
 
