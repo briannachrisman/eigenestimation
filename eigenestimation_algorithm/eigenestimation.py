@@ -3,7 +3,7 @@
 import torch
 import torch.nn as nn
 from torch.nn.utils import stateless
-from torch.func import jacrev, functional_call, jvp, vmap
+from torch.func import jacrev, functional_call, jvp, vmap, jacrev
 import einops
 from typing import Any, Dict, List, Tuple, Callable
 import gc
@@ -65,6 +65,7 @@ class EigenEstimation(nn.Module):
         self, x: torch.Tensor, u: torch.Tensor
     ) -> torch.Tensor:
 
+        #return vmap(test, in_dims=(None, 0), out_dims=0, chunk_size=20)(X_transformer[:32], eigenmodel_transformer.u[:100])
         # Compute the first derivative along u.
         def inner_jvp(w0):
           return jvp(
@@ -72,9 +73,14 @@ class EigenEstimation(nn.Module):
               )[1]
               
         # Compute the second derivative along u.
-        return jvp(inner_jvp, (self.w0,), (u,))[1]
+        return inner_jvp(self.w0)#jvp(inner_jvp, (self.w0,), (u,))[1]
 
     def vmap_double_grad_along_u(self, x, us):
+      #jr = jacrev(self.compute_loss, argnums=1)(x, self.w0)
+      #print(jr)
+      #return einops.einsum(jr, us, '... w, v w -> v ...')
+      #return jvp(partial(self.compute_loss, x), (eigenmodel_transformer.w0,), (us,))[1]
+
       return vmap(self.double_grad_along_u, in_dims=(None, 0), out_dims=0, chunk_size=self.u_chunk_size)(x, us)
 
     def normalize_parameters(self, eps=1e-6) -> None:

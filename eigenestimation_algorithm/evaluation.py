@@ -80,32 +80,46 @@ def PrintActivatingExamplesTransformer(
     feature_idx: int,
     top_k: int,
     batch_size: int = 32,  # Define a batch size for minibatch processing,
-    device: str = 'cuda'
+    device: str = 'cuda', 
+    k_logits: int = 5
 ) -> None:
     num_samples = X.shape[0]
     
     # Split X into minibatches
     dH_list: List[torch.Tensor] = []
+    bottom_logits_list = []
+    top_logits_list = []
+
     dataloader_X = DataLoader(X, shuffle=False, batch_size=batch_size)
     with torch.no_grad():
         for X_batch in dataloader_X:
             
             # Compute dH for the current minibatch
-            dH_batch = eigenmodel(X_batch.to(device), eigenmodel.u[[feature_idx]])[0].detach()
-            dH_list.append(dH_batch)
+            dP_batch = eigenmodel(X_batch.to(device), eigenmodel.u[[feature_idx]])[0].detach()
+            FIM_diag =  einops.einsum(dP_batch, dP_batch, '... c, ... c -> ...')
+            dH_list.append(FIM_diag)
 
+
+            #dP_batch = eigenmodel_transformer(X_transformer[:4].to(device), eigenmodel_transformer.u[[1]])[0].detach()
+            top_idx = torch.topk(dP_batch, k_logits, dim=-1, largest=True, sorted=True).indices
+            bottom_idx = torch.topk(dP_batch, k_logits, dim=-1, largest=False, sorted=True).indices
+            top_logits_list.append(top_idx)
+            bottom_logits_list.append(bottom_idx)
+
+        
             #torch.cuda.empty_cache()
             #gc.collect()
         
     # Concatenate dH results from all minibatches
     feature_vals = torch.cat(dH_list, dim=0)
+    top_logits_idx = torch.cat(top_logits_list, dim=0)
+    bottom_logits_idx = torch.cat(bottom_logits_list, dim=0)
 
     # Flatten the tensor to find the top k values globally
     flattened_tensor = feature_vals.flatten()
     
     # Find the top 5 highest values and their indices in the flattened tensor
     top_values, top_idx = torch.topk(flattened_tensor, top_k)
-
     # Convert the flattened indices back to the original 3D indices
     top_idx_sample, top_idx_token = torch.unravel_index(top_idx, feature_vals.shape)
 
@@ -126,8 +140,10 @@ def PrintActivatingExamplesTransformer(
         # Decode the specific token with the highest value
         token_of_value = eigenmodel.model.tokenizer.decode(X[sample, token]).replace("\n", "newline")
         
+        top_logits =  [eigenmodel.model.tokenizer.decode(i) for i in (top_logits_idx[sample,token,:])]
+        bottom_logits =  [eigenmodel.model.tokenizer.decode(i) for i in (bottom_logits_idx[sample,token,:])]
+
+
         # Print the modified tokens with the bolded token and its value
-        print(f"{bolded_tokens} -> {token_of_value} (Value: {value:.3f})")
-
-
+        print(f"{bolded_tokens} -> {token_of_value} (Value: {value:.3f}), top: {top_logits}, bottom: {bottom_logits}")
 
