@@ -17,10 +17,7 @@ def TrainEigenEstimation(
 ) -> None:
 
   
-    # Create a lower triangular mask for loss computation
-    lower_triangular_mask: torch.Tensor = torch.tril(
-        torch.ones(eigenmodel.n_u_vectors, eigenmodel.n_u_vectors, dtype=torch.bool), diagonal=-1
-    ).to(device)
+
 
     # Collect parameters to optimize (excluding the model's own parameters)
     params_to_optimize = [eigenmodel.u]
@@ -36,23 +33,32 @@ def TrainEigenEstimation(
       high_H_losses: float = 0.0
       total_losses: float = 0.0
       n_batches: int = 0
-      #u_dataloader = DataLoader(eigenmodel.u, batch_size=u_batch_size, shuffle=False)
       #idx_dataloader = DataLoader(torch.arange(len(eigenmodel.u)), batch_size=u_batch_size, shuffle=True)
 
 
       for x in x_dataloader:
-        #for idx in idx_dataloader:
+        n_batches += 1
+
+        u_dataloader = DataLoader(eigenmodel.u, batch_size=u_batch_size, shuffle=True)
+        for u in u_dataloader:
+
+          # Create a lower triangular mask for loss computation
+          lower_triangular_mask: torch.Tensor = torch.tril(
+              torch.ones(u.shape[0],u.shape[0], dtype=torch.bool), diagonal=-1
+          ).to(device)
           dH_du_list = []
           u_list = []
-          n_batches += 1
 
-          dP_du = eigenmodel(x.to(device), eigenmodel.u)
+          dP_du, FIM_diag= eigenmodel(x.to(device), u) # n_classes n_u
 
-          FIM_diag = einops.einsum(dP_du, dP_du, 'v ... c, v ... c -> v ...') #/  dP_du.shape[-1]
+          #FIM_diag = einops.einsum(dP_du, dP_du, 'v ... c, v ... c -> v ...') #/  dP_du.shape[-1]
+          #print(FIM_diag.shape, dP_du.shape)
           FIM2_loss = -(FIM_diag**2).mean()
           FIM2_flat = einops.rearrange(FIM_diag, 'v n ... -> v (n ...)')
-          u_cosine_samples = abs(einops.einsum(FIM2_flat, FIM2_flat, 'v1 n,v2 n->v1 v2'))/FIM2_flat.shape[-1]
-          FIM_cosine_sim_loss = u_cosine_samples[lower_triangular_mask].mean()
+          u_cosine_samples_prev = (einops.einsum(FIM2_flat, WFIM2_flat, 'v1 n,v2 n->v1 v2'))/FIM2_flat.shape[-1]
+          u_cosine_samples_angle =  abs(einops.einsum(u, u, 'v1 w,v2 w->v1 v2')).sqrt()#/FIM2_flat.shape[-1]
+
+          FIM_cosine_sim_loss = abs(u_cosine_samples_prev*u_cosine_samples_angle)[lower_triangular_mask].mean()
           
           #dP_du = eigenmodel_transformer(X_transformer[:4,:16].to(device), eigenmodel_transformer.u)
           #lower_triangular_mask: torch.Tensor = torch.tril(
@@ -107,8 +113,9 @@ def TrainEigenEstimation(
           high_H_losses = high_H_losses + FIM2_loss.detach()
           basis_losses = basis_losses + FIM_cosine_sim_loss.detach()         
           
-          torch.cuda.empty_cache()
-          gc.collect()
+          #torch.cuda.empty_cache()
+          #gc.collect()
+          break
       # Logging progress every 1% of total epochs
       if epoch % max(1, round(n_epochs / 100)) == 0:
         avg_total_loss = (high_H_losses + basis_losses) / n_batches

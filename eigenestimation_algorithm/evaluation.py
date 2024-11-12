@@ -5,7 +5,7 @@ from typing import Tuple, List
 import gc
 def PrintFeatureVals(X: torch.Tensor, eigenmodel: torch.nn.Module, device='cuda') -> None:
     # Compute dH_du and u_tensor from the model
-    dH_du = eigenmodel(X.to(device), eigenmodel.u.to(device)).detach()
+    _, dH_du = eigenmodel(X.to(device), eigenmodel.u.to(device))    
     
     # Print rounded values of the input features and corresponding outputs
     for x, h in zip(X.detach().cpu().numpy().round(2), dH_du.transpose(0,1).detach().cpu().numpy().round(2)):
@@ -19,7 +19,7 @@ def ActivatingExamples(
     ascending: bool = False, device='cuda'
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     # Compute dH_du from the model
-    dH_du = eigenmodel(X.to(device), eigenmodel.u.to(device)).detach()
+    _, dH_du = eigenmodel(X.to(device), eigenmodel.u.to(device))
     
     # Select the specific index and convert to numpy
     dH_du_idx: torch.Tensor = dH_du[idx,:].detach().cpu().numpy().flatten()

@@ -93,5 +93,5 @@ class EigenEstimation(nn.Module):
         # Compute the double gradient along u
         dH_du: torch.Tensor = self.vmap_double_grad_along_u(x, parameters)
 
-        return dH_du
+        return dH_du, einops.einsum(dH_du, dH_du, 'v ... c, v ... c -> v ...')
         
