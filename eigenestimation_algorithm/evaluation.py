@@ -3,6 +3,9 @@ import torch
 from torch.utils.data import DataLoader
 from typing import Tuple, List
 import gc
+import numpy 
+import matplotlib.pyplot as plt
+
 def PrintFeatureVals(X: torch.Tensor, eigenmodel: torch.nn.Module, device='cuda') -> None:
     # Compute dH_du and u_tensor from the model
     _, dH_du = eigenmodel(X.to(device), eigenmodel.u.to(device))    
@@ -34,13 +37,6 @@ def ActivatingExamples(
     top_k_values = dH_du_idx[argidx[:k]]
 
     return top_k_examples, top_k_values
-
-
-
-
-import torch
-import einops
-from typing import List
 
 def PrintFeatureValsTransformer(
     eigenmodel: torch.nn.Module,
@@ -147,3 +143,58 @@ def PrintActivatingExamplesTransformer(
         # Print the modified tokens with the bolded token and its value
         print(f"{bolded_tokens} -> {token_of_value} (Value: {value:.3f}), top: {top_logits}, bottom: {bottom_logits}")
 
+
+
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+def DrawNeuralNetwork(weights_dict):
+    """
+    Draw a neural network diagram based on a dictionary of weights.
+    
+    Args:
+        weights_dict (dict): Dictionary where keys are layer names and values are weight matrices (tensors).
+                             Each weight matrix should have dimensions (output_size, input_size).
+    """
+    # Get layer names and sizes based on the weight matrices
+    layer_names = list(weights_dict.keys())
+    input_size = weights_dict[layer_names[0]].shape[1]
+    layer_sizes = [input_size] + [weights_dict[layer].shape[0] for layer in layer_names]
+    
+    # Define x-coordinates for each layer
+    layer_x = np.linspace(1, len(layer_sizes), len(layer_sizes))
+    
+    # Define y-coordinates for each layer's nodes, spacing them vertically
+    layer_y = {f'layer_{i}': np.linspace(0.1, 0.9, layer_sizes[i]) for i in range(len(layer_sizes))}
+    
+    # Create figure
+    fig, ax = plt.subplots(figsize=(5, 4))
+    ax.axis('off')  # Turn off the axis
+    
+    # Draw the nodes for each layer
+    def draw_layer_nodes(layer_x, layer_y, label):
+        for y in layer_y:
+            ax.plot(layer_x, y, 'o', markersize=12, color='skyblue')
+        ax.text(layer_x, 1.0, label, ha='center', fontsize=12, color='black')
+
+    # Draw connections (edges) between nodes based on weights
+    def draw_connections(layer_x1, layer_y1, layer_x2, layer_y2, weights):
+        for i, y1 in enumerate(layer_y1):
+            for j, y2 in enumerate(layer_y2):
+                weight = weights[j, i]
+                color = 'green' if weight > 0 else 'red'
+                linewidth =  5 * abs(weight)  # Scale line width by weight magnitude
+                ax.plot([layer_x1, layer_x2], [y1, y2], color=color, linewidth=linewidth)
+    
+    # Draw layers and connections iteratively
+    for i, (layer_name, weights) in enumerate(weights_dict.items()):
+        # Draw the nodes for the current layer
+        if i == 0:
+            draw_layer_nodes(layer_x[0], layer_y[f'layer_{i}'], 'Input')
+        draw_layer_nodes(layer_x[i + 1], layer_y[f'layer_{i + 1}'], layer_name)
+        
+        # Draw connections from the previous layer to the current layer
+        draw_connections(layer_x[i], layer_y[f'layer_{i}'], layer_x[i + 1], layer_y[f'layer_{i + 1}'], weights.cpu().detach().numpy())
+    
+    plt.show()
