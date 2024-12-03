@@ -117,7 +117,7 @@ class EigenEstimationComparison(nn.Module):
         self.u = nn.Parameter(torch.randn(n_u_vectors, self.n_params).requires_grad_(True))
         
     def params_to_vectors(self, param_dict):
-        return torch.cat([param.flatten(-2,-1) for name, param in  param_dict.items()])
+        return torch.cat([param.flatten(-len(self.param_dict[name].shape),-1) for name, param in  param_dict.items()], dim=-1)
         
     # Restore parameters from a vector to the dictionary format
     def vector_to_parameters(self, vector):
@@ -143,7 +143,7 @@ class EigenEstimationComparison(nn.Module):
        
         # Detach outputs to prevent gradients flowing back
         with torch.no_grad():
-            truth: torch.Tensor = self.model0(x)
+            truth: torch.Tensor = self.model(x)
 
         # CrossEntropyLoss needs to be of form (_, n_classes, ...)        
         #outputs = einops.rearrange(outputs, '... c -> c ...').unsqueeze(0)
@@ -159,11 +159,7 @@ class EigenEstimationComparison(nn.Module):
       with torch.no_grad():
         self.u.div_(eps+self.u.norm(keepdim=True, dim=1).detach())
 
-
-    def forward(self, x: torch.Tensor, param_dict) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, x: torch.Tensor, jacobian: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         # Compute the double gradient along u
-        
-        partial_func = partial(self.compute_loss, x)
-        j = self.params_to_vectors(jacrev(partial_func)(param_dict))
-        j_u = einops.einsum(j, self.u, '... w, v w -> v ...')
-        return j_u, 0#, einops.einsum(j_u, j_u, 'v1 ..., v2 ...  -> v1 v2 ...')
+        j_u = einops.einsum(jacobian, self.u, '... w, v w -> v ...')
+        return j_u #, einops.einsum(j_u, j_u, 'v1 ..., v2 ...  -> v1 v2 ...')

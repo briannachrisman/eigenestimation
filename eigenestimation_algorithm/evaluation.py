@@ -5,6 +5,8 @@ from typing import Tuple, List
 import gc
 import numpy 
 import matplotlib.pyplot as plt
+from torch.func import jvp
+from functools import partial 
 
 def PrintFeatureVals(X: torch.Tensor, eigenmodel: torch.nn.Module, device='cuda') -> None:
     # Compute dH_du and u_tensor from the model
@@ -82,66 +84,71 @@ def PrintActivatingExamplesTransformer(
     num_samples = X.shape[0]
     
     # Split X into minibatches
-    dH_list: List[torch.Tensor] = []
+    dH_list = []
     bottom_logits_list = []
     top_logits_list = []
 
     dataloader_X = DataLoader(X, shuffle=False, batch_size=batch_size)
     with torch.no_grad():
         for X_batch in dataloader_X:
-            
-            # Compute dH for the current minibatch
-            dP_batch = eigenmodel(X_batch.to(device), eigenmodel.u[[feature_idx]])[0].detach()
-            FIM_diag =  einops.einsum(dP_batch, dP_batch, '... c, ... c -> ...')
-            dH_list.append(FIM_diag)
 
+            f = partial(eigenmodel.compute_loss, X_batch)
+
+            # Compute dH for the current minibatch
+            _, H = jvp(f, 
+                primals=(eigenmodel.param_dict,), 
+                tangents=(eigenmodel.vector_to_parameters(eigenmodel.u[feature_idx]),))            #FIM_diag =  einops.einsum(dP_batch, dP_batch, '... c, ... c -> ...')
+            
+            dH_list.append(H)
 
             #dP_batch = eigenmodel_transformer(X_transformer[:4].to(device), eigenmodel_transformer.u[[1]])[0].detach()
-            top_idx = torch.topk(dP_batch, k_logits, dim=-1, largest=True, sorted=True).indices
-            bottom_idx = torch.topk(dP_batch, k_logits, dim=-1, largest=False, sorted=True).indices
-            top_logits_list.append(top_idx)
-            bottom_logits_list.append(bottom_idx)
+            #top_idx = torch.topk(dP_batch, k_logits, dim=0, largest=True, sorted=True).indices
+            #bottom_idx = torch.topk(dP_batch, k_logits, dim=0, largest=False, sorted=True).indices
+            #top_logits_list.append(top_idx)
+            #bottom_logits_list.append(bottom_idx)
 
         
             #torch.cuda.empty_cache()
             #gc.collect()
-        
-    # Concatenate dH results from all minibatches
-    feature_vals = torch.cat(dH_list, dim=0)
-    top_logits_idx = torch.cat(top_logits_list, dim=0)
-    bottom_logits_idx = torch.cat(bottom_logits_list, dim=0)
-
-    # Flatten the tensor to find the top k values globally
-    flattened_tensor = feature_vals.flatten()
     
-    # Find the top 5 highest values and their indices in the flattened tensor
-    top_values, top_idx = torch.topk(flattened_tensor, top_k)
-    # Convert the flattened indices back to the original 3D indices
-    top_idx_sample, top_idx_token = torch.unravel_index(top_idx, feature_vals.shape)
+    if True:#for f in feature_idx:
+
+        # Concatenate dH results from all minibatches
+        feature_vals = (torch.cat(dH_list, dim=0))
+        #top_logits_idx = torch.cat(top_logits_list, dim=1)
+        #bottom_logits_idx = torch.cat(bottom_logits_list, dim=1)
+
+        # Flatten the tensor to find the top k values globally
+        flattened_tensor = feature_vals.flatten()
+        #print(top_logits_idx.shape)
+        # Find the top 5 highest values and their indices in the flattened tensor
+        top_values, top_idx = torch.topk(flattened_tensor, top_k, largest=False)
+        # Convert the flattened indices back to the original 3D indices
+        top_idx_sample, top_idx_token = torch.unravel_index(top_idx, feature_vals.shape)
 
 
-    # Iterate over the top values and their indices
-    for (sample, token, value) in zip(top_idx_sample, top_idx_token, top_values):
-        #print(sample, token, value)
-        # Decode the entire sequence of tokens for the current sample as individual tokens
-        tokens_list = eigenmodel.model.tokenizer.convert_ids_to_tokens(X[sample].tolist())
-        
-        # Bold the token at the specific index
-        tokens_list[token] = f"**{tokens_list[token]}**"
-        
-        # Join the tokens back together for displaying
-        bolded_tokens = eigenmodel.model.tokenizer.convert_tokens_to_string(tokens_list)
-        bolded_tokens = bolded_tokens.replace("\n", "newline")
+        # Iterate over the top values and their indices
+        for (sample, token, value) in zip(top_idx_sample, top_idx_token, top_values):
+            #print(sample, token, value)
+            # Decode the entire sequence of tokens for the current sample as individual tokens
+            tokens_list = eigenmodel.model.tokenizer.convert_ids_to_tokens(X[sample].tolist())
+            
+            # Bold the token at the specific index
+            tokens_list[token] = f"**{tokens_list[token]}**"
+            
+            # Join the tokens back together for displaying
+            bolded_tokens = eigenmodel.model.tokenizer.convert_tokens_to_string(tokens_list[:(token+1)])
+            bolded_tokens = bolded_tokens.replace("\n", "newline")
 
-        # Decode the specific token with the highest value
-        token_of_value = eigenmodel.model.tokenizer.decode(X[sample, token]).replace("\n", "newline")
-        
-        top_logits =  [eigenmodel.model.tokenizer.decode(i) for i in (top_logits_idx[sample,token,:])]
-        bottom_logits =  [eigenmodel.model.tokenizer.decode(i) for i in (bottom_logits_idx[sample,token,:])]
+            # Decode the specific token with the highest value
+            token_of_value = eigenmodel.model.tokenizer.decode(X[sample, token]).replace("\n", "newline")
+            
+            #top_logits =  [eigenmodel.model.tokenizer.decode(i) for i in (top_logits_idx[:,sample,token])]
+            #bottom_logits =  [eigenmodel.model.tokenizer.decode(i) for i in (bottom_logits_idx[:,sample,token])]
 
 
-        # Print the modified tokens with the bolded token and its value
-        print(f"{bolded_tokens} -> {token_of_value} (Value: {value:.3f}), top: {top_logits}, bottom: {bottom_logits}")
+            # Print the modified tokens with the bolded token and its value
+            print(f"{bolded_tokens} -> {token_of_value} (Value: {value:.3f})")# top: {top_logits}, bottom: {bottom_logits}")
 
 
 

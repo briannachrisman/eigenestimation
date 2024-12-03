@@ -5,16 +5,21 @@ import einops
 from typing import List, Any
 
 class TransformerWrapper(nn.Module):
-    def __init__(self, transformer: nn.Module, tokenizer: Any) -> None:
+    def __init__(self, transformer: nn.Module, tokenizer: Any, outputs_logits=True, eps=1e-10) -> None:
         super(TransformerWrapper, self).__init__()
         self.transformer = transformer
         self.tokenizer = tokenizer
+        self.outputs_logits = outputs_logits
+        self.eps = eps
 
     def forward(self, tokenized_X: torch.Tensor) -> torch.Tensor:
         # Generate model outputs
-        logits: torch.Tensor = self.transformer(tokenized_X)
+        model_output: torch.Tensor = self.transformer(tokenized_X)
         # Rearrange the output to a flat batch of logits
-        probs = logits.softmax(dim=-1)
+        if self.outputs_logits:
+            probs = model_output.softmax(dim=-1) + self.eps
+        else: 
+            probs = (model_output.logits).softmax(dim=-1) + self.eps
         return probs #einops.rearrange(probs, 'batch tokens logits -> (batch tokens) logits')
 
 def DeleteParams(model: nn.Module, attributes_to_delete: List[str]) -> None:

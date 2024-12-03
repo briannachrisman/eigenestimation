@@ -5,6 +5,7 @@ from torch.utils.data import DataLoader
 from typing import Any, List
 import einops
 import gc
+import math
 
 def TrainEigenEstimation(
     eigenmodel: nn.Module,
@@ -44,7 +45,7 @@ def TrainEigenEstimation(
           ).to(device)
           dH_du_list = []
           u_list = []
-          dP_du, FIM_diag= eigenmodel(x.to(device), u) # n_classes n_u
+          dP_du, FIM_diag= eigenmodel(x, u) # n_classes n_u
           FIM_diag = einops.einsum(dP_du, dP_du, 'v1 ... c, v2 ... c -> v1 v2 ...') #/  dP_du.shape[-1]
           H = einops.einsum(dP_du, dP_du, 'v1 ... p, v2 ... p -> v1 v2 ...')
           lower_triangular_mask: torch.Tensor = torch.tril(
@@ -95,6 +96,7 @@ def TrainEigenEstimationComparison(
     n_epochs: int,
     lambda_penalty: List[float],
     u_batch_size = 16,
+    jac_chunk_size = None,
     device: str = 'cuda'
 ) -> None:
 
@@ -118,13 +120,13 @@ def TrainEigenEstimationComparison(
       #idx_dataloader = DataLoader(torch.arange(len(eigenmodel.u)), batch_size=u_batch_size, shuffle=True)
 
 
-      for x in x_dataloader:
+      for x,jac in x_dataloader:
         n_batches += 1
 
         if True:
           dH_du_list = []
           u_list = []
-          dP_du, _ = eigenmodel(x.to(device), eigenmodel.param_dict) # n_classes n_u
+          dP_du = eigenmodel(x.to(device), jac.to(device)) # n_classes n_u
           H = einops.einsum(dP_du, dP_du, 'v1 ..., v2 ... -> v1 v2 ...') #/  dP_du.shape[-1]
           lower_triangular_mask: torch.Tensor = torch.tril(
               torch.ones(H.shape[0],H.shape[0], dtype=torch.bool), diagonal=-1
@@ -135,10 +137,9 @@ def TrainEigenEstimationComparison(
           not_diag = (1-diag.float()).bool()
 
           #print(FIM_diag.shape, dP_du.shape)
-          
-          FIM2_loss = (H[diag,...]).mean()#-(FIM_diag.mean())
-          FIM_cosine_sim_loss = (H[not_diag,...]**2).mean()#/2#FIM2_flat = einops.rearrange(FIM_diag, 'v n ... -> (n ...) v')
-          
+          n_samples = math.prod(list(H.shape[2:]))
+          FIM2_loss = (H[diag,...]).sum()/n_samples#-(FIM_diag.mean())
+          FIM_cosine_sim_loss = (H[not_diag,...]**2).sum()/n_samples #*H.shape[0]#/sum(H.shape[2:])#/2#FIM2_flat = einops.rearrange(FIM_diag, 'v n ... -> (n ...) v')
 
 
           L = -FIM2_loss + lambda_penalty[0] * FIM_cosine_sim_loss + lambda_penalty[1]*abs(eigenmodel.u).mean()
@@ -155,9 +156,9 @@ def TrainEigenEstimationComparison(
           
           #torch.cuda.empty_cache()
           #gc.collect()
-          break
+          
       # Logging progress every 10% of total epochs
-      if epoch % max(1, round(n_epochs / 10)) == 0:
+      if (epoch+1) % max(1, round(n_epochs / 10)) == 0:
         avg_total_loss =total_losses / n_batches
         avg_high_H_loss = high_H_losses / n_batches
         avg_basis_loss = basis_losses / n_batches
