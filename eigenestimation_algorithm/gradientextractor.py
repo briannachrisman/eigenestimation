@@ -45,7 +45,7 @@ def ExtractJacs(jac_extractor, x_dataloader, device='cuda'):
     x_list = []
     for i, x_batch in enumerate(x_dataloader):
         print(f"Processing batch {i+1}/{len(x_dataloader)}")
-        jac = jac_extractor(x_batch.to(device))
+        jac = jac_extractor(x_batch)
         jacs.append(jac.detach().cpu())
         x_list.append(x_batch.detach().cpu())
         del jac, x_batch

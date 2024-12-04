@@ -137,6 +137,7 @@ class EigenEstimationComparison(nn.Module):
     def compute_loss(
         self, x: torch.Tensor, param_dict
     ) -> torch.Tensor:
+        print('here')
         # Perform a stateless functional call to the model with given parameters
         #param_dict = self.vector_to_parameters(parameters)
         outputs: torch.Tensor = functional_call(self.model, param_dict, (x,))
