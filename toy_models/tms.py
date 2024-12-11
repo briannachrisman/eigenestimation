@@ -5,25 +5,47 @@ from torch.utils.data import DataLoader, TensorDataset
 import einops
 from typing import Tuple
 
+class AutoencoderSymmetric(nn.Module):
+    def __init__(self, input_dim: int, hidden_dim: int) -> None:
+        super(AutoencoderSymmetric, self).__init__()
+
+        # Define parameters for the autoencoder
+        self.W_in: nn.Parameter = nn.Parameter(torch.randn(input_dim, hidden_dim))
+        #self.W_out = self.W_in.transpose(0,1)
+
+        self.b: nn.Parameter = nn.Parameter(torch.zeros(input_dim))
+
+        # Initialize W with Xavier normal
+        nn.init.xavier_normal_(self.W_in)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        # Encoding step
+        h: torch.Tensor = einops.einsum(self.W_in, x, 'f h, b f -> b h')
+        # Decoding step
+        x_hat: torch.Tensor = einops.einsum(self.W_in.transpose(0,1), h, 'h f, b h -> b f')
+        # Add bias and apply ReLU activation
+        x_hat = x_hat + self.b
+        return torch.relu(x_hat)
+
 class Autoencoder(nn.Module):
     def __init__(self, input_dim: int, hidden_dim: int) -> None:
         super(Autoencoder, self).__init__()
 
         # Define parameters for the autoencoder
         self.W_in: nn.Parameter = nn.Parameter(torch.randn(input_dim, hidden_dim))
-        #self.W_out: nn.Parameter = nn.Parameter(torch.randn(hidden_dim, input_dim))
+        self.W_out: nn.Parameter = nn.Parameter(torch.randn(hidden_dim, input_dim))
 
         self.b: nn.Parameter = nn.Parameter(torch.zeros(input_dim))
 
         # Initialize W with Xavier normal
         nn.init.xavier_normal_(self.W_in)
-        #nn.init.xavier_normal_(self.W_out)
+        nn.init.xavier_normal_(self.W_out)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         # Encoding step
         h: torch.Tensor = einops.einsum(self.W_in, x, 'f h, b f -> b h')
         # Decoding step
-        x_hat: torch.Tensor = einops.einsum(self.W_in, h, 'f h, b h -> b f')
+        x_hat: torch.Tensor = einops.einsum(self.W_out, h, 'h f, b h -> b f')
         # Add bias and apply ReLU activation
         x_hat = x_hat + self.b
         return torch.relu(x_hat)
@@ -108,7 +130,7 @@ class AutoencoderParallel(nn.Module):
 
         # Define parameters for the autoencoder
         self.W_in: nn.Parameter = nn.Parameter(torch.randn(n_networks*input_dim, n_networks*hidden_dim))
-        #self.W_out: nn.Parameter = nn.Parameter(torch.randn(hidden_dim, input_dim))
+        self.W_out: nn.Parameter = nn.Parameter(torch.randn(n_networks*hidden_dim, n_networks*input_dim))
 
         self.b: nn.Parameter = nn.Parameter(torch.zeros(n_networks*input_dim))
 
@@ -120,7 +142,7 @@ class AutoencoderParallel(nn.Module):
         # Encoding step
         h: torch.Tensor = einops.einsum(self.W_in, x, 'f h, b f -> b h')
         # Decoding step
-        x_hat: torch.Tensor = einops.einsum(self.W_in, h, 'f h, b h -> b f')
+        x_hat: torch.Tensor = einops.einsum(self.W_out, h, 'h f, b h -> b f')
         # Add bias and apply ReLU activation
         x_hat = x_hat + self.b
         return torch.relu(x_hat)

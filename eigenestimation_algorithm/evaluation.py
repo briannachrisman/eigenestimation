@@ -191,7 +191,7 @@ def DrawNeuralNetwork(weights_dict):
             for j, y2 in enumerate(layer_y2):
                 weight = weights[j, i]
                 color = 'green' if weight > 0 else 'red'
-                linewidth =  5 * abs(weight)  # Scale line width by weight magnitude
+                linewidth =  1*abs(weight)  # Scale line width by weight magnitude
                 ax.plot([layer_x1, layer_x2], [y1, y2], color=color, linewidth=linewidth)
     
     # Draw layers and connections iteratively
