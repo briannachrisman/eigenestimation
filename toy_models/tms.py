@@ -96,10 +96,8 @@ def GenerateTMSDataParallel( num_features: int,
 
     # Apply sparsity to the feature vectors
     feature_vectors = feature_vectors * (np.random.rand(num_datapoints, num_features * n_networks) < sparsity)
-    print(feature_vectors.shape)
     # Remove feature vectors that are all zeros
     non_zero_indices: np.ndarray = np.any(feature_vectors != 0, axis=-1)
-    print(non_zero_indices.shape)
 
     feature_vectors = feature_vectors[non_zero_indices]
 
