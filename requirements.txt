@@ -1,0 +1,7 @@
+einops
+torch
+matplotlib
+transformers
+transformer_lens
+datasets
+numpy
