@@ -166,8 +166,8 @@ def DrawNeuralNetwork(weights_dict):
     """
     # Get layer names and sizes based on the weight matrices
     layer_names = list(weights_dict.keys())
-    input_size = weights_dict[layer_names[0]].shape[1]
-    layer_sizes = [input_size] + [weights_dict[layer].shape[0] for layer in layer_names]
+    input_size = weights_dict[layer_names[0]].shape[0]
+    layer_sizes = [input_size] + [weights_dict[layer].shape[1] for layer in layer_names]
     
     # Define x-coordinates for each layer
     layer_x = np.linspace(1, len(layer_sizes), len(layer_sizes))
@@ -180,16 +180,16 @@ def DrawNeuralNetwork(weights_dict):
     ax.axis('off')  # Turn off the axis
     
     # Draw the nodes for each layer
-    def draw_layer_nodes(layer_x, layer_y, label):
+    def draw_layer_nodes(layer_x, layer_y, label, text_x):
         for y in layer_y:
             ax.plot(layer_x, y, 'o', markersize=12, color='skyblue')
-        ax.text(layer_x, 1.0, label, ha='center', fontsize=12, color='black')
+        ax.text(text_x, 1.0, label, ha='center', fontsize=12, color='black')
 
     # Draw connections (edges) between nodes based on weights
     def draw_connections(layer_x1, layer_y1, layer_x2, layer_y2, weights):
         for i, y1 in enumerate(layer_y1):
             for j, y2 in enumerate(layer_y2):
-                weight = weights[j, i]
+                weight = weights[i, j]
                 color = 'green' if weight > 0 else 'red'
                 linewidth =  1*abs(weight)  # Scale line width by weight magnitude
                 ax.plot([layer_x1, layer_x2], [y1, y2], color=color, linewidth=linewidth)
@@ -198,8 +198,8 @@ def DrawNeuralNetwork(weights_dict):
     for i, (layer_name, weights) in enumerate(weights_dict.items()):
         # Draw the nodes for the current layer
         if i == 0:
-            draw_layer_nodes(layer_x[0], layer_y[f'layer_{i}'], 'Input')
-        draw_layer_nodes(layer_x[i + 1], layer_y[f'layer_{i + 1}'], layer_name)
+            draw_layer_nodes(layer_x[0], layer_y[f'layer_{i}'], 'Input', layer_x[0])
+        draw_layer_nodes(layer_x[i + 1], layer_y[f'layer_{i + 1}'], layer_name, (layer_x[i + 1] + layer_x[i])/2)
         
         # Draw connections from the previous layer to the current layer
         draw_connections(layer_x[i], layer_y[f'layer_{i}'], layer_x[i + 1], layer_y[f'layer_{i + 1}'], weights.cpu().detach().numpy())
