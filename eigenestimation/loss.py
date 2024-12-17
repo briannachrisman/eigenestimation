@@ -53,3 +53,28 @@ class KLDivergenceLoss(nn.Module):
             return per_sample_kl_div.sum()
         else:  # 'none'
             return per_sample_kl_div
+        
+        
+        
+class MSELoss(nn.Module):
+    def __init__(self, reduction: str = 'none') -> None:
+        """
+        Args:
+            reduction (str): Specifies the reduction to apply to the output:
+                             'none' | 'mean' | 'sum'. Default is 'mean'.
+        """
+        super(MSELoss, self).__init__()
+        self.reduction = reduction
+
+    def forward(self, preds: torch.Tensor, truth: torch.Tensor) -> torch.Tensor:
+        """
+        """
+        # 
+        per_samples_MSE = ((preds - truth)**2).sum(dim=-1)
+
+
+        # Apply reduction
+        if self.reduction == 'mean':
+            return per_samples_MSE.mean(dim=0)
+        else:  # 'none'
+            return per_samples_MSE
