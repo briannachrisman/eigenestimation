@@ -1,6 +1,1 @@
-# Eigenestimation
-
-To install:
-
-```
-
+# eigenestimation

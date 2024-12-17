@@ -1,4 +1,0 @@
-# Ignore compiled Python files
-*.pyc
-__pycache__/
-eigenestimation_env
