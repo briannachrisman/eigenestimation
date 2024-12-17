@@ -1,4 +1,4 @@
 # Ignore compiled Python files
 *.pyc
-__pycache__/
+*pycache*g
 *env
