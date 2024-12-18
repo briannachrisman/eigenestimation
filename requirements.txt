@@ -6,4 +6,5 @@ transformer_lens
 datasets
 numpy
 ipykernel
-jupyter
+jupyters
+wandb

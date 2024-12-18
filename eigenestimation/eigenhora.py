@@ -22,7 +22,6 @@ class EigenHora(nn.Module):
         self.loss: Callable = loss
         self.n_features = n_features
         self.param_dict = {name: param.detach().clone() for name, param in model.named_parameters()}
-        self.n_params = sum([v.numel() for v in self.param_dict.values()])
         self.low_rank = {name: [(torch.randn(length, reduced_dim, n_features)/n_features).to(device).requires_grad_(True) for length in param.shape]
                          for name, param in self.model.named_parameters()}
 
