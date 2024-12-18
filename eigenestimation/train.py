@@ -24,14 +24,14 @@ def Train(
         reconstruction_losses: float = 0.0
         total_losses: float = 0.0
         n_batches: int = 0
-        for jacobian in jacobian_dataloader:
+        for _, jacobian in jacobian_dataloader:
             n_batches += 1
             jvp = eigenmodel(jacobian)
             reconstruction = eigenmodel.reconstruct(jvp.relu())
             jvp_einops_shape = ' '.join(["d" + str(i) for i in range(len(jvp.shape)-1)])
             L2_error = torch.stack([einops.einsum( # jvp_einops_shape = batch size
                 (reconstruction[name] - jacobian[name])**2, f'{jvp_einops_shape} ... -> {jvp_einops_shape}') for name in jacobian], dim=0).sum(dim=0).mean()
-            L0_error = einops.einsum((abs(jvp) + eps), '... f -> ...').mean()
+            L0_error = einops.einsum((abs(jvp)), '... f -> ...').mean()
             L = L2_error + L0_penalty * L0_error
             
             sparsity_losses += L0_error

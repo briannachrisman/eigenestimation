@@ -2,3 +2,4 @@
 *.pyc
 *pycache__/*
 *env
+*ipynb_checkpoints*

@@ -10,7 +10,7 @@ class TransformDataLoader:
 
     def __iter__(self):
         for batch in self.dataloader:
-            yield self.transform_fn(batch)
+            yield batch, self.transform_fn(batch)
 
     def __len__(self):
         return len(self.dataloader)

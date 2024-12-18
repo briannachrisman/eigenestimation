@@ -29,7 +29,7 @@ class EigenHora(nn.Module):
     def compute_loss(self, x: torch.Tensor, param_dict) -> torch.Tensor:
         outputs: torch.Tensor = functional_call(self.model, param_dict, (x,))
         with torch.no_grad():
-            truth: torch.Tensor = self.model0(x)
+            truth: torch.Tensor = self.model0(outputs)
         return self.loss(outputs, truth)
 
     def compute_jacobian(self, x: torch.Tensor):
@@ -39,9 +39,19 @@ class EigenHora(nn.Module):
         jvp_dict = dict({})
         for name in self.low_rank:
             jvp_dict[name] = einops.einsum(jacobian[name], self.low_rank[name][-1], '... w , w r f -> f r ...')
-            for tensor in self.low_rank[name][-2:1:-1]:
+            for tensor in self.low_rank[name][-2:0:-1]:
                 jvp_dict[name] = einops.einsum(jvp_dict[name], tensor, 'f r ... w, w r f -> f r ...')
             jvp_dict[name] = einops.einsum(jvp_dict[name], self.low_rank[name][0], 'f r ... w, w r f -> ... f')
+        jvp = torch.stack([jvp_dict[name] for name in jvp_dict], dim=0).sum(dim=0) # Dimensions = (samples) x features
+        return jvp
+    
+    def jacobian_vector_product(self, jacobian, feature_idx):
+        jvp_dict = dict({})
+        for name in self.low_rank:
+            jvp_dict[name] = einops.einsum(jacobian[name], self.low_rank[name][-1][...,feature_idx], '... w , w r-> r ...')
+            for tensor in self.low_rank[name][-2:0:-1]:
+                jvp_dict[name] = einops.einsum(jvp_dict[name], tensor[...,feature_idx], 'r ... w, w r -> r ...')
+            jvp_dict[name] = einops.einsum(jvp_dict[name], self.low_rank[name][0][...,feature_idx], 'r ... w, w r-> ...')
         jvp = torch.stack([jvp_dict[name] for name in jvp_dict], dim=0).sum(dim=0) # Dimensions = (samples) x features
         return jvp
     
