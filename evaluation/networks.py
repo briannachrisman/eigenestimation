@@ -30,7 +30,8 @@ def DrawNeuralNetwork(weights_dict, title=''):
     layer_y = {f'layer_{i}': np.linspace(0.1, 0.9, layer_sizes[i]) for i in range(len(layer_sizes))}
     
     # Create figure
-    fig, ax = plt.subplots(figsize=(5, 4))
+    max_y = max([param.shape[0] for _, param in weights_dict.items()])
+    fig, ax = plt.subplots(figsize=(3*len(weights_dict), max_y))
     ax.axis('off')  # Turn off the axis
     
     # Draw the nodes for each layer

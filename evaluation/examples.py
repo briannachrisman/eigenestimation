@@ -1,6 +1,6 @@
 import torch 
 
-def TopActivatingSamples(eigenmodel, dataloader, top_n=5, feature_idxs=None, bold_char='*', to_print=False):
+def TopActivatingSamples(eigenmodel, dataloader, top_n=5, feature_idxs=None, to_print=False):
 
     if feature_idxs is None: feature_idxs = range(eigenmodel.n_features)
     top_n_X_values = {i:[] for i in feature_idxs}
@@ -26,7 +26,7 @@ def TopActivatingSamples(eigenmodel, dataloader, top_n=5, feature_idxs=None, bol
     for feature_idx in top_n_X_values:
         if to_print: print(f'------feature {feature_idx}-------')
         for i, (jvp_val, x) in enumerate(top_n_X_values[feature_idx]):
-            if to_print: print('{x} -> {jvp_val}')
+            if to_print: print(f'{x} -> {jvp_val}')
     return top_n_X_values
 
 
@@ -48,7 +48,7 @@ def TopActivatingTexts(eigenmodel, dataloader, top_n=5, feature_idxs=None, bold_
             for x, jvp_vals in zip(X, jvp[...,feature_idx]):
                 for token_idx, jvp_val in enumerate(jvp_vals):
                     # Use a tuple of (-jvp_val, x) to store in the heap (negative for max-heap behavior)
-                    top_n_X_values[feature_idx].append((jvp_val.item(), x, token_idx, ''))
+                    top_n_X_values[feature_idx].append((jvp_val.item(), x, token_idx))
                 
                 # Sort the list by jvp_val (descending order) and slice to keep the top N
                 top_n_X_values[feature_idx].sort(key=lambda item: item[0], reverse=True)
@@ -62,7 +62,7 @@ def TopActivatingTexts(eigenmodel, dataloader, top_n=5, feature_idxs=None, bold_
             to_decode = x[:token_idx].cpu().detach().tolist() + insert_char + [x[token_idx]] + insert_char + x[(token_idx+1):].detach().cpu().tolist()
             text = eigenmodel.model.tokenizer.decode(to_decode).replace('\n', 'newline')
             if to_print: print('{text} -> {jvp_val}')
-            top_n_X_values[feature_idx][i][-1] = text
+            top_n_X_values[feature_idx][i] = (jvp_val, x, token_idx, text)
     return top_n_X_values
 
 
