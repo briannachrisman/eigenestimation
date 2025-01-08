@@ -37,10 +37,12 @@ class EigenHora(nn.Module):
     def forward(self, jacobian: torch.Tensor) -> torch.Tensor:
         jvp_dict = dict({})
         for name in self.low_rank:
-            jvp_dict[name] = einops.einsum(jacobian[name], self.low_rank[name][-1], '... w , w r f -> f r ...')
-            for tensor in self.low_rank[name][-2:0:-1]:
-                jvp_dict[name] = einops.einsum(jvp_dict[name], tensor, 'f r ... w, w r f -> f r ...')
-            jvp_dict[name] = einops.einsum(jvp_dict[name], self.low_rank[name][0], 'f r ... w, w r f -> ... f')
+             # (samples, param_dimensions, final_param_dimension) x (final_param_dimension, rank, n_features) -> (samples, param_dimensions, reduced_dimension, n_features)
+            jvp_dict[name] = einops.einsum(jacobian[name], self.low_rank[name][-1], '... w , w r f -> ... r f')
+            for tensor in self.low_rank[name][-2::-1]:
+                # (samples, param_dimensions, final_param_dimension, reduced_dimension, n_features) x (final_param_dimension, rank, n_features) -> (samples, param_dimensions, reduced_dimension, n_features)
+                jvp_dict[name] = einops.einsum(jvp_dict[name], tensor, '... w r f, w r f -> ... r f')
+            jvp_dict[name] = einops.einsum(jvp_dict[name], '... r f -> ... f')
         jvp = torch.stack([jvp_dict[name] for name in jvp_dict], dim=0).sum(dim=0) # Dimensions = (samples) x features
         return jvp
     
@@ -48,19 +50,20 @@ class EigenHora(nn.Module):
         jvp_dict = dict({})
         for name in self.low_rank:
             jvp_dict[name] = einops.einsum(jacobian[name], self.low_rank[name][-1][...,feature_idx], '... w , w r-> r ...')
-            for tensor in self.low_rank[name][-2:0:-1]:
+            for tensor in self.low_rank[name][-2::-1]:
                 jvp_dict[name] = einops.einsum(jvp_dict[name], tensor[...,feature_idx], 'r ... w, w r -> r ...')
-            jvp_dict[name] = einops.einsum(jvp_dict[name], self.low_rank[name][0][...,feature_idx], 'r ... w, w r-> ...')
+            jvp_dict[name] = einops.einsum(jvp_dict[name], 'r ... w -> ...')
+
         jvp = torch.stack([jvp_dict[name] for name in jvp_dict], dim=0).sum(dim=0) # Dimensions = (samples) x features
         return jvp
     
     def reconstruct(self, jvp: torch.Tensor) -> torch.Tensor:
         reconstruction = dict({})
         for name in self.low_rank:
-            reconstruction[name] = einops.einsum(jvp, self.low_rank[name][0], '... f , w r f -> ... w f r')
-            for tensor in self.low_rank[name][1:-1]:
-                reconstruction[name] = einops.einsum(reconstruction[name], tensor, '... f r, w r f -> ... w f r')
-            reconstruction[name] = einops.einsum(reconstruction[name], self.low_rank[name][-1], '... f r, w r f -> ... w')
+            reconstruction[name] = einops.einsum(jvp, self.low_rank[name][0], '... f , w r f -> ... w r f')
+            for tensor in self.low_rank[name][1:]:
+                reconstruction[name] = einops.einsum(reconstruction[name], tensor, '... r f, w r f -> ... w r f')
+            reconstruction[name] = einops.einsum(reconstruction[name], '... w r f -> ... w')
         return reconstruction
 
 
@@ -68,9 +71,9 @@ class EigenHora(nn.Module):
         reconstruction = dict({})
         for name in self.low_rank:
             reconstruction[name] = self.low_rank[name][0]
-            for tensor in self.low_rank[name][1:-1]:
-                reconstruction[name] = einops.einsum(reconstruction[name], tensor, 'r f, w r f ->  w r f')
-            reconstruction[name] = einops.einsum(reconstruction[name], self.low_rank[name][-1], '... r f, w r f -> ... w')
+            for tensor in self.low_rank[name][1:]:
+                reconstruction[name] = einops.einsum(reconstruction[name], tensor, '... r f, w r f ->  ... w r f')
+            reconstruction[name] = einops.einsum(reconstruction[name], '... w r f -> ... w')
         return reconstruction
     
     def construct_subnetworks(self) -> dict:
@@ -79,8 +82,8 @@ class EigenHora(nn.Module):
             reconstruction = dict({})
             for name in self.low_rank:
                 reconstruction[name] = self.low_rank[name][0][...,i]
-                for tensor in self.low_rank[name][1:-1]:
+                for tensor in self.low_rank[name][1:]:
                     reconstruction[name] = einops.einsum(reconstruction[name], tensor[...,i], '... r, w r -> ... w r')
-                reconstruction[name] = einops.einsum(reconstruction[name], self.low_rank[name][-1][...,i], '... r, w r-> ... w')
+                reconstruction[name] = einops.einsum(reconstruction[name], '... w r -> ... w')
             networks.append(reconstruction)
         return networks

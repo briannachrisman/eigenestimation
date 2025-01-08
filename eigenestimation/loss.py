@@ -4,8 +4,11 @@ import torch.nn.functional as F
 import einops
 from typing import List, Any
 
-def MSELoss(x, y):
-    return (x - y)**2
+#def MSELoss(x, y):
+#    return (x - y)**2
+
+#def ErrorLoss(x, y):
+#    return x
 
 
 class KLDivergenceLoss(nn.Module):
@@ -71,6 +74,31 @@ class MSELoss(nn.Module):
         """
         # 
         per_samples_MSE = ((preds - truth)**2).sum(dim=-1)
+
+
+        # Apply reduction
+        if self.reduction == 'mean':
+            return per_samples_MSE.mean(dim=0)
+        else:  # 'none'
+            return per_samples_MSE
+        
+        
+
+class ErrorLoss(nn.Module):
+    def __init__(self, reduction: str = 'none') -> None:
+        """
+        Args:
+            reduction (str): Specifies the reduction to apply to the output:
+                             'none' | 'mean' | 'sum'. Default is 'mean'.
+        """
+        super(ErrorLoss, self).__init__()
+        self.reduction = reduction
+
+    def forward(self, preds: torch.Tensor, truth: torch.Tensor) -> torch.Tensor:
+        """
+        """
+        # 
+        per_samples_MSE = ((preds - truth)).sum(dim=-1)
 
 
         # Apply reduction

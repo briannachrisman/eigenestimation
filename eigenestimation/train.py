@@ -102,6 +102,7 @@ def Train(
     torch.save(eigenmodel.low_rank, "subnetworks.pt")
     artifact = wandb.Artifact(f"{project_name}_{run_name}_subnetworks", type="model-params")
     artifact.add_file("subnetworks.pt")
+    wandb.log_artifact(artifact)
 
     print('evaluating...')
     for fn in eval_fns:

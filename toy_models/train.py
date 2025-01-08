@@ -41,8 +41,9 @@ def TrainModel(
                 optimizer.step()  # Update weights
 
             # Track progress every 100 epochs after 200
-            if epoch % round(n_epochs/10) == 0 and epoch > 200:
+            if epoch % round(n_epochs/10) == 0 and epoch:
                 print(f'Epoch {epoch}, Loss: {loss.item()}')
+            if epoch > 10:
                 if losses[-1] < 0.001:
                     done = True
 
