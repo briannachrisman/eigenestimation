@@ -59,7 +59,7 @@ def Train(
 
             n_batches += 1
             jvp = eigenmodel(jacobian)
-            reconstruction = eigenmodel.reconstruct(jvp.relu())
+            reconstruction = eigenmodel.reconstruct(jvp)#.relu())
             jvp_einops_shape = ' '.join(["d" + str(i) for i in range(len(jvp.shape)-1)])
             L2_error = torch.stack([
                 einops.einsum((reconstruction[name] - jacobian[name])**2, f'{jvp_einops_shape} ... -> {jvp_einops_shape}') 

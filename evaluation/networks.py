@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from torch.func import jvp
 from functools import partial 
 
-def DrawNeuralNetwork(weights_dict, biases_dict, title=''):
+def DrawNeuralNetwork(weights_dict, biases_dict, title='', ax):
     """
     Draw a neural network diagram based on a dictionary of weights and biases.
 
@@ -33,8 +33,11 @@ def DrawNeuralNetwork(weights_dict, biases_dict, title=''):
 
     # Create figure
     max_y = .2*max(layer_sizes)
-    fig, ax = plt.subplots(figsize=(len(weights_dict), max_y))
-    ax.axis('off')  # Turn off the axis
+    
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(len(weights_dict), max_y))
+
+        ax.axis('off')  # Turn off the axis
 
     # Draw the nodes for each layer
     def draw_layer_nodes(layer_x, layer_y, label, text_x, biases=None):
