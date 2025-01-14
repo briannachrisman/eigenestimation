@@ -17,7 +17,6 @@ from transformer_lens.utils import tokenize_and_concatenate
 
 
 # Local imports
-import toy_models.xornet
 import toy_models.tms
 import toy_models.train
 import toy_models.transformer_wrapper

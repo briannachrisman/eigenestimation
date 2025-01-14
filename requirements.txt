@@ -1,11 +1,11 @@
 einops
-torch
+torch==2.1.2  --index-url https://download.pytorch.org/whl/cu118
 matplotlib
 transformers
 transformer_lens
 datasets
-numpy
+numpy==1.26.4 
 ipykernel
 jupyters
 wandb
-torchvision
+torchvision==0.16.2 --index-url https://download.pytorch.org/whl/cu118

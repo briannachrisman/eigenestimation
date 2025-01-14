@@ -1,0 +1,10 @@
+isc_project_id = "4c067223-8029-4381-aedf-8f62315ed584	"
+experiment_name = "eigenestimation_test"
+gpu_type = "24GB VRAM GPU"
+gpus = 4
+compute_mode = "cycle"
+output_path = "~/outputs/eigenestimation_test"
+command = '''
+source ~/.eigenestimation/bin/activate && 
+cd ~/eigenestimation/ && 
+python eigenestimation/train_script.py'''

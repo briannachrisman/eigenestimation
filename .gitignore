@@ -1,7 +1,9 @@
 # Ignore compiled Python files
 *.pyc
-*pycache__/*
+*pycache*
 *env
 *ipynb_checkpoints*
 *writeup
 *wandb*
+*outputs
+*.pyc

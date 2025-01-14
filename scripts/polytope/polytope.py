@@ -18,7 +18,6 @@ from transformer_lens.utils import tokenize_and_concatenate
 import toy_models.train
 import toy_models.polytope
 
-# Reload modules for interactive sessions
 
 # Specific imports from local modules
 from toy_models.polytope import ReluNetwork, GeneratePolytopeData
