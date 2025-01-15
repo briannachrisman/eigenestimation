@@ -21,11 +21,6 @@ class TransformDataLoader:
     
 
 
-def HoraShape(tensor, n_dim, n_features):
-    return einops.repeat(
-        einops.einsum(
-            tensor, '... h w -> h ...'), 'h ... -> h d ... r', r=n_features, d=n_dim).shape
-
 
 
 def DeleteParams(model: nn.Module, attributes_to_delete) -> None:

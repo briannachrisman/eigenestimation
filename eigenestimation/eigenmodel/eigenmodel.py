@@ -5,9 +5,9 @@ import einops
 from torch.func import functional_call
 from typing import Callable
 from torch import Tensor
-from eigenestimation.utils import HoraShape
 
-class EigenHora(nn.Module):
+
+class EigenModel(nn.Module):
     def __init__(self, 
                  model: nn.Module, 
                  model0: Callable,
@@ -15,7 +15,7 @@ class EigenHora(nn.Module):
                  n_features: int,
                  reduced_dim: int = 1,
                  device='cuda') -> None:
-        super(EigenHora, self).__init__()
+        super(EigenModel, self).__init__()
 
         self.model: nn.Module = model
         self.model0: Callable = model0
@@ -87,3 +87,5 @@ class EigenHora(nn.Module):
                 reconstruction[name] = einops.einsum(reconstruction[name], '... w r -> ... w')
             networks.append(reconstruction)
         return networks
+    
+    
