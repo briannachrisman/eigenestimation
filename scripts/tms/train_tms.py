@@ -28,10 +28,7 @@ def get_args_parser():
     """
     parser = argparse.ArgumentParser(description="Training configuration")
     parser.add_argument("--epochs", type=int, default=10, help="Number of training epochs")
-    parser.add_argument("--test-epochs", type=int, default=5, help="Number of epochs between evaluations")
     parser.add_argument("--lr", type=float, default=0.01, help="Learning rate")
-    parser.add_argument("--lr-step-epochs", type=int, default=100, help="Epoch step size for learning rate decay")
-    parser.add_argument("--lr-decay-rate", type=float, default=0, help="Learning rate decay rate")
     parser.add_argument("--batch-size", type=int, default=16, help="Batch size for training")
     parser.add_argument("--checkpoint-dir", type=Path, required=True, help="Directory to save checkpoints")
     parser.add_argument("--checkpoint-epochs", type=int, required=True, help="Frequency at which to save checkpoints")
@@ -83,10 +80,12 @@ def main():
     batch_size = args.batch_size
 
     # Generate training and evaluation data
-    X_train, y_train, _ = GenerateTMSData(num_features=n_features, num_datapoints=n_training_datapoints, sparsity=sparsity, batch_size=batch_size)
+    X_train, _ = GenerateTMSData(num_features=n_features, num_datapoints=n_training_datapoints, sparsity=sparsity, batch_size=batch_size)
+    y_train = X_train
     
-    X_eval, y_eval, _ = GenerateTMSData(num_features=n_features, num_datapoints=n_eval_datapoints, sparsity=sparsity, batch_size=batch_size)
-
+    X_eval, _ = GenerateTMSData(num_features=n_features, num_datapoints=n_eval_datapoints, sparsity=sparsity, batch_size=batch_size)
+    y_eval = X_eval 
+    
     # Create TensorDatasets for DataLoader compatibility
     train_dataset = TensorDataset(X_train, y_train)
     eval_dataset = TensorDataset(X_eval, y_eval)
@@ -96,7 +95,7 @@ def main():
     criterion = nn.MSELoss()
 
     # Initialize the trainer and start training
-    trainer = Trainer(model, train_dataset, eval_dataset, args)
+    trainer = Trainer(model, criterion, train_dataset, eval_dataset, args)
     trainer.train()
 
     # Log final model and metrics to Weights & Biases

@@ -69,21 +69,18 @@ def GenerateTMSData(
 
     # Convert feature vectors to numpy arrays
     data_inputs: np.ndarray = np.array(feature_vectors)
-    data_labels: np.ndarray = np.array(feature_vectors)
 
     # Create tensors from numpy arrays and move to GPU
     X_tms: torch.Tensor = torch.tensor(data_inputs, dtype=torch.float32).to('cuda')
-    Y_tms: torch.Tensor = torch.tensor(data_labels, dtype=torch.float32).to('cuda')
 
     # Create a DataLoader for the dataset
     dataloader_tms: DataLoader = DataLoader(
-        TensorDataset(X_tms, Y_tms), 
+        TensorDataset(X_tms, X_tms), 
         batch_size=batch_size, 
         shuffle=True, 
-        #generator=torch.Generator(device=device)
     )
 
-    return X_tms, Y_tms, dataloader_tms
+    return X_tms, dataloader_tms
 
 
 def GenerateTMSDataParallel( num_features: int, 
