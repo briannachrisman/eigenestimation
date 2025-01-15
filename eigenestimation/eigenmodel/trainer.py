@@ -1,207 +1,229 @@
 import os
+import sys
 import torch
-import wandb
+from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.data import DataLoader
-from pathlib import Path
-import argparse
+from cycling_utils import (
+    InterruptableDistributedSampler,
+    MetricsTracker,
+    atomic_torch_save,
+    TimestampedTimer,
+)
+import wandb  # Add Weights & Biases for logging
+import einops 
 
+# Append module directory for imports
+module_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "~/eigenestimation/eigenestimation"))
+sys.path.append(module_dir)
+
+from utils.utils import TransformDataLoader
 
 class Trainer:
-    def __init__(self, eigenmodel_class, train_data_generator, eval_data_generator, hyperparams, checkpoint_freq, run_name):
-        self.eigenmodel_class = eigenmodel_class
-        self.train_data_generator = train_data_generator
-        self.eval_data_generator = eval_data_generator
-        self.hyperparams = hyperparams
-        self.checkpoint_freq = checkpoint_freq
-        self.run_name = run_name
-        self.device = hyperparams.get("device", "cuda" if torch.cuda.is_available() else "cpu")
+    """
+    Trainer class for distributed training of models using PyTorch DDP.
 
-        # Initialize W&B
-        wandb.init(project="eigenestimation", name=self.run_name, config=self.hyperparams)
-
-        # Prepare model, loss, optimizer, and data
-        self.model = self.eigenmodel_class(**hyperparams).to(self.device)
-        self.loss_fn = hyperparams.get("loss_fn", torch.nn.MSELoss())
-        self.optimizer = hyperparams.get("optimizer", torch.optim.Adam(self.model.parameters(), lr=hyperparams.get("lr", 0.001)))
-        self.train_dataloader = self.get_dataloader(train_data_generator, hyperparams["batch_size"])
-        self.eval_dataloader = self.get_dataloader(eval_data_generator, hyperparams["batch_size"])
-
-        # Checkpointing via W&B artifacts
-        self.start_epoch = self.load_checkpoint_from_wandb()
-
-    def get_dataloader(self, data_generator, batch_size):
+    Args:
+        model (torch.nn.Module): The model to train.
+        train_data (Dataset): The training dataset.
+        eval_data (Dataset): The evaluation dataset.
+        args (argparse.Namespace): Training configuration arguments.
+    """
+    def __init__(self, eigenmodel, train_data, eval_data, jacobian_fn, args, timer):
         """
-        Get DataLoader from the data generator.
+        Initializes the Trainer object by setting up the model, dataloaders, optimizers, and checkpoint.
         """
-        data = data_generator()
-        if isinstance(data, DataLoader):
-            return data
-        else:
-            return DataLoader(data, batch_size=batch_size, shuffle=True)
+        self.timer =timer
+        self.device_id = args.device_id
+        self.is_master = args.is_master
+        # Data loaders and samplers
+        self.train_sampler = InterruptableDistributedSampler(train_data)
+        self.eval_sampler = InterruptableDistributedSampler(eval_data)
+        self.jacobian_fn = jacobian_fn
+        
+        self.train_dataloader = DataLoader(train_data, batch_size=args.batch_size, sampler=self.train_sampler)
+            
+        self.eval_dataloader = DataLoader(eval_data, batch_size=args.batch_size, sampler=self.eval_sampler)
 
-    def save_checkpoint_to_wandb(self, epoch, loss):
+            
+        self.timer.report("Data loaders initialized")
+
+        # Model and training utilities setup
+        self.ddp = DDP(eigenmodel.to(self.device_id), device_ids=[self.device_id])
+        self.eigenmodel = self.ddp.module
+        self.optimizer = torch.optim.Adam(self.eigenmodel.parameters(), lr=args.lr)
+        self.metrics = {"train": MetricsTracker(), "eval": MetricsTracker()}
+        self.checkpoint_path = args.checkpoint_dir / "checkpoint.pt"
+        self.checkpoint_epochs = args.checkpoint_epochs
+        self.log_epochs = args.log_epochs
+        self.epochs = args.epochs
+        self.L0_penalty = args.L0_penalty
+
+        os.makedirs(self.checkpoint_path.parent, exist_ok=True)
+        self.timer.report("Model and training utilities initialized")
+
+        # Load checkpoint if exists
+        if os.path.isfile(self.checkpoint_path):
+            self.load_checkpoint()
+
+    def load_checkpoint(self):
         """
-        Save checkpoint as a W&B artifact.
+        Loads a training checkpoint to resume training from a saved state.
         """
-        checkpoint_path = f"checkpoint_epoch_{epoch + 1}.pth"
-        torch.save({
-            "epoch": epoch,
-            "model_state_dict": self.model.state_dict(),
-            "optimizer_state_dict": self.optimizer.state_dict(),
-            "loss": loss
-        }, checkpoint_path)
-
-        # Upload the checkpoint to W&B as an artifact
-        artifact = wandb.Artifact(name=f"{self.run_name}_checkpoint", type="model")
-        artifact.add_file(checkpoint_path)
-        wandb.log_artifact(artifact)
-        print(f"Checkpoint saved to W&B at epoch {epoch + 1}.")
-
-    def load_checkpoint_from_wandb(self):
+        print(f"Loading checkpoint from {self.checkpoint_path}")
+        checkpoint = torch.load(self.checkpoint_path, map_location=f"cuda:{self.device_id}")
+        self.ddp.load_state_dict(checkpoint["ddp"])
+        self.optimizer.load_state_dict(checkpoint["optimizer"])
+        self.train_sampler.load_state_dict(checkpoint["train_sampler"])
+        self.eval_sampler.load_state_dict(checkpoint["eval_sampler"])
+        self.metrics = checkpoint["metrics"]
+        self.timer.report("Checkpoint loaded")
+        
+    def save_checkpoint(self):
         """
-        Load checkpoint from W&B if available.
+        Saves the current state of the model, optimizer, sampler, scheduler, and metrics to a checkpoint.
+        Also logs the checkpoint to Weights & Biases.
         """
-        artifact_name = f"{self.run_name}_checkpoint:latest"
-        try:
-            artifact = wandb.use_artifact(artifact_name)
-            artifact_dir = artifact.download()
-            checkpoint_path = os.path.join(artifact_dir, f"checkpoint_epoch.pth")
-            checkpoint = torch.load(checkpoint_path)
+        if self.is_master:
+            checkpoint_path = str(self.checkpoint_path)
+            atomic_torch_save(
+                {
+                    "ddp": self.ddp.state_dict(),
+                    "optimizer": self.optimizer.state_dict(),
+                    "train_sampler": self.train_sampler.state_dict(),
+                    "eval_sampler": self.eval_sampler.state_dict(),
+                    "metrics": self.metrics,
+                },
+                self.checkpoint_path,
+            )
+            self.timer.report("Checkpoint saved")
 
-            self.model.load_state_dict(checkpoint["model_state_dict"])
-            self.optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
-            print(f"Resumed training from epoch {checkpoint['epoch'] + 1}")
-            return checkpoint["epoch"] + 1
-        except wandb.errors.CommError:
-            print("No checkpoint found in W&B. Starting from scratch.")
-            return 0
-
-    def save_final_artifacts(self):
+    def log_metrics_to_wandb(self, metrics, epoch, phase):
         """
-        Save final model, metrics, and artifacts to W&B.
+        Logs training or evaluation metrics to Weights & Biases.
+
+        Args:
+            metrics (dict): Dictionary of metrics to log.
+            epoch (int): Current epoch number.
+            phase (str): 'train' or 'eval' phase.
         """
-        # Save the final model to W&B
-        final_model_path = "final_model.pth"
-        torch.save(self.model.state_dict(), final_model_path)
-        final_model_artifact = wandb.Artifact(name=f"{self.run_name}_final_model", type="model")
-        final_model_artifact.add_file(final_model_path)
-        wandb.log_artifact(final_model_artifact)
-        print("Final model saved to W&B!")
+        if self.is_master:
+            wandb.log({f"{phase}/loss": metrics["loss"], 
+                       f"{phase}/reconstruction_loss": metrics["reconstruction_loss"],
+                       f"{phase}/sparsity_loss": metrics["sparsity_loss"], "epoch": epoch})
 
-        # Save custom artifacts (e.g., activations, plots, etc.)
-        metrics_path = "evaluation_metrics.txt"
-        with open(metrics_path, "w") as f:
-            f.write("Example custom metric: TopActivatingSamples\n")
-            f.write("Custom evaluation metrics saved at the end of training.\n")
-
-        evaluation_artifact = wandb.Artifact(name=f"{self.run_name}_evaluation_results", type="evaluation")
-        evaluation_artifact.add_file(metrics_path)
-        wandb.log_artifact(evaluation_artifact)
-        print("Evaluation metrics saved to W&B!")
-
-    def train_loop(self):
+    def train_one_epoch(self, epoch):
         """
-        Run the training loop.
+        Performs one epoch of training, iterating over the training dataset.
+
+        Args:
+            epoch (int): The current epoch number.
         """
-        for epoch in range(self.start_epoch, self.hyperparams["epochs"]):
-            print(f"Epoch {epoch + 1}/{self.hyperparams['epochs']}")
-            self.model.train()
-            running_loss = 0.0
+        self.eigenmodel.train()
+        total_loss = 0
+        total_batches = 0
+        sparsity_loss = 0
+        reconstruction_loss = 0
+        for x in self.train_dataloader:
+            # Forward pass
+            jacobian = self.jacobian_fn(x.to(self.device_id))
+            #jacobian = {k: v.to(self.device_id) for k, v in jacobian.items()}
+            jvp = self.eigenmodel(jacobian)
+            reconstruction = self.eigenmodel.reconstruct(jvp)#.relu())
+            jvp_einops_shape = ' '.join(["d" + str(i) for i in range(len(jvp.shape)-1)])
 
-            for batch in self.train_dataloader:
-                batch = batch.to(self.device)
-                self.optimizer.zero_grad()
-                outputs = self.model(batch)
-                loss = outputs["loss"]
-                loss.backward()
-                self.optimizer.step()
-                running_loss += loss.item()
+            L2_error = torch.stack([
+                einops.einsum((reconstruction[name] - jacobian[name])**2, f'{jvp_einops_shape} ... -> {jvp_einops_shape}') 
+                for name in jacobian
+            ], dim=0).sum(dim=0).mean()
+            L0_error = einops.einsum((abs(jvp)), '... f -> ...').mean()
+            L = L2_error + self.L0_penalty * L0_error
 
-            avg_train_loss = running_loss / len(self.train_dataloader)
-            wandb.log({"epoch": epoch, "train_loss": avg_train_loss})
+            sparsity_loss += L0_error.item()
+            reconstruction_loss += L2_error.item()
+            total_loss += L.item()
+            total_batches = total_batches +1
+            
+            # Backpropagation and optimizer step
+            self.optimizer.zero_grad()
+            L.backward()
+            self.optimizer.step()
 
-            # Run evaluation
-            eval_loss = self.eval_loop(epoch)
-            wandb.log({"epoch": epoch, "eval_loss": eval_loss})
+        # Log to Weights & Biases
+        if epoch % self.log_epochs == 0:
+            if self.is_master:
+                self.log_metrics_to_wandb({
+                    "loss": total_loss/total_batches,
+                    "reconstruction_loss": reconstruction_loss/total_batches,
+                    "sparsity_loss": sparsity_loss/total_batches,}, epoch, "train")
+                self.timer.report(
+                    f'''
+                    Epoch {epoch},
+                    training loss: {total_loss/total_batches},
+                    training reconstruction_loss: {reconstruction_loss/total_batches},
+                    training sparsity_loss: {sparsity_loss/total_batches}'''
+                )
 
-            # Save checkpoint to W&B
-            if epoch % self.checkpoint_freq == 0 or epoch == self.hyperparams["epochs"] - 1:
-                self.save_checkpoint_to_wandb(epoch, avg_train_loss)
-
-        # Save final artifacts at the end of training
-        self.save_final_artifacts()
-
-    def eval_loop(self, epoch):
+    def evaluate(self, epoch):
         """
-        Run evaluation loop.
+        Evaluates the model on the evaluation dataset.
+
+        Args:
+            epoch (int): The current epoch number.
         """
-        self.model.eval()
-        eval_loss = 0.0
-        with torch.no_grad():
-            for batch in self.eval_dataloader:
-                batch = batch.to(self.device)
-                outputs = self.model(batch)
-                eval_loss += outputs["loss"].item()
+        self.eigenmodel.eval()
+        total_loss = 0
+        total_batches = 0
+        sparsity_loss = 0
+        reconstruction_loss = 0
+        for x in self.eval_dataloader:
+            jacobian = self.jacobian_fn(x)
+            
+            # Forward pass
+            jacobian = {k: v.to(self.device_id) for k, v in jacobian.items()}
+            jvp = self.eigenmodel(jacobian)
+            reconstruction = self.eigenmodel.reconstruct(jvp)#.relu())
+            jvp_einops_shape = ' '.join(["d" + str(i) for i in range(len(jvp.shape)-1)])
 
-        avg_eval_loss = eval_loss / len(self.eval_dataloader)
-        print(f"Epoch {epoch + 1}: Eval Loss = {avg_eval_loss:.4f}")
-        return avg_eval_loss
+            L2_error = torch.stack([
+                einops.einsum((reconstruction[name] - jacobian[name])**2, f'{jvp_einops_shape} ... -> {jvp_einops_shape}') 
+                for name in jacobian
+            ], dim=0).sum(dim=0).mean()
+            L0_error = einops.einsum((abs(jvp)), '... f -> ...').mean()
+            L = L2_error + self.L0_penalty * L0_error
 
+            sparsity_loss += L0_error.item()
+            reconstruction_loss += L2_error.item()
+            total_loss += L.item()
+            total_batches = total_batches +1
+            
 
-# ----------------------------------------
-# **Main Function to Run Training**
-# ----------------------------------------
-def main():
-    parser = argparse.ArgumentParser(description="Training Script for EigenEstimation")
-    parser.add_argument("--checkpoint-freq", type=int, default=5, help="Checkpoint frequency in epochs")
-    parser.add_argument("--run-name", type=str, default="eigen_train_run", help="Run name for W&B")
-    args = parser.parse_args()
+        # Log to Weights & Biases
+        if epoch % self.log_epochs == 0:
+            if self.is_master:
+                self.log_metrics_to_wandb({
+                    "loss": total_loss/total_batches,
+                    "reconstruction_loss": reconstruction_loss/total_batches,
+                    "sparsity_loss": sparsity_loss/total_batches,}, epoch, "eval")
+                self.timer.report(
+                    f'''
+                    Epoch {epoch},
+                    eval loss: {total_loss/total_batches},
+                    eval reconstruction_loss: {reconstruction_loss/total_batches},
+                    eval sparsity_loss: {sparsity_loss/total_batches}'''
+                )
 
-    # Hyperparameters
-    hyperparams = {
-        "input_dim": 5,
-        "hidden_dim": 2,
-        "n_networks": 3,
-        "hora_features": 15,
-        "hora_rank": 1,
-        "epochs": 20,
-        "batch_size": 32,
-        "lr": 0.001,
-        "device": "cuda" if torch.cuda.is_available() else "cpu",
-        "loss_fn": torch.nn.MSELoss()
-    }
-
-    # Data generators
-    def train_data_generator():
-        n_datapoints = 3 * 4096
-        X_tms_p, _, _ = tms.GenerateTMSDataParallel(
-            num_features=5, num_datapoints=n_datapoints, sparsity=0.05, n_networks=3
-        )
-        return X_tms_p
-
-    def eval_data_generator():
-        n_datapoints = 1000
-        X_tms_p, _, _ = tms.GenerateTMSDataParallel(
-            num_features=5, num_datapoints=n_datapoints, sparsity=0.05, n_networks=3
-        )
-        return X_tms_p
-
-    # Create Trainer instance
-    trainer = Trainer(
-        eigenmodel_class=EigenHora,
-        train_data_generator=train_data_generator,
-        eval_data_generator=eval_data_generator,
-        hyperparams=hyperparams,
-        checkpoint_freq=args.checkpoint_freq,
-        run_name=args.run_name
-    )
-
-    # Run Training
-    trainer.train_loop()
-
-
-# ----------------------------------------
-# **Run Script**
-# ----------------------------------------
-if __name__ == "__main__":
-    main()
+    def train(self):
+        """
+        Runs the full training process for the specified number of epochs.
+        Calls `train_one_epoch` for training and `evaluate` periodically.
+        """
+        for epoch in range(self.train_dataloader.sampler.epoch, self.epochs):
+            with self.train_dataloader.sampler.in_epoch(epoch):
+                self.train_one_epoch(epoch)
+                if epoch % self.log_epochs == 0:
+                    with self.eval_dataloader.sampler.in_epoch(epoch):
+                        self.evaluate(epoch)
+                if epoch % self.checkpoint_epochs == 0:
+                    self.save_checkpoint()
+        if self.is_master:
+            self.save_checkpoint()

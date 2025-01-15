@@ -114,7 +114,7 @@ def GenerateTMSDataParallel( num_features: int,
         #generator=torch.Generator(device=device)
     )
 
-    return X_tms, Y_tms, dataloader_tms
+    return X_tms, dataloader_tms
 
 
 

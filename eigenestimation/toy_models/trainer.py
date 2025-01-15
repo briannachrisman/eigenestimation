@@ -20,11 +20,11 @@ class Trainer:
         eval_data (Dataset): The evaluation dataset.
         args (argparse.Namespace): Training configuration arguments.
     """
-    def __init__(self, model, loss_fn, train_data, eval_data, args):
+    def __init__(self, model, loss_fn, train_data, eval_data, args, timer):
         """
         Initializes the Trainer object by setting up the model, dataloaders, optimizers, and checkpoint.
         """
-        self.timer = TimestampedTimer("Trainer Initialized")
+        self.timer = timer
         self.device_id = args.device_id
         self.is_master = args.is_master
         # Data loaders and samplers
@@ -36,7 +36,7 @@ class Trainer:
 
         # Model and training utilities setup
         self.model = DDP(model.to(self.device_id), device_ids=[self.device_id])
-        self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=args.lr)
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=args.lr)
         self.loss_fn = loss_fn
         self.metrics = {"train": MetricsTracker(), "eval": MetricsTracker()}
         self.checkpoint_path = args.checkpoint_dir / "checkpoint.pt"
@@ -57,7 +57,7 @@ class Trainer:
         """
         print(f"Loading checkpoint from {self.checkpoint_path}")
         checkpoint = torch.load(self.checkpoint_path, map_location=f"cuda:{self.device_id}")
-        self.model.load_state_dict(checkpoint["model"])
+        self.model.load_state_dict(checkpoint["ddp"])
         self.optimizer.load_state_dict(checkpoint["optimizer"])
         self.train_sampler.load_state_dict(checkpoint["train_sampler"])
         self.eval_sampler.load_state_dict(checkpoint["eval_sampler"])
@@ -73,7 +73,8 @@ class Trainer:
             checkpoint_path = str(self.checkpoint_path)
             atomic_torch_save(
                 {
-                    "model": self.model.state_dict(),
+                    "ddp": self.model.state_dict(),
+                    "model": self.model.module.state_dict(),
                     "optimizer": self.optimizer.state_dict(),
                     "train_sampler": self.train_sampler.state_dict(),
                     "eval_sampler": self.eval_sampler.state_dict(),
@@ -141,7 +142,6 @@ class Trainer:
                 predictions = self.model(inputs)
                 loss = loss + self.loss_fn(predictions, targets)
                 total_batches += 1
-            self.metrics["eval"].update({"loss": loss.item()/total_batches})
 
             # Log evaluation metrics
             if self.is_master:
@@ -162,4 +162,4 @@ class Trainer:
                 if epoch % self.checkpoint_epochs == 0:
                     self.save_checkpoint()
         if self.is_master:
-            self.timer.report(f"Training complete!")
+            self.save_checkpoint()

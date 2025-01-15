@@ -8,9 +8,10 @@ import os
 import shutil 
 
 class TransformDataLoader:
-    def __init__(self, data, transform_fn, batch_size):
-        self.dataloader = DataLoader(data, batch_size=batch_size, shuffle=True)
+    def __init__(self, dataloader, transform_fn, sampler):
+        self.dataloader = dataloader
         self.transform_fn = transform_fn
+        self.sampler = sampler
 
     def __iter__(self):
         for batch in self.dataloader:
