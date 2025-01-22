@@ -7,6 +7,7 @@ from torch.utils.data import TensorDataset, DataLoader
 import wandb  # Add Weights & Biases for tracking
 import os
 import sys
+import numpy as np
 
 # Append module directory for imports
 module_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../eigenestimation"))
@@ -17,11 +18,11 @@ from eigenmodel.eigenmodel import EigenModel
 from utils.utils import TransformDataLoader
 from utils.loss import MSELoss
 
-from toy_models.tms import AutoencoderSymmetric, GenerateTMSData, GenerateTMSDataParallel, AutoencoderParallel  # Import your model
+from toy_models.parallel_serial_network import CustomMLP, ParallelSerializedModel
 
 # Ensure correct device usage
 device = "cuda" if torch.cuda.is_available() else "cpu"
-
+print(device)
 from cycling_utils import TimestampedTimer
 
 timer = TimestampedTimer("Imported TimestampedTimer")
@@ -39,33 +40,41 @@ def get_args_parser():
     parser.add_argument("--lr", type=float, default=0.01, help="Learning rate")
     parser.add_argument("--batch-size", type=int, default=16, help="Batch size for training")
     parser.add_argument("--checkpoint-path", type=Path, required=True, help="Directory to save checkpoints")
-    
-    parser.add_argument("--model-path", type=Path, required=True, help="Filewith model")
-
-    
+        
     parser.add_argument("--checkpoint-epochs", type=int, required=True, help="Frequency at which to save checkpoints")
     
     parser.add_argument("--log-epochs", type=int, required=True, help="Frequency at which to save checkpoints")
-    
-    parser.add_argument("--n-features", type=int, default=5, help="Number of input features")
-    parser.add_argument("--n-hidden", type=int, default=2, help="Number of hidden features")
-    
+        
     parser.add_argument("--n-networks", type=int, default=2, help="Number of networks")
 
     parser.add_argument("--n-eigenfeatures", type=int, default=2, help="Number of networks")
     
     parser.add_argument("--n-eigenrank", type=int, default=2, help="Number of networks")
 
-
     parser.add_argument("--n-training-datapoints", type=int, default=100, help="Number of training data points")
 
     parser.add_argument("--L0-penalty", type=float, default=.01, help="Penalty")
     
     parser.add_argument("--n-eval-datapoints", type=int, default=100, help="Number of evaluation data points")
-    
-    parser.add_argument("--sparsity", type=float, default=0.1, help="Sparsity level for generated data")
-    
+        
     parser.add_argument("--wandb-project", type=str, default="tms-autoencoder-training", help="Weights & Biases project name")
+
+
+    # Advanced model structure arguments
+    parser.add_argument("--max-macrolayers", type=int, default=4, help="Maximum number of macrolayers in the network")
+    parser.add_argument("--max-layers-per-mlp", type=int, default=3, help="Maximum number of layers per MLP")
+    parser.add_argument("--max-mlps-per-macrolayer", type=int, default=6, help="Maximum number of MLPs per macrolayer")
+    parser.add_argument("--max-hidden-units-per-layer", type=int, default=10, help="Maximum hidden units per layer in an MLP")
+
+
+    # Input and output configuration
+    parser.add_argument("--input-dim", type=int, default=10, help="Input dimension for the model")
+    parser.add_argument("--output-dim", type=int, default=2, help="Output dimension for the model")
+
+    # Fully connected layer configurations
+    parser.add_argument("--n-fc-hidden-units", type=int, default=10, help="Number of hidden units in fully connected layers")
+    parser.add_argument("--n-fc-layers", type=int, default=5, help="Number of fully connected layers")
+    
     return parser
 
 def setup_distributed_training(args):
@@ -95,48 +104,47 @@ def main(args, timer):
     if args.is_master:
         wandb.init(project=args.wandb_project, config=vars(args))
 
+    model = CustomMLP(args.input_dim, [4, 6, 2, 4, 6, 2, 2], args.output_dim)
+    module_list = [
+        [[], list(range(2)), list(range(3)), list(range(1)), [], [], [], [], []],
+        [[], list(range(2,4)), list(range(3,6)), list(range(1,2)), [], [], [], [], []],
+        #[[], list(range(4,6)), list(range(6,9)), list(range(2,3)), [], [], [], [], []],
+        [[], [], [], [], list(range(2)), list(range(3)),list(range(1)), [], []],
+        [[], [], [], [], list(range(2,4)), list(range(3,6)), list(range(1,2)), [],[]],
+        #[[], [], [], [], list(range(4,6)), list(range(6,9)), list(range(2,3)), [], []],
+    ]
+
+    for module in module_list:
+        for layer_i, layer in enumerate(module[:-1]):
+                    if len(module[layer_i])==0 or len(module[layer_i+1])==0: continue
+                    mask = torch.ones_like(model.layers[layer_i].weight.data)
+                    for i in module[layer_i]:
+                        mask[:,i] = 0
+                        for j in module[layer_i+1]:
+                            mask[j,i:] = 0
+                            mask[j, i] = 1
+                    model.layers[layer_i].weight.data = model.layers[layer_i].weight.data*mask
+
+    subnetwork_model = model.to(args.device_id)
+    
     # Hyperparameters and model configuration
-    n_features = args.n_features
-    n_hidden = args.n_hidden
     n_training_datapoints = args.n_training_datapoints
     n_eval_datapoints = args.n_eval_datapoints
-    sparsity = args.sparsity
-    batch_size = args.batch_size
-
-    # Generate training and evaluation data
-    X_train, _ = GenerateTMSDataParallel(num_features=n_features, num_datapoints=n_training_datapoints, sparsity=sparsity, batch_size=batch_size, n_networks=args.n_networks)
     
-    X_eval, _ = GenerateTMSDataParallel(num_features=n_features, num_datapoints=n_eval_datapoints, sparsity=sparsity, batch_size=batch_size, n_networks=args.n_networks)
+    # Generate training and evaluation data
+    X_train = 2*torch.rand(args.n_training_datapoints, args.input_dim)-1
+    X_eval = 2*torch.rand(args.n_eval_datapoints, args.input_dim)-1
     
     # Create TensorDatasets for DataLoader compatibility
     train_dataset = X_train
     eval_dataset = X_eval
-    # Single model
-    model_checkpoint = torch.load(args.model_path, map_location=f"cuda:{args.device_id}")
-    tms_model = model_checkpoint["model"]
-    timer.report("Original model loaded")
-
-    tms_model_p = AutoencoderParallel(input_dim=n_features, hidden_dim=n_hidden, n_networks=args.n_networks)
     
-    
-    
-    # Transfer TMS model weights to a TMS parallel model.
-    for n,p in tms_model.named_parameters():
-        if "W" in n:
-            dict(tms_model_p.named_parameters())['W_in'].data = torch.block_diag(*[p for _ in range(args.n_networks)])
-            dict(tms_model_p.named_parameters())['W_out'].data = torch.block_diag(*[p.transpose(0,1) for _ in range(args.n_networks)])
-
-        if "b" in n:
-            dict(tms_model_p.named_parameters())[n].data = torch.concat([p for _ in range(args.n_networks)])
-        
     
 
-
-    eigenmodel = EigenModel(tms_model_p, ZeroOutput, MSELoss(), args.n_eigenfeatures, args.n_eigenrank)
-    
+    eigenmodel = EigenModel(subnetwork_model, ZeroOutput, MSELoss(), args.n_eigenfeatures, args.n_eigenrank)
     
     # Initialize the trainer and start training
-    trainer = Trainer(eigenmodel, train_dataset, eval_dataset, args, timer, )
+    trainer = Trainer(eigenmodel, train_dataset, eval_dataset, args, timer)
     trainer.train()
 
 if __name__ == "__main__":

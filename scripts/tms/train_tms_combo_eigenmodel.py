@@ -17,8 +17,7 @@ from eigenmodel.eigenmodel import EigenModel
 from utils.utils import TransformDataLoader
 from utils.loss import MSELoss
 
-from toy_models.tms import AutoencoderSymmetric, GenerateTMSData, GenerateTMSDataParallel, AutoencoderParallel  # Import your model
-
+from toy_models.tms import SingleHiddenLayerPerceptron, GenerateTMSAdditiveData
 # Ensure correct device usage
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -42,6 +41,8 @@ def get_args_parser():
     
     parser.add_argument("--model-path", type=Path, required=True, help="Filewith model")
 
+    parser.add_argument("--choose-k", type=int, required=True, help="Filewith model")
+
     
     parser.add_argument("--checkpoint-epochs", type=int, required=True, help="Frequency at which to save checkpoints")
     
@@ -50,12 +51,10 @@ def get_args_parser():
     parser.add_argument("--n-features", type=int, default=5, help="Number of input features")
     parser.add_argument("--n-hidden", type=int, default=2, help="Number of hidden features")
     
-    parser.add_argument("--n-networks", type=int, default=2, help="Number of networks")
 
     parser.add_argument("--n-eigenfeatures", type=int, default=2, help="Number of networks")
     
     parser.add_argument("--n-eigenrank", type=int, default=2, help="Number of networks")
-
 
     parser.add_argument("--n-training-datapoints", type=int, default=100, help="Number of training data points")
 
@@ -102,37 +101,27 @@ def main(args, timer):
     n_eval_datapoints = args.n_eval_datapoints
     sparsity = args.sparsity
     batch_size = args.batch_size
+    choose_k = args.choose_k
 
     # Generate training and evaluation data
-    X_train, _ = GenerateTMSDataParallel(num_features=n_features, num_datapoints=n_training_datapoints, sparsity=sparsity, batch_size=batch_size, n_networks=args.n_networks)
+    X_train, Y_train, dataloader_train = GenerateTMSAdditiveData(num_features=n_features, num_datapoints=n_training_datapoints, sparsity=sparsity, choose_k=choose_k, batch_size=batch_size)
     
-    X_eval, _ = GenerateTMSDataParallel(num_features=n_features, num_datapoints=n_eval_datapoints, sparsity=sparsity, batch_size=batch_size, n_networks=args.n_networks)
+    X_eval, Y_eval, dataloader_eval = GenerateTMSAdditiveData(num_features=n_features, num_datapoints=n_eval_datapoints, sparsity=sparsity, choose_k=choose_k, batch_size=batch_size)
+    
+    
     
     # Create TensorDatasets for DataLoader compatibility
     train_dataset = X_train
     eval_dataset = X_eval
+    
+    
     # Single model
     model_checkpoint = torch.load(args.model_path, map_location=f"cuda:{args.device_id}")
-    tms_model = model_checkpoint["model"]
+    model = model_checkpoint["model"]
     timer.report("Original model loaded")
 
-    tms_model_p = AutoencoderParallel(input_dim=n_features, hidden_dim=n_hidden, n_networks=args.n_networks)
     
-    
-    
-    # Transfer TMS model weights to a TMS parallel model.
-    for n,p in tms_model.named_parameters():
-        if "W" in n:
-            dict(tms_model_p.named_parameters())['W_in'].data = torch.block_diag(*[p for _ in range(args.n_networks)])
-            dict(tms_model_p.named_parameters())['W_out'].data = torch.block_diag(*[p.transpose(0,1) for _ in range(args.n_networks)])
-
-        if "b" in n:
-            dict(tms_model_p.named_parameters())[n].data = torch.concat([p for _ in range(args.n_networks)])
-        
-    
-
-
-    eigenmodel = EigenModel(tms_model_p, ZeroOutput, MSELoss(), args.n_eigenfeatures, args.n_eigenrank)
+    eigenmodel = EigenModel(model, ZeroOutput, MSELoss(), args.n_eigenfeatures, args.n_eigenrank)
     
     
     # Initialize the trainer and start training

@@ -1,0 +1,15 @@
+isc_project_id = "4c067223-8029-4381-aedf-8f62315ed584"
+experiment_name = "eigenestimation_test2"
+gpu_type = "24GB VRAM GPU"
+gpus = 8
+compute_mode = "burst"
+output_path = "~/outputs/eigenestimation_test"
+command = '''
+source ~/.eigenestimation/bin/activate && 
+cd ~/eigenestimation/ && 
+echo $NNODES $N_PROC
+rm outputs/toy_models/polytope2.pt
+torchrun  --nnodes=$NNODES --nproc-per-node=$N_PROC  scripts/polytope/train_polytope.py   --epochs 50000  --lr 0.001   --batch-size 32   --checkpoint-path outputs/toy_models/polytope2.pt \
+--data-path outputs/toy_models/polytope_data2.pt \
+  --checkpoint-epochs 1000 --n-features 2 --n-feature-choices 5 --n-hidden-units 3 --n-hidden-layers 3   --n-training-datapoints 10000   --n-eval-datapoints 10000   --wandb-project train-polytope --log-epochs 100
+'''

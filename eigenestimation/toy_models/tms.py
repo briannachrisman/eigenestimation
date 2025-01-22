@@ -4,6 +4,7 @@ import numpy as np
 from torch.utils.data import DataLoader, TensorDataset
 import einops
 from typing import Tuple
+import itertools
 
 class AutoencoderSymmetric(nn.Module):
     def __init__(self, input_dim: int, hidden_dim: int) -> None:
@@ -49,6 +50,31 @@ class Autoencoder(nn.Module):
         # Add bias and apply ReLU activation
         x_hat = x_hat + self.b
         return torch.relu(x_hat)
+    
+    
+class SingleHiddenLayerPerceptron(nn.Module):
+    def __init__(self, input_dim: int, hidden_dim: int, output_dim:int) -> None:
+        super(SingleHiddenLayerPerceptron, self).__init__()
+
+        # Define parameters for the autoencoder
+        self.W_in: nn.Parameter = nn.Parameter(torch.randn(input_dim, hidden_dim))
+        self.W_out: nn.Parameter = nn.Parameter(torch.randn(hidden_dim, output_dim))
+
+        self.b: nn.Parameter = nn.Parameter(torch.zeros(output_dim))
+
+        # Initialize W with Xavier normal
+        #nn.init.xavier_normal_(self.W_in)
+        #nn.init.xavier_normal_(self.W_out)
+
+        
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        # Encoding step
+        h: torch.Tensor = einops.einsum(self.W_in, x, 'f h, b f -> b h')
+        # Decoding step
+        x_hat: torch.Tensor = einops.einsum(self.W_out, h, 'h o, b h -> b o')
+        # Add bias and apply ReLU activation
+        x_hat = x_hat + self.b
+        return torch.relu(x_hat)
 
 def GenerateTMSData(
     num_features: int, 
@@ -81,6 +107,53 @@ def GenerateTMSData(
     )
 
     return X_tms, dataloader_tms
+
+
+def GenerateTMSAdditiveData(
+    num_features: int, 
+    num_datapoints: int, 
+    sparsity: float, 
+    choose_k: int,
+    batch_size: int,
+   # device: str
+) -> Tuple[torch.Tensor, torch.Tensor, DataLoader]:
+    
+    # Initialize feature vectors with random values
+    feature_vectors: np.ndarray = np.random.rand(num_datapoints, num_features)
+    # Apply sparsity to the feature vectors
+    feature_vectors = feature_vectors * (np.random.rand(num_datapoints, num_features) < sparsity)
+
+    # Remove feature vectors that are all zeros
+    non_zero_indices: np.ndarray = np.any(feature_vectors != 0, axis=1)
+    feature_vectors = feature_vectors[non_zero_indices]
+
+    # Convert feature vectors to numpy arrays
+    data_inputs: np.ndarray = np.array(feature_vectors)
+    
+    
+    # Generate combinations of num_features choose choose_k
+    feature_idxs = np.array(list(itertools.combinations(range(num_features), choose_k)))
+    
+    additive_block_mat = torch.zeros((num_features, len(feature_idxs)))
+    print(additive_block_mat.shape, 'shape')
+    for idx, combo in enumerate(feature_idxs):
+        for c in combo:
+            additive_block_mat[c, idx] = 1
+            
+    # Create tensors from numpy arrays and move to GPU
+    X_tms: torch.Tensor = torch.tensor(data_inputs, dtype=torch.float32)
+    
+    Y_tms: torch.Tensor = einops.einsum(X_tms, additive_block_mat, 'b f, f k -> b k')
+
+
+    # Create a DataLoader for the dataset
+    dataloader_tms: DataLoader = DataLoader(
+        TensorDataset(X_tms, Y_tms), 
+        batch_size=batch_size, 
+        shuffle=True, 
+    )
+
+    return X_tms, Y_tms, dataloader_tms
 
 
 def GenerateTMSDataParallel( num_features: int, 

@@ -28,7 +28,7 @@ class Trainer:
         eval_data (Dataset): The evaluation dataset.
         args (argparse.Namespace): Training configuration arguments.
     """
-    def __init__(self, eigenmodel, train_data, eval_data, jacobian_fn, args, timer):
+    def __init__(self, eigenmodel, train_data, eval_data, args, timer, compute_jacobian=True):
         """
         Initializes the Trainer object by setting up the model, dataloaders, optimizers, and checkpoint.
         """
@@ -38,7 +38,6 @@ class Trainer:
         # Data loaders and samplers
         self.train_sampler = InterruptableDistributedSampler(train_data)
         self.eval_sampler = InterruptableDistributedSampler(eval_data)
-        self.jacobian_fn = jacobian_fn
         
         self.train_dataloader = DataLoader(train_data, batch_size=args.batch_size, sampler=self.train_sampler)
             
@@ -48,15 +47,16 @@ class Trainer:
         self.timer.report("Data loaders initialized")
 
         # Model and training utilities setup
-        self.ddp = DDP(eigenmodel.to(self.device_id), device_ids=[self.device_id])
-        self.eigenmodel = self.ddp.module
-        self.optimizer = torch.optim.Adam(self.eigenmodel.parameters(), lr=args.lr)
+        self.model = DDP(eigenmodel.to(self.device_id), device_ids=[self.device_id])
+        params_to_optimize = [*[t for name in self.model.module.low_rank for t in self.model.module.low_rank[name]]]
+        self.optimizer = torch.optim.Adam(params_to_optimize, lr=args.lr)
         self.metrics = {"train": MetricsTracker(), "eval": MetricsTracker()}
-        self.checkpoint_path = args.checkpoint_dir / "checkpoint.pt"
+        self.checkpoint_path = args.checkpoint_path
         self.checkpoint_epochs = args.checkpoint_epochs
         self.log_epochs = args.log_epochs
         self.epochs = args.epochs
         self.L0_penalty = args.L0_penalty
+        self.compute_jacobian = compute_jacobian
 
         os.makedirs(self.checkpoint_path.parent, exist_ok=True)
         self.timer.report("Model and training utilities initialized")
@@ -71,12 +71,13 @@ class Trainer:
         """
         print(f"Loading checkpoint from {self.checkpoint_path}")
         checkpoint = torch.load(self.checkpoint_path, map_location=f"cuda:{self.device_id}")
-        self.ddp.load_state_dict(checkpoint["ddp"])
+        self.model = DDP(checkpoint["model"].to(self.device_id), device_ids=[self.device_id])
         self.optimizer.load_state_dict(checkpoint["optimizer"])
         self.train_sampler.load_state_dict(checkpoint["train_sampler"])
         self.eval_sampler.load_state_dict(checkpoint["eval_sampler"])
         self.metrics = checkpoint["metrics"]
         self.timer.report("Checkpoint loaded")
+        
         
     def save_checkpoint(self):
         """
@@ -87,7 +88,7 @@ class Trainer:
             checkpoint_path = str(self.checkpoint_path)
             atomic_torch_save(
                 {
-                    "ddp": self.ddp.state_dict(),
+                    "model": self.model.module,
                     "optimizer": self.optimizer.state_dict(),
                     "train_sampler": self.train_sampler.state_dict(),
                     "eval_sampler": self.eval_sampler.state_dict(),
@@ -118,17 +119,19 @@ class Trainer:
         Args:
             epoch (int): The current epoch number.
         """
-        self.eigenmodel.train()
+        self.model.train()
         total_loss = 0
         total_batches = 0
         sparsity_loss = 0
         reconstruction_loss = 0
         for x in self.train_dataloader:
             # Forward pass
-            jacobian = self.jacobian_fn(x.to(self.device_id))
+            if self.compute_jacobian:
+                jacobian = self.model.module.compute_jacobian(x.to(self.device_id))
+            else: jacobian = x
             #jacobian = {k: v.to(self.device_id) for k, v in jacobian.items()}
-            jvp = self.eigenmodel(jacobian)
-            reconstruction = self.eigenmodel.reconstruct(jvp)#.relu())
+            jvp = self.model(jacobian)
+            reconstruction = self.model.module.reconstruct(jvp)#.relu())
             jvp_einops_shape = ' '.join(["d" + str(i) for i in range(len(jvp.shape)-1)])
 
             L2_error = torch.stack([
@@ -170,18 +173,19 @@ class Trainer:
         Args:
             epoch (int): The current epoch number.
         """
-        self.eigenmodel.eval()
+        self.model.eval()
         total_loss = 0
         total_batches = 0
         sparsity_loss = 0
         reconstruction_loss = 0
         for x in self.eval_dataloader:
-            jacobian = self.jacobian_fn(x)
-            
+            if self.compute_jacobian:
+                jacobian = self.model.module.compute_jacobian(x.to(self.device_id))
+            else: jacobian = x            
             # Forward pass
             jacobian = {k: v.to(self.device_id) for k, v in jacobian.items()}
-            jvp = self.eigenmodel(jacobian)
-            reconstruction = self.eigenmodel.reconstruct(jvp)#.relu())
+            jvp = self.model(jacobian)
+            reconstruction = self.model.module.reconstruct(jvp)#.relu())
             jvp_einops_shape = ' '.join(["d" + str(i) for i in range(len(jvp.shape)-1)])
 
             L2_error = torch.stack([

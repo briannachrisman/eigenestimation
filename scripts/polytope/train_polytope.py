@@ -17,7 +17,7 @@ module_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../eige
 sys.path.append(module_dir)
 
 from toy_models.trainer import Trainer
-from toy_models.tms import AutoencoderSymmetric, GenerateTMSData  # Import your model
+from toy_models.polytope import ReluNetwork, GeneratePolytopeData  # Import your model
 
 # Ensure correct device usage
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -35,16 +35,19 @@ def get_args_parser():
     parser.add_argument("--lr", type=float, default=0.01, help="Learning rate")
     parser.add_argument("--batch-size", type=int, default=16, help="Batch size for training")
     parser.add_argument("--checkpoint-path", type=Path, required=True, help="Directory to save checkpoints")
+    parser.add_argument("--data-path", type=Path, required=True, help="Directory to save data")
+
     parser.add_argument("--checkpoint-epochs", type=int, required=True, help="Frequency at which to save checkpoints")
     
     parser.add_argument("--log-epochs", type=int, required=True, help="Frequency at which to save checkpoints")
     
-    parser.add_argument("--n-features", type=int, default=5, help="Number of input features")
-    parser.add_argument("--n-hidden", type=int, default=2, help="Number of hidden features")
+    parser.add_argument("--n-features", type=int, default=2, help="Number of input features")
+    parser.add_argument("--n-feature-choices", type=int, default=5, help="Number of input features")
+    parser.add_argument("--n-hidden-units", type=int, default=2, help="Number of hidden units")
+    parser.add_argument("--n-hidden-layers", type=int, default=2, help="Number of hidden layers")
     parser.add_argument("--n-training-datapoints", type=int, default=100, help="Number of training data points")
     parser.add_argument("--n-eval-datapoints", type=int, default=100, help="Number of evaluation data points")
-    parser.add_argument("--sparsity", type=float, default=0.1, help="Sparsity level for generated data")
-    parser.add_argument("--wandb-project", type=str, default="tms-autoencoder-training", help="Weights & Biases project name")
+    parser.add_argument("--wandb-project", type=str, default="polytope-training", help="Weights & Biases project name")
     return parser
 
 def setup_distributed_training(args):
@@ -74,28 +77,28 @@ def main(args, timer):
     if args.is_master:
         wandb.init(project=args.wandb_project, config=vars(args))
 
-    # Hyperparameters and model configuration
-    n_features = args.n_features
-    n_hidden = args.n_hidden
-    n_training_datapoints = args.n_training_datapoints
-    n_eval_datapoints = args.n_eval_datapoints
-    sparsity = args.sparsity
-    batch_size = args.batch_size
-
     # Generate training and evaluation data
-    X_train, _ = GenerateTMSData(num_features=n_features, num_datapoints=n_training_datapoints, sparsity=sparsity, batch_size=batch_size)
-    y_train = X_train
+    X, y, lookup_dict = GeneratePolytopeData(
+        args.n_features,
+        args.n_feature_choices, 
+        (args.n_training_datapoints + args.n_eval_datapoints)
+        )
+    torch.save(lookup_dict, args.data_path)
+    X_train, y_train = X[:args.n_training_datapoints], y[:args.n_training_datapoints]
+    X_eval, y_eval = X[-args.n_eval_datapoints:], y[-args.n_eval_datapoints:]
     
-    X_eval, _ = GenerateTMSData(num_features=n_features, num_datapoints=n_eval_datapoints, sparsity=sparsity, batch_size=batch_size)
-    y_eval = X_eval 
     
     # Create TensorDatasets for DataLoader compatibility
     train_dataset = TensorDataset(X_train, y_train)
     eval_dataset = TensorDataset(X_eval, y_eval)
 
     # Initialize the model and loss function
-    model = AutoencoderSymmetric(n_features, n_hidden).to(device)
-    criterion = nn.MSELoss()
+    model = ReluNetwork(
+        args.n_features,
+        args.n_feature_choices**args.n_features,
+        args.n_hidden_layers, args.n_hidden_units).to(device)
+    
+    criterion = nn.CrossEntropyLoss()
 
     # Initialize the trainer and start training
     trainer = Trainer(model, criterion, train_dataset, eval_dataset, args, timer)

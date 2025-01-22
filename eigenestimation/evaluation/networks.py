@@ -35,7 +35,7 @@ def DrawNeuralNetwork(weights_dict, biases_dict, title=''):
     max_y = .2*max(layer_sizes)
     
     #if ax is None:
-    fig, ax = plt.subplots(figsize=(len(weights_dict), max_y))
+    fig, ax = plt.subplots(figsize=(len(weights_dict), 1+max_y))
 
     ax.axis('off')  # Turn off the axis
 
@@ -44,7 +44,7 @@ def DrawNeuralNetwork(weights_dict, biases_dict, title=''):
         for idx, y in enumerate(layer_y):
             # Normalize bias darkness
             bias_value = biases[idx] if biases is not None else 0
-            color = (1, 0, 0, abs(bias_value)) if bias_value > 0 else (0, 0, 1, abs(bias_value))
+            color = (1, 0, 0, min(1,abs(bias_value))) if bias_value > 0 else (0, 0, 1, min(abs(bias_value), 1))
             
             ax.plot(layer_x, y, 'o', markersize=8, color=color, markeredgecolor='black', markeredgewidth=.5)
         ax.text(text_x, 1.0, label, ha='center', fontsize=5, color='black')

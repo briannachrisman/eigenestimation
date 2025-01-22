@@ -1,0 +1,13 @@
+isc_project_id = "4c067223-8029-4381-aedf-8f62315ed584"
+experiment_name = "train_tms_combo"
+gpu_type = "24GB VRAM GPU"
+gpus = 4
+compute_mode = "burst"
+output_path = "~/outputs/eigenestimation_test"
+command = '''
+source ~/.eigenestimation/bin/activate && 
+cd ~/eigenestimation/ && 
+echo $NNODES $N_PROC &&
+rm outputs/toy_models/tms_combo.pt &&
+torchrun  --nnodes=$NNODES --nproc-per-node=$N_PROC  scripts/tms/train_tms_combo.py   --epochs 1000  --lr 0.001   --batch-size 64   --checkpoint-path outputs/toy_models/tms_combo.pt  --checkpoint-epochs 100 --n-features 3   --n-hidden 2   --n-training-datapoints 10000   --n-eval-datapoints 1000   --sparsity 0.1  --choose-k 2 --wandb-project tms-combo --log-epochs 100
+'''
