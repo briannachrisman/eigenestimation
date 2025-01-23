@@ -20,8 +20,8 @@ torchrun  --nnodes=$NNODES --nproc-per-node=$N_PROC  scripts/modular/train_modul
     --max-layers-per-mlp 2 \
     --max-mlps-per-macrolayer 2 \
     --max-hidden-units-per-layer 2 \
-    --input-dim 2 \
-    --output-dim 1 \
+    --input-dim 5 \
+    --output-dim 5 \
     --n-fc-hidden-units 3 \
     --n-fc-layers 3
 '''

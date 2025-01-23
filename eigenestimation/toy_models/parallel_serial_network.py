@@ -23,7 +23,7 @@ class CustomMLP(nn.Module):
         
         # Initialize weights
         for layer in layers:
-            nn.init.uniform_(layer.weight, 0,1)
+            nn.init.xavier_normal_(layer.weight)
             nn.init.zeros_(layer.bias)
         
         # Register layer parametrs with names

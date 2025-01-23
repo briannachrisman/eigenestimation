@@ -1,0 +1,28 @@
+isc_project_id = "4c067223-8029-4381-aedf-8f62315ed584"
+experiment_name = "eigenestimation_test"
+gpu_type = "24GB VRAM GPU"
+gpus = 4
+compute_mode = "cycle"
+output_path = "~/outputs/eigenestimation_test"
+command = '''
+source ~/.eigenestimation/bin/activate && 
+cd ~/eigenestimation/ && 
+echo $NNODES $N_PROC &&
+rm outputs/toy_models/piecewise.pt &&
+torchrun  --nnodes=$NNODES --nproc-per-node=$N_PROC  scripts/piecewise/train_piecewise.py   \
+    --epochs 1000 \
+    --lr 0.0001 \
+    --batch-size 64 \
+    --checkpoint-path outputs/toy_models/piecewise.pt \
+    --dataset-path outputs/toy_models/piecewise_training_data.pt \
+    --checkpoint-epochs 100 \
+    --log-epochs 100 \
+    --n-training-datapoints 10000 \
+    --n-eval-datapoints 10000 \
+    --wandb-project piecewise-network \
+    --n-hidden-units 3 \
+    --n-hidden-layers 3 \
+    --input-dim 1 \
+    --output-dim 1 \
+    --n-knots 10
+'''

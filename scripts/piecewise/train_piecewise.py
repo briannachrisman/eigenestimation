@@ -9,7 +9,7 @@ import os
 import sys
 import numpy as np
 from cycling_utils import TimestampedTimer
-
+from torch import Tensor 
 timer = TimestampedTimer("Imported TimestampedTimer")
 
 # Append module directory for imports
@@ -38,7 +38,7 @@ def get_args_parser():
     parser.add_argument("--lr", type=float, default=0.01, help="Learning rate")
     parser.add_argument("--batch-size", type=int, default=16, help="Batch size for training")
     parser.add_argument("--checkpoint-path", type=Path, required=True, help="Directory to save checkpoints")
-    parser.add_argument("--subnetwork-path", type=Path, required=True, help="Directory to save subnetwork model")
+    parser.add_argument("--dataset-path", type=Path, required=True, help="Directory to save checkpoints")
     parser.add_argument("--checkpoint-epochs", type=int, required=True, help="Frequency at which to save checkpoints")
     parser.add_argument("--log-epochs", type=int, required=True, help="Frequency at which to log metrics")
 
@@ -47,19 +47,15 @@ def get_args_parser():
     parser.add_argument("--n-eval-datapoints", type=int, default=100, help="Number of evaluation data points")
     parser.add_argument("--wandb-project", type=str, default="subnetworks-fc", help="Weights & Biases project name")
 
-    # Advanced model structure arguments
-    parser.add_argument("--max-macrolayers", type=int, default=4, help="Maximum number of macrolayers in the network")
-    parser.add_argument("--max-layers-per-mlp", type=int, default=3, help="Maximum number of layers per MLP")
-    parser.add_argument("--max-mlps-per-macrolayer", type=int, default=6, help="Maximum number of MLPs per macrolayer")
-    parser.add_argument("--max-hidden-units-per-layer", type=int, default=10, help="Maximum hidden units per layer in an MLP")
-
     # Input and output configuration
     parser.add_argument("--input-dim", type=int, default=10, help="Input dimension for the model")
     parser.add_argument("--output-dim", type=int, default=2, help="Output dimension for the model")
 
     # Fully connected layer configurations
-    parser.add_argument("--n-fc-hidden-units", type=int, default=10, help="Number of hidden units in fully connected layers")
-    parser.add_argument("--n-fc-layers", type=int, default=5, help="Number of fully connected layers")
+    parser.add_argument("--n-hidden-units", type=int, default=10, help="Number of hidden units in fully connected layers")
+    parser.add_argument("--n-hidden-layers", type=int, default=5, help="Number of fully connected layers")
+
+    parser.add_argument("--n-knots", type=int, default=5, help="Number of fully connected layers")
 
     return parser
 
@@ -80,49 +76,75 @@ def setup_distributed_training(args):
     args.is_master = rank == 0  # Check if the current process is the master
     return rank
 
+def create_random_piecewise_function(intervals, range_y):
+    """
+    Create and plot a random piecewise function.
+
+    Parameters:
+        intervals (list of tuples): List of (start, end) tuples for each piece.
+        range_y (tuple): Range of y-values for the random function.
+        x_dense (numpy.ndarray): Dense x-values for the piecewise function.
+
+
+    Returns:
+        y_dense (numpy.ndarray): Corresponding y-values.
+    """
+    
+    # Create random control points for each interval
+    x_points = []
+    y_points = []
+    for start, end in intervals:
+        x_points.append(start)
+        y_points.append(np.random.uniform(range_y[0], range_y[1]))
+    
+    # Add the final endpoint
+    x_points.append(intervals[-1][1])
+    y_points.append(np.random.uniform(range_y[0], range_y[1]))
+
+    x_points = np.array(x_points)
+    y_points = np.array(y_points)
+    
+    return lambda x: np.interp(x, x_points, y_points)
+
 def main(args, timer):
     """
     Main function to initialize data, model, and trainer, and begin training.
     """
     rank = setup_distributed_training(args)
-
+    
     # Initialize Weights & Biases (only in the master process)
     if args.is_master:
         wandb.init(project=args.wandb_project, config=vars(args))
-
-    # Create a random set of subnetworks
-    mlps_per_macrolayer = [args.input_dim] + [args.max_mlps_per_macrolayer for _ in range(args.max_macrolayers)] + [args.output_dim]
-    subnetworks = [
-        [
-            CustomMLP(mlps_per_macrolayer[i],
-                [args.max_hidden_units_per_layer for _ in range(args.max_layers_per_mlp)], 
-                1) for _ in range(mlps_per_macrolayer[i+1])
-        ] 
-        for i in range(len(mlps_per_macrolayer)-1)
-    ]
-
-    
-    # Use the subnetworks to set up the fully connected model
-    subnetwork_model = ParallelSerializedModel(
-            parallel_layers=subnetworks,
-    ).to(device)
-    if args.is_master:
-        torch.save(subnetwork_model, args.subnetwork_path)
         
-    np.random.seed(42)
+    np.random.seed(21)
     # Generate data
-    X_train = 2*torch.rand(args.n_training_datapoints, args.input_dim, device=device)-1  # Batch size of 4, 10 input features
-    y_train, _ = subnetwork_model(X_train)
     
-    X_eval = 2*torch.rand(args.n_eval_datapoints, args.input_dim, device=device)-1  # Batch size of 4, 10 input features
-    y_eval, _ = subnetwork_model(X_eval)
     
-    train_dataset = TensorDataset(X_train, y_train.detach())
-    eval_dataset = TensorDataset(X_eval, y_eval.detach())
-    timer.report("Generated Data")
+    knots = np.linspace(-1,1, args.n_knots)
+    intervals = [(knots[i], knots[i+1]) for i in range(len(knots)-1)]
+    range_y = (-1, 1)
+    piecewise_fn = create_random_piecewise_function(intervals, range_y)
+    
+    # Save piecewise_fn as pickled object
+    
+    X_train = 2*np.random.rand(args.n_training_datapoints, args.input_dim)-1  # Batch size of 4, 10 input features
+    y_train = piecewise_fn(X_train)
+    
+    X_eval = 2*np.random.rand(args.n_training_datapoints, args.input_dim)-1  # Batch size of 4, 10 input features
+    y_eval = piecewise_fn(X_eval)
+    
+    # Save X_train, y_train, X_eval, y_eval as pickled objects
+    
+    
+    train_dataset = TensorDataset(Tensor(X_train), Tensor(y_train))
+    if args.is_master:
+        torch.save(train_dataset, args.dataset_path)
 
-    fc_network = CustomMLP(
-        args.input_dim, [args.n_fc_hidden_units for _ in range(args.n_fc_layers)], args.output_dim)
+    eval_dataset = TensorDataset(Tensor(X_eval), Tensor(y_eval))
+    timer.report("Generated Data")
+    
+    print(X_train.shape, y_train.shape, 'SHAPE!!!')
+    fc_network = CustomMLP(args.input_dim, [args.n_hidden_units for _ in range(args.n_hidden_layers)], args.output_dim)
     
     criterion = nn.MSELoss()
     # Initialize the trainer and start training
