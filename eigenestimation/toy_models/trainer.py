@@ -36,7 +36,9 @@ class Trainer:
 
         # Model and training utilities setup
         self.model = DDP(model.to(self.device_id), device_ids=[self.device_id])
-        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=args.lr, weight_decay=.001)
+        self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=args.lr, weight_decay=.001)
+        self.lr_scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer, step_size=args.lr_step_epochs, gamma=args.lr_decay_rate)
+
         self.loss_fn = loss_fn
         self.metrics = {"train": MetricsTracker(), "eval": MetricsTracker()}
         self.checkpoint_path = args.checkpoint_path 
@@ -59,6 +61,7 @@ class Trainer:
         checkpoint = torch.load(self.checkpoint_path, map_location=f"cuda:{self.device_id}")
         self.model = DDP(checkpoint["model"].to(self.device_id), device_ids=[self.device_id])
         self.optimizer.load_state_dict(checkpoint["optimizer"])
+        self.lr_scheduler.load_state_dict(checkpoint["lr_scheduler"])
         self.train_sampler.load_state_dict(checkpoint["train_sampler"])
         self.eval_sampler.load_state_dict(checkpoint["eval_sampler"])
         self.metrics = checkpoint["metrics"]
@@ -75,6 +78,7 @@ class Trainer:
                 {
                     "model": self.model.module,
                     "optimizer": self.optimizer.state_dict(),
+                    "lr_scheduler": self.lr_scheduler.state_dict(),
                     "train_sampler": self.train_sampler.state_dict(),
                     "eval_sampler": self.eval_sampler.state_dict(),
                     "metrics": self.metrics,
@@ -105,6 +109,7 @@ class Trainer:
         self.model.train()
         total_loss = 0
         total_batches = 0
+        train_batches_per_epoch = len(train_dataloader)
         for inputs, targets in train_dataloader:
             inputs, targets = inputs.to(self.device_id), targets.to(self.device_id)
     
@@ -117,6 +122,11 @@ class Trainer:
             self.optimizer.zero_grad()
             loss.backward()
             self.optimizer.step()
+            
+            batch = train_dataloader.sampler.progress // train_dataloader.batch_size
+            is_last_batch = (batch + 1) == train_batches_per_epoch
+        if self.is_master:
+            self.lr_scheduler.step() 
 
         # Log to Weights & Biases
         if epoch % self.log_epochs == 0:
@@ -135,12 +145,14 @@ class Trainer:
         self.model.eval()
         loss = 0
         total_batches = 0
+
         with torch.no_grad():
             for inputs, targets in self.eval_dataloader:
                 inputs, targets = inputs.to(self.device_id), targets.to(self.device_id)
                 predictions = self.model(inputs)
                 loss = loss + self.loss_fn(predictions, targets)
-                total_batches += 1
+                total_batches = total_batches +1
+
 
             # Log evaluation metrics
             if self.is_master:
@@ -165,4 +177,5 @@ class Trainer:
             self.timer.report("Finished training!")
             self.save_checkpoint()
             self.timer.report("Done")
+            
 

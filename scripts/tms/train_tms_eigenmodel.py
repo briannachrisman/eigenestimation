@@ -37,6 +37,8 @@ def get_args_parser():
     parser = argparse.ArgumentParser(description="Training configuration")
     parser.add_argument("--epochs", type=int, default=10, help="Number of training epochs")
     parser.add_argument("--lr", type=float, default=0.01, help="Learning rate")
+    parser.add_argument("--lr-step-epochs", type=int, default=10, help="Learning rate step epochs")
+    parser.add_argument("--lr-decay-rate", type=float, default=0.1, help="Learning rate step size")
     parser.add_argument("--batch-size", type=int, default=16, help="Batch size for training")
     parser.add_argument("--checkpoint-path", type=Path, required=True, help="Directory to save checkpoints")
     

@@ -19,6 +19,7 @@ from utils.utils import TransformDataLoader
 from utils.loss import MSELoss
 
 from toy_models.parallel_serial_network import CustomMLP, ParallelSerializedModel
+from toy_models.tms import GenerateTMSData
 
 # Ensure correct device usage
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -38,6 +39,10 @@ def get_args_parser():
     parser = argparse.ArgumentParser(description="Training configuration")
     parser.add_argument("--epochs", type=int, default=10, help="Number of training epochs")
     parser.add_argument("--lr", type=float, default=0.01, help="Learning rate")
+    
+    parser.add_argument("--lr-step-epochs", type=int, default=100, help="Learning rate")
+    parser.add_argument("--lr-decay-rate", type=float, default=0.8, help="Learning rate")
+    
     parser.add_argument("--batch-size", type=int, default=16, help="Batch size for training")
     parser.add_argument("--checkpoint-path", type=Path, required=True, help="Directory to save checkpoints")
 
@@ -55,6 +60,9 @@ def get_args_parser():
     parser.add_argument("--n-eigenrank", type=int, default=2, help="Number of networks")
 
     parser.add_argument("--n-training-datapoints", type=int, default=100, help="Number of training data points")
+
+    parser.add_argument("--sparsity", type=float, default=.05, help="Sparisty")
+
 
     parser.add_argument("--L0-penalty", type=float, default=.01, help="Penalty")
     
@@ -96,24 +104,31 @@ def main(args, timer):
     if args.is_master:
         wandb.init(project=args.wandb_project, config=vars(args))
 
+
     # Load submodel
-    piecewise_model = torch.load(args.model_path, map_location=f"cuda:{args.device_id}")['model']
+    model = torch.load(args.model_path, map_location=f"cuda:{args.device_id}")['model']
     
+    
+    n_features = model.layers[0].in_features
+
     # Hyperparameters and model configuration
     n_training_datapoints = args.n_training_datapoints
     n_eval_datapoints = args.n_eval_datapoints
     
-    # Generate training and evaluation data
-    X_train = 2*torch.rand(args.n_training_datapoints, 1)-1
-    X_eval = 2*torch.rand(args.n_eval_datapoints, 1)-1
+    X_train, _ = GenerateTMSData(num_features=n_features, num_datapoints=args.n_training_datapoints, sparsity=args.sparsity, batch_size=args.batch_size)
+    train_dataset = X_train * (2*torch.rand_like(X_train).round() - 1)
     
-    # Create TensorDatasets for DataLoader compatibility
-    train_dataset = X_train
-    eval_dataset = X_eval
+    print(X_train.shape)
+    
+    X_eval, _ = GenerateTMSData(num_features=n_features, num_datapoints=args.n_eval_datapoints, sparsity=args.sparsity, batch_size=args.batch_size)
+    eval_dataset = X_eval * (2*torch.rand_like(X_eval).round() - 1)
+
+
+
     
     
 
-    eigenmodel = EigenModel(piecewise_model, ZeroOutput, MSELoss(), args.n_eigenfeatures, args.n_eigenrank)
+    eigenmodel = EigenModel(model, ZeroOutput, MSELoss(), args.n_eigenfeatures, args.n_eigenrank)
     
     # Initialize the trainer and start training
     trainer = Trainer(eigenmodel, train_dataset, eval_dataset, args, timer)

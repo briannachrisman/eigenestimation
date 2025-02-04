@@ -17,11 +17,13 @@ module_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../eige
 sys.path.append(module_dir)
 
 from toy_models.trainer import Trainer
-from toy_models.tms import AutoencoderSymmetric, GenerateTMSData  # Import your model
+from toy_models.tms import SingleHiddenLayerPerceptron, GenerateTMSPolynomialData
 
 # Ensure correct device usage
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
+# Set torch seed
+torch.manual_seed(42)
 
 def get_args_parser():
     """
@@ -33,21 +35,24 @@ def get_args_parser():
     parser = argparse.ArgumentParser(description="Training configuration")
     parser.add_argument("--epochs", type=int, default=10, help="Number of training epochs")
     parser.add_argument("--lr", type=float, default=0.01, help="Learning rate")
-    parser.add_argument("--lr-step-epochs", type=int, default=10, help="Learning rate step epochs")
-    parser.add_argument("--lr-decay-rate", type=float, default=0.1, help="Learning rate step size")
+    parser.add_argument("--lr-step-epochs", type=int, default=100, help="Learning rate step epochs")
+    parser.add_argument("--lr-decay-rate", type=float, default=0.9, help="Learning rate decay rate")
     parser.add_argument("--batch-size", type=int, default=16, help="Batch size for training")
     parser.add_argument("--checkpoint-path", type=Path, required=True, help="Directory to save checkpoints")
     parser.add_argument("--checkpoint-epochs", type=int, required=True, help="Frequency at which to save checkpoints")
-    
+    parser.add_argument("--max-coefficient", type=float, default=5, help="Maximum coefficient for generated data")
     parser.add_argument("--log-epochs", type=int, required=True, help="Frequency at which to save checkpoints")
     
     parser.add_argument("--n-features", type=int, default=5, help="Number of input features")
+    parser.add_argument("--n-outputs", type=int, default=5, help="Number of input features")
     parser.add_argument("--n-hidden", type=int, default=2, help="Number of hidden features")
     parser.add_argument("--n-training-datapoints", type=int, default=100, help="Number of training data points")
     parser.add_argument("--n-eval-datapoints", type=int, default=100, help="Number of evaluation data points")
     parser.add_argument("--sparsity", type=float, default=0.1, help="Sparsity level for generated data")
-    parser.add_argument("--wandb-project", type=str, default="tms-autoencoder-training", help="Weights & Biases project name")
+    parser.add_argument("--choose-k", type=int, default=2, help="Sparsity level for generated data")
+    parser.add_argument("--wandb-project", type=str, default="tms-additive-training", help="Weights & Biases project name")
     return parser
+
 
 def setup_distributed_training(args):
     """
@@ -78,25 +83,28 @@ def main(args, timer):
 
     # Hyperparameters and model configuration
     n_features = args.n_features
+    n_outputs = args.n_outputs
     n_hidden = args.n_hidden
     n_training_datapoints = args.n_training_datapoints
     n_eval_datapoints = args.n_eval_datapoints
     sparsity = args.sparsity
+    max_coefficient = args.max_coefficient
     batch_size = args.batch_size
 
     # Generate training and evaluation data
-    X_train, _ = GenerateTMSData(num_features=n_features, num_datapoints=n_training_datapoints, sparsity=sparsity, batch_size=batch_size)
-    y_train = X_train
+    coefs = torch.rand(n_features, n_outputs) * max_coefficient
+    X_train, y_train, _ = GenerateTMSPolynomialData(num_features=n_features, num_datapoints=n_training_datapoints, sparsity=sparsity, batch_size=batch_size, coefs=coefs)
     
-    X_eval, _ = GenerateTMSData(num_features=n_features, num_datapoints=n_eval_datapoints, sparsity=sparsity, batch_size=batch_size)
-    y_eval = X_eval 
+    X_eval, y_eval, _ = GenerateTMSPolynomialData(num_features=n_features, num_datapoints=n_eval_datapoints, sparsity=sparsity, batch_size=batch_size, coefs=coefs)
+
+
     
     # Create TensorDatasets for DataLoader compatibility
-    train_dataset = TensorDataset(X_train, y_train)
-    eval_dataset = TensorDataset(X_eval, y_eval)
+    train_dataset = TensorDataset(X_train.to(args.device_id), y_train.to(args.device_id))
+    eval_dataset = TensorDataset(X_eval.to(args.device_id), y_eval.to(args.device_id))
 
     # Initialize the model and loss function
-    model = AutoencoderSymmetric(n_features, n_hidden).to(device)
+    model = SingleHiddenLayerPerceptron(n_features, n_hidden, y_eval.size(1)).to(device)
     criterion = nn.MSELoss()
 
     # Initialize the trainer and start training

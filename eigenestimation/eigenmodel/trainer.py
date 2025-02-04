@@ -28,7 +28,7 @@ class Trainer:
         eval_data (Dataset): The evaluation dataset.
         args (argparse.Namespace): Training configuration arguments.
     """
-    def __init__(self, eigenmodel, train_data, eval_data, args, timer, compute_jacobian=True):
+    def __init__(self, eigenmodel, train_data, eval_data, args, timer, compute_gradients=True):
         """
         Initializes the Trainer object by setting up the model, dataloaders, optimizers, and checkpoint.
         """
@@ -48,15 +48,17 @@ class Trainer:
 
         # Model and training utilities setup
         self.model = DDP(eigenmodel.to(self.device_id), device_ids=[self.device_id])
-        params_to_optimize = [*[t for name in self.model.module.low_rank for t in self.model.module.low_rank[name]]]
+        params_to_optimize = [*[t for name in self.model.module.low_rank_encode for t in self.model.module.low_rank_encode[name]]] + [*[t for name in self.model.module.low_rank_decode for t in self.model.module.low_rank_decode[name]]]
         self.optimizer = torch.optim.Adam(params_to_optimize, lr=args.lr)
+        self.lr_scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer, step_size=args.lr_step_epochs, gamma=args.lr_decay_rate)
+
         self.metrics = {"train": MetricsTracker(), "eval": MetricsTracker()}
         self.checkpoint_path = args.checkpoint_path
         self.checkpoint_epochs = args.checkpoint_epochs
         self.log_epochs = args.log_epochs
         self.epochs = args.epochs
         self.L0_penalty = args.L0_penalty
-        self.compute_jacobian = compute_jacobian
+        self.compute_gradients = compute_gradients
 
         os.makedirs(self.checkpoint_path.parent, exist_ok=True)
         self.timer.report("Model and training utilities initialized")
@@ -73,6 +75,8 @@ class Trainer:
         checkpoint = torch.load(self.checkpoint_path, map_location=f"cuda:{self.device_id}")
         self.model = DDP(checkpoint["model"].to(self.device_id), device_ids=[self.device_id])
         self.optimizer.load_state_dict(checkpoint["optimizer"])
+        self.lr_scheduler.load_state_dict(checkpoint["lr_scheduler"])
+
         self.train_sampler.load_state_dict(checkpoint["train_sampler"])
         self.eval_sampler.load_state_dict(checkpoint["eval_sampler"])
         self.metrics = checkpoint["metrics"]
@@ -90,6 +94,8 @@ class Trainer:
                 {
                     "model": self.model.module,
                     "optimizer": self.optimizer.state_dict(),
+                    "lr_scheduler": self.lr_scheduler.state_dict(),
+
                     "train_sampler": self.train_sampler.state_dict(),
                     "eval_sampler": self.eval_sampler.state_dict(),
                     "metrics": self.metrics,
@@ -112,7 +118,8 @@ class Trainer:
                        f"{phase}/reconstruction_loss": metrics["reconstruction_loss"],
                        f"{phase}/sparsity_loss": metrics["sparsity_loss"], "epoch": epoch})
 
-    def train_one_epoch(self, epoch):
+
+    def train_one_epoch(self, train_dataloader, epoch):
         """
         Performs one epoch of training, iterating over the training dataset.
 
@@ -120,36 +127,64 @@ class Trainer:
             epoch (int): The current epoch number.
         """
         self.model.train()
+        
+        
         total_loss = 0
         total_batches = 0
         sparsity_loss = 0
         reconstruction_loss = 0
-        for x in self.train_dataloader:
+        baseline_reconstruction_loss = 0
+        train_batches_per_epoch = len(train_dataloader)
+
+        for x in train_dataloader:
             # Forward pass
-            if self.compute_jacobian:
-                jacobian = self.model.module.compute_jacobian(x.to(self.device_id))
-            else: jacobian = x
-            #jacobian = {k: v.to(self.device_id) for k, v in jacobian.items()}
-            jvp = self.model(jacobian)
-            reconstruction = self.model.module.reconstruct(jvp)#.relu())
+            if self.compute_gradients:
+                gradients = self.model.module.compute_gradients(x.to(self.device_id))
+            else: gradients = x
+            #gradients = {k: v.to(self.device_id) for k, v in gradients.items()}
+            jvp = self.model(gradients)
+            reconstruction = self.model.module.reconstruct(jvp.relu())
             jvp_einops_shape = ' '.join(["d" + str(i) for i in range(len(jvp.shape)-1)])
 
-            L2_error = torch.stack([
-                einops.einsum((reconstruction[name] - jacobian[name])**2, f'{jvp_einops_shape} ... -> {jvp_einops_shape}') 
-                for name in jacobian
-            ], dim=0).sum(dim=0).mean()
-            L0_error = einops.einsum((abs(jvp)), '... f -> ...').mean()
+            #L2_error = torch.stack([
+            #    einops.einsum((reconstruction[name] - gradients[name])**2, f'#{jvp_einops_shape} ... -> ({jvp_einops_shape} ...)') 
+            #    for name in gradients
+            #], dim=0).mean()
+            
+            L2_error = torch.concat([
+                ((reconstruction[name] - gradients[name])**2).flatten()
+                for name in gradients
+            ], dim=0).mean() 
+            
+            baseline_L2_error = torch.concat([
+                ((gradients[name])**2).flatten()
+                for name in gradients
+            ], dim=0).mean()
+            
+            L2_error = torch.concat([
+                ((reconstruction[name] - gradients[name])**2).flatten()
+                for name in gradients
+            ], dim=0).mean() / baseline_L2_error
+            
+            L0_error = abs(jvp).mean() / baseline_L2_error #einops.einsum((abs(jvp)), '... f -> ...').mean()
             L = L2_error + self.L0_penalty * L0_error
 
             sparsity_loss += L0_error.item()
             reconstruction_loss += L2_error.item()
+            baseline_reconstruction_loss += baseline_L2_error.item()
             total_loss += L.item()
             total_batches = total_batches +1
+            
             
             # Backpropagation and optimizer step
             self.optimizer.zero_grad()
             L.backward()
             self.optimizer.step()
+            
+            self.model.module.normalize_low_ranks()
+            
+        if self.is_master:
+            self.lr_scheduler.step() 
 
         # Log to Weights & Biases
         if epoch % self.log_epochs == 0:
@@ -163,7 +198,8 @@ class Trainer:
                     Epoch {epoch},
                     training loss: {total_loss/total_batches},
                     training reconstruction_loss: {reconstruction_loss/total_batches},
-                    training sparsity_loss: {sparsity_loss/total_batches}'''
+                    training sparsity_loss: {sparsity_loss/total_batches},
+                    training baseline_reconstruction_loss: {baseline_reconstruction_loss/total_batches}'''
                 )
 
     def evaluate(self, epoch):
@@ -178,19 +214,20 @@ class Trainer:
         total_batches = 0
         sparsity_loss = 0
         reconstruction_loss = 0
+        
         for x in self.eval_dataloader:
-            if self.compute_jacobian:
-                jacobian = self.model.module.compute_jacobian(x.to(self.device_id))
-            else: jacobian = x            
+            if self.compute_gradients:
+                gradients = self.model.module.compute_gradients(x.to(self.device_id))
+            else: gradients = x            
             # Forward pass
-            jacobian = {k: v.to(self.device_id) for k, v in jacobian.items()}
-            jvp = self.model(jacobian)
-            reconstruction = self.model.module.reconstruct(jvp)#.relu())
+            gradients = {k: v.to(self.device_id) for k, v in gradients.items()}
+            jvp = self.model(gradients)
+            reconstruction = self.model.module.reconstruct(jvp.relu())
             jvp_einops_shape = ' '.join(["d" + str(i) for i in range(len(jvp.shape)-1)])
 
             L2_error = torch.stack([
-                einops.einsum((reconstruction[name] - jacobian[name])**2, f'{jvp_einops_shape} ... -> {jvp_einops_shape}') 
-                for name in jacobian
+                einops.einsum((reconstruction[name] - gradients[name])**2, f'{jvp_einops_shape} ... -> {jvp_einops_shape}') 
+                for name in gradients
             ], dim=0).sum(dim=0).mean()
             L0_error = einops.einsum((abs(jvp)), '... f -> ...').mean()
             L = L2_error + self.L0_penalty * L0_error
@@ -199,6 +236,7 @@ class Trainer:
             reconstruction_loss += L2_error.item()
             total_loss += L.item()
             total_batches = total_batches +1
+            
             
 
         # Log to Weights & Biases
@@ -223,7 +261,7 @@ class Trainer:
         """
         for epoch in range(self.train_dataloader.sampler.epoch, self.epochs):
             with self.train_dataloader.sampler.in_epoch(epoch):
-                self.train_one_epoch(epoch)
+                self.train_one_epoch(self.train_dataloader, epoch)
                 if epoch % self.log_epochs == 0:
                     with self.eval_dataloader.sampler.in_epoch(epoch):
                         self.evaluate(epoch)

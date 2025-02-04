@@ -21,10 +21,13 @@ class CustomMLP(nn.Module):
             layers.append(nn.Linear(dims[i], dims[i + 1]))
         layers.append(nn.Linear(dims[-1], output_dim))
         
+        
+        self.leaky_relu_slope = .01
+        self.activation = nn.ELU()#negative_slope=self.leaky_relu_slope)
         # Initialize weights
         for layer in layers:
-            nn.init.xavier_normal_(layer.weight)
-            nn.init.zeros_(layer.bias)
+            nn.init.kaiming_normal_(layer.weight, mode='fan_in', nonlinearity='relu')  # He Normal
+            nn.init.uniform_(layer.bias, .01)
         
         # Register layer parametrs with names
         for i, layer in enumerate(layers):
@@ -33,9 +36,10 @@ class CustomMLP(nn.Module):
         self.layers = layers
 
     def forward(self, x: Tensor) -> Tensor:
-        for layer in self.layers[:-1]:
-            x = layer(x).relu()
-        return self.layers[-1](x)
+        for layer in self.layers:
+            x = layer(x)
+            x = self.activation(x)
+        return x
     
     
 
