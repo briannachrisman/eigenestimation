@@ -141,7 +141,6 @@ class Trainer:
             if self.compute_gradients:
                 gradients = self.model.module.compute_gradients(x.to(self.device_id))
             else: gradients = x
-            #gradients = {k: v.to(self.device_id) for k, v in gradients.items()}
             jvp = self.model(gradients)
             reconstruction = self.model.module.reconstruct(jvp)
             batch_shape = ' '.join(["d" + str(i) for i in range(len(jvp.shape)-1)])
@@ -185,8 +184,8 @@ class Trainer:
             L2_error = (A_dot_A*A_dot_A - 2*A_dot_B*A_dot_B + B_dot_B*B_dot_B + eps).sqrt().mean()
 
             
-            # TODO (sparsity)
-            L0_error = abs(jvp*jvp).mean() #/ baseline_L2_error #einops.einsum((abs(jvp)), '... f -> ...').mean()
+            # TODO (sparsity) # (Batch x V)^T(Vatcg x V).sum()
+            L0_error = (abs(jvp**2).sum(dim=-1)).mean() #/ baseline_L2_error #einops.einsum((abs(jvp)), '... f -> ...').mean()
             L = L2_error + self.L0_penalty * L0_error
 
             sparsity_loss += L0_error.item()
