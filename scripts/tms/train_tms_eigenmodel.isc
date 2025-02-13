@@ -1,21 +1,21 @@
 isc_project_id = "4c067223-8029-4381-aedf-8f62315ed584"
 experiment_name = "eigenestimation_test"
 gpu_type = "24GB VRAM GPU"
-gpus = 4
+gpus = 16
 compute_mode = "cycle"
 output_path = "~/outputs/eigenestimation_test"
 command = '''
 source ~/.eigenestimation/bin/activate && 
 cd ~/eigenestimation/ && 
-echo $NNODES $N_PROC
-rm outputs/eigenmodels/tms_parallel.pt 
+rm outputs/eigenmodels/tms_parallel.pt &&
 torchrun  --nnodes=$NNODES --nproc-per-node=$N_PROC  scripts/tms/train_tms_eigenmodel.py  \
     --wandb-project tms-eigenmodel --model-path outputs/toy_models/tms.pt \
     --checkpoint-path outputs/eigenmodels/tms_parallel.pt   \
     --wandb-project tms-eigenmodel \
-    --n-features 5   --n-hidden 2  --n-networks 3  \
-    --n-eigenfeatures 15  --n-eigenrank 1   --L0-penalty .1 \
-    --n-training-datapoints 10000   --n-eval-datapoints 10000  --sparsity 0.05 \
-    --lr 0.001   --batch-size 32    \
-    --epochs 1000  --log-epochs 100 --checkpoint-epochs 100
+    --n-features 5  --n-networks 3  \
+    --n-eigenfeatures 15  --n-eigenrank 1   --L0-penalty 0 \
+    --n-training-datapoints 10000   --n-eval-datapoints 1000  --sparsity 0.05 \
+    --lr .001   --batch-size 32    \
+    --lr-step-epochs 100  --lr-decay-rate 0.95 \
+    --epochs 10000  --log-epochs 100 --checkpoint-epochs 100
 '''

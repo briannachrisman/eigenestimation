@@ -15,7 +15,7 @@ sys.path.append(module_dir)
 from eigenmodel.trainer import Trainer
 from eigenmodel.eigenmodel import EigenModel
 from utils.utils import TransformDataLoader
-from utils.loss import MSELoss
+from utils.loss import MSELoss, MSERandomLoss, MSEOutputLoss   
 
 from toy_models.tms import AutoencoderSymmetric, GenerateTMSData, GenerateTMSDataParallel, AutoencoderParallel  # Import your model
 
@@ -25,7 +25,7 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 from cycling_utils import TimestampedTimer
 
 timer = TimestampedTimer("Imported TimestampedTimer")
-from utils.uniform_models import ZeroOutput
+from utils.uniform_models import ZeroOutput, SameOutput, MeanOutput
 
 def get_args_parser():
     """
@@ -134,7 +134,7 @@ def main(args, timer):
     
 
 
-    eigenmodel = EigenModel(tms_model_p, ZeroOutput, MSELoss(), args.n_eigenfeatures, args.n_eigenrank)
+    eigenmodel = EigenModel(tms_model_p, MeanOutput, MSERandomLoss(), args.n_eigenfeatures, args.n_eigenrank)
     
     
     # Initialize the trainer and start training

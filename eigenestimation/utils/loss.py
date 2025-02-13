@@ -82,6 +82,59 @@ class MSELoss(nn.Module):
         else:  # 'none'
             return per_samples_MSE
         
+
+        
+        
+        
+   
+class MSERandomLoss(nn.Module):
+    def __init__(self, reduction: str = 'none') -> None:
+        """
+        Args:
+            reduction (str): Specifies the reduction to apply to the output:
+                             'none' | 'mean' | 'sum'. Default is 'mean'.
+        """
+        super(MSERandomLoss, self).__init__()
+        self.reduction = reduction
+
+    def forward(self, preds: torch.Tensor, truth: torch.Tensor) -> torch.Tensor:
+        """
+        """
+        # 
+        random_v = torch.where(torch.randn_like(preds) > 0, 1.0, -1.0)
+        per_samples_MSE = (preds * random_v).sum(dim=-1)
+
+
+        # Apply reduction
+        if self.reduction == 'mean':
+            return per_samples_MSE.mean(dim=0)
+        else:  # 'none'
+            return per_samples_MSE
+        
+class MSEOutputLoss(nn.Module):
+    def __init__(self, reduction: str = 'none') -> None:
+        """
+        Args:
+            reduction (str): Specifies the reduction to apply to the output:
+                             'none' | 'mean' | 'sum'. Default is 'mean'.
+        """
+        super(MSEOutputLoss, self).__init__()
+        self.reduction = reduction
+
+    def forward(self, preds: torch.Tensor, truth: torch.Tensor) -> torch.Tensor:
+        """
+        """
+        # 
+        preds_mean = preds.mean(dim=0, keepdim=True)
+        per_samples_MSE = (preds * ((preds-preds_mean)/preds_mean).detach()).sum(dim=-1)
+
+
+        # Apply reduction
+        if self.reduction == 'mean':
+            return per_samples_MSE.mean(dim=0)
+        else:  # 'none'
+            return per_samples_MSE
+        
         
 
 class ErrorLoss(nn.Module):

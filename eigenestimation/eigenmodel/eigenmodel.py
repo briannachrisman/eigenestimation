@@ -22,9 +22,6 @@ class EigenModel(nn.Module):
         self.loss: Callable = loss
         self.n_features = n_features
         self.param_dict = {name: param.detach().clone() for name, param in model.named_parameters()}
-
-    
-        print("HERE!")
         
         self.low_rank_decode = {name: [(torch.randn(length, reduced_dim, n_features)/n_features).to(device).requires_grad_(True) for length in param.shape]
                          for name, param in self.model.named_parameters()}
@@ -50,7 +47,42 @@ class EigenModel(nn.Module):
         return self.loss(outputs, truth)
 
     def compute_gradients(self, x: torch.Tensor):
+        
         return torch.func.jacrev(self.compute_loss, argnums=-1)(x, self.param_dict)
+    
+    
+    
+    def compute_gradients_hessian(self, x):
+        
+        
+        """
+        Compute Hessian-vector product for multiple samples with the same vector.
+        
+        Args:
+            x: Input samples (batch_size x input_dim)
+            v: Vector to compute product with (param_dim)
+            
+        Returns:
+            Hessian-vector product (batch_size x param_dim)
+        """
+        
+        # Make v the same object and shape as parametesr
+        
+        # Create a different v for every sample
+        v =  {
+            name: torch.randn(len(x), *param.shape).to(device=x.device)
+            for name, param in self.param_dict.items()
+        }
+
+        # Create a wrapper to compute the dot product of gradients with vector v
+        def hvp_wrapper(x, param_dict):
+            g = torch.func.jacrev(self.compute_loss, argnums=-1)(x, param_dict)
+            a  = sum([einops.einsum(g[name], v[name], 'b ..., b ... -> b') for name in g])
+            return a
+        # Compute the Hessian-vector product using grad of the dot product
+        hvp = torch.func.jacrev(hvp_wrapper, argnums=-1)(x, self.param_dict)
+    
+        return hvp
     
     def forward(self, gradients: torch.Tensor) -> torch.Tensor:
         jvp_dict = dict({})

@@ -27,7 +27,7 @@ print(device)
 from cycling_utils import TimestampedTimer
 
 timer = TimestampedTimer("Imported TimestampedTimer")
-from utils.uniform_models import ZeroOutput
+from utils.uniform_models import ZeroOutput, MeanOutput
 
 def get_args_parser():
     """
@@ -128,7 +128,7 @@ def main(args, timer):
     
     
 
-    eigenmodel = EigenModel(model, ZeroOutput, MSELoss(), args.n_eigenfeatures, args.n_eigenrank)
+    eigenmodel = EigenModel(model, MeanOutput, MSELoss(), args.n_eigenfeatures, args.n_eigenrank)
     
     # Initialize the trainer and start training
     trainer = Trainer(eigenmodel, train_dataset, eval_dataset, args, timer)

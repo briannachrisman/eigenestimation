@@ -42,7 +42,7 @@ class Trainer:
         self.train_dataloader = DataLoader(train_data, batch_size=args.batch_size, sampler=self.train_sampler)
             
         self.eval_dataloader = DataLoader(eval_data, batch_size=args.batch_size, sampler=self.eval_sampler)
-
+        self.batch_size = args.batch_size
             
         self.timer.report("Data loaders initialized")
 
@@ -143,30 +143,50 @@ class Trainer:
             else: gradients = x
             #gradients = {k: v.to(self.device_id) for k, v in gradients.items()}
             jvp = self.model(gradients)
-            reconstruction = self.model.module.reconstruct(jvp.relu())
-            jvp_einops_shape = ' '.join(["d" + str(i) for i in range(len(jvp.shape)-1)])
+            reconstruction = self.model.module.reconstruct(jvp)
+            batch_shape = ' '.join(["d" + str(i) for i in range(len(jvp.shape)-1)])
 
+                
             #L2_error = torch.stack([
-            #    einops.einsum((reconstruction[name] - gradients[name])**2, f'#{jvp_einops_shape} ... -> ({jvp_einops_shape} ...)') 
+            #    einops.rearrange((reconstruction[name] - gradients[name])**2, #f'{batch_shape} ... -> {batch_shape} (...)') 
             #    for name in gradients
             #], dim=0).mean()
-            
-            L2_error = torch.concat([
-                ((reconstruction[name] - gradients[name])**2).flatten()
-                for name in gradients
-            ], dim=0).mean() 
             
             baseline_L2_error = torch.concat([
                 ((gradients[name])**2).flatten()
                 for name in gradients
             ], dim=0).mean()
             
-            L2_error = torch.concat([
+            L2_error_old = torch.concat([
                 ((reconstruction[name] - gradients[name])**2).flatten()
                 for name in gradients
-            ], dim=0).mean() / baseline_L2_error
+            ], dim=0).mean() #/ baseline_L2_error
             
-            L0_error = abs(jvp).mean() / baseline_L2_error #einops.einsum((abs(jvp)), '... f -> ...').mean()
+            
+            eps = 1e-5
+            A_dot_A = (torch.concat([einops.rearrange(
+                    reconstruction[name] * reconstruction[name], 
+                    f'{batch_shape} ... -> {batch_shape} (...)')
+                for name in gradients
+            ], dim=-1).sum(dim=-1)) # batch x params#.mean()#sum(dim=0).mean()
+            
+            B_dot_B = (torch.concat([einops.rearrange(
+                    gradients[name] * gradients[name], 
+                    f'{batch_shape} ... -> {batch_shape} (...)')
+                for name in gradients
+            ], dim=-1).sum(dim=-1)) # batch x params#.mean()#sum(dim=0).mean()(dim=0).mean()
+            
+            A_dot_B = (torch.concat([einops.rearrange(
+                    reconstruction[name] * gradients[name], 
+                    f'{batch_shape} ... -> {batch_shape} (...)')
+                for name in gradients
+            ], dim=-1).sum(dim=-1)) # batch x params#.mean()#sum(dim=0).mean()(dim=0).mean()
+            
+            L2_error = (A_dot_A*A_dot_A - 2*A_dot_B*A_dot_B + B_dot_B*B_dot_B + eps).sqrt().mean()
+
+            
+            # TODO (sparsity)
+            L0_error = abs(jvp*jvp).mean() #/ baseline_L2_error #einops.einsum((abs(jvp)), '... f -> ...').mean()
             L = L2_error + self.L0_penalty * L0_error
 
             sparsity_loss += L0_error.item()
@@ -222,7 +242,7 @@ class Trainer:
             # Forward pass
             gradients = {k: v.to(self.device_id) for k, v in gradients.items()}
             jvp = self.model(gradients)
-            reconstruction = self.model.module.reconstruct(jvp.relu())
+            reconstruction = self.model.module.reconstruct(jvp)
             jvp_einops_shape = ' '.join(["d" + str(i) for i in range(len(jvp.shape)-1)])
 
             L2_error = torch.stack([
