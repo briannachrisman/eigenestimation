@@ -104,6 +104,49 @@ class Trainer:
             )
             self.timer.report("Checkpoint saved")
 
+
+
+    def compute_sparsity_loss(self, reconstruction):
+        L0_error = sum([((reconstruction[name])**2).sum() for name in reconstruction]).mean()
+        return L0_error
+    
+    
+    def compute_reconstruction_loss(self, reconstruction, gradients):
+        batch_shape = ' '.join(["d" + str(i) for i in range(len(list(reconstruction.values())[0].shape)-1)])
+        '''
+        A_dot_A = (torch.concat([einops.rearrange(
+            reconstruction[name] * reconstruction[name], 
+            f'{batch_shape} ... -> {batch_shape} (...)')
+                                 for name in gradients
+            ], dim=-1).sum(dim=-1)) # batch x params#.mean()#sum(dim=0).mean()
+            
+        B_dot_B = (torch.concat([einops.rearrange(
+                    gradients[name] * gradients[name], 
+                    f'{batch_shape} ... -> {batch_shape} (...)')
+                for name in gradients
+            ], dim=-1).sum(dim=-1)) # batch x params#.mean()#sum(dim=0).mean()(dim=0).mean()
+            
+        A_dot_B = (torch.concat([einops.rearrange(
+                    reconstruction[name] * gradients[name], 
+                    f'{batch_shape} ... -> {batch_shape} (...)')
+                for name in gradients
+            ], dim=-1).sum(dim=-1)) # batch x params#.mean()#sum(dim=0).mean()(dim=0).mean()
+            
+        '''    
+        #print((self.model.module.low_rank_decode['W_in'][0]**2).sum())
+        #print((self.model.module.low_rank_encode['W_in'][0]**2).sum())
+
+        #L2_error = sum([((reconstruction[name])**2).sum() for name in #reconstruction]).mean()
+        
+        
+        L2_error = ((reconstruction['W_in']-gradients['W_in'])**2).sum()/((gradients['W_in']**2).sum()+1e-10)
+
+        #L2_error = ((A_dot_A*A_dot_A - 2*A_dot_B*A_dot_B + B_dot_B*B_dot_B #+ eps)/(B_dot_B*B_dot_B + eps)).sqrt().mean()
+
+        return L2_error
+            
+        
+        
     def log_metrics_to_wandb(self, metrics, epoch, phase):
         """
         Logs training or evaluation metrics to Weights & Biases.
@@ -141,66 +184,32 @@ class Trainer:
             if self.compute_gradients:
                 gradients = self.model.module.compute_gradients(x.to(self.device_id))
             else: gradients = x
+            
+            
+            # Fake, easy to solve gradients
+            gradients = {k: torch.ones_like(v) for k, v in gradients.items()}
+            
             jvp = self.model(gradients)
             reconstruction = self.model.module.reconstruct(jvp)
-            batch_shape = ' '.join(["d" + str(i) for i in range(len(jvp.shape)-1)])
-
-                
-            #L2_error = torch.stack([
-            #    einops.rearrange((reconstruction[name] - gradients[name])**2, #f'{batch_shape} ... -> {batch_shape} (...)') 
-            #    for name in gradients
-            #], dim=0).mean()
             
-            baseline_L2_error = torch.concat([
-                ((gradients[name])**2).flatten()
-                for name in gradients
-            ], dim=0).mean()
+            #L0_error = self.compute_sparsity_loss(reconstruction)
+            L2_error = self.compute_reconstruction_loss(reconstruction, gradients)
             
-            L2_error_old = torch.concat([
-                ((reconstruction[name] - gradients[name])**2).flatten()
-                for name in gradients
-            ], dim=0).mean() #/ baseline_L2_error
+    
             
-            
-            eps = 1e-5
-            A_dot_A = (torch.concat([einops.rearrange(
-                    reconstruction[name] * reconstruction[name], 
-                    f'{batch_shape} ... -> {batch_shape} (...)')
-                for name in gradients
-            ], dim=-1).sum(dim=-1)) # batch x params#.mean()#sum(dim=0).mean()
-            
-            B_dot_B = (torch.concat([einops.rearrange(
-                    gradients[name] * gradients[name], 
-                    f'{batch_shape} ... -> {batch_shape} (...)')
-                for name in gradients
-            ], dim=-1).sum(dim=-1)) # batch x params#.mean()#sum(dim=0).mean()(dim=0).mean()
-            
-            A_dot_B = (torch.concat([einops.rearrange(
-                    reconstruction[name] * gradients[name], 
-                    f'{batch_shape} ... -> {batch_shape} (...)')
-                for name in gradients
-            ], dim=-1).sum(dim=-1)) # batch x params#.mean()#sum(dim=0).mean()(dim=0).mean()
-            
-            L2_error = (A_dot_A*A_dot_A - 2*A_dot_B*A_dot_B + B_dot_B*B_dot_B + eps).sqrt().mean()
-
-            
-            # TODO (sparsity) # (Batch x V)^T(Vatcg x V).sum()
-            L0_error = (abs(jvp**2).sum(dim=-1)).mean() #/ baseline_L2_error #einops.einsum((abs(jvp)), '... f -> ...').mean()
-            L = L2_error + self.L0_penalty * L0_error
-
-            sparsity_loss += L0_error.item()
+            L = L2_error #+ self.L0_penalty * L0_error
+            sparsity_loss += 0#L0_error.item()
             reconstruction_loss += L2_error.item()
-            baseline_reconstruction_loss += baseline_L2_error.item()
             total_loss += L.item()
             total_batches = total_batches +1
             
             
             # Backpropagation and optimizer step
-            self.optimizer.zero_grad()
             L.backward()
             self.optimizer.step()
-            
-            self.model.module.normalize_low_ranks()
+            self.optimizer.zero_grad()
+
+            #self.model.module.normalize_low_ranks()
             
         if self.is_master:
             self.lr_scheduler.step() 

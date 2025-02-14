@@ -13,9 +13,9 @@ torchrun  --nnodes=$NNODES --nproc-per-node=$N_PROC  scripts/tms/train_tms_eigen
     --checkpoint-path outputs/eigenmodels/tms_parallel.pt   \
     --wandb-project tms-eigenmodel \
     --n-features 5  --n-networks 3  \
-    --n-eigenfeatures 15  --n-eigenrank 1   --L0-penalty .1 \
-    --n-training-datapoints 10000   --n-eval-datapoints 1000  --sparsity 0.05 \
-    --lr .001   --batch-size 32    \
-    --lr-step-epochs 100  --lr-decay-rate 0.95 \
-    --epochs 10000  --log-epochs 100 --checkpoint-epochs 100
+    --n-eigenfeatures 1  --n-eigenrank 15   --L0-penalty 0 \
+    --n-training-datapoints 1000   --n-eval-datapoints 1000  --sparsity 0.05 \
+    --lr .1   --batch-size 32    \
+    --lr-step-epochs 10  --lr-decay-rate 0.8 \
+    --epochs 2000 --log-epochs 100 --checkpoint-epochs 200
 '''

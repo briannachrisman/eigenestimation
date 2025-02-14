@@ -101,7 +101,7 @@ class MSERandomLoss(nn.Module):
         """
         """
         # 
-        random_v = torch.where(torch.randn_like(preds) > 0, 1.0, -1.0)
+        random_v = 1#torch.where(torch.randn_like(preds) > 0, 1.0, -1.0)
         per_samples_MSE = (preds * random_v).sum(dim=-1)
 
 
