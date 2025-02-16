@@ -134,7 +134,7 @@ def main(args, timer):
     
 
 
-    eigenmodel = EigenModel(tms_model_p, MeanOutput, MSERandomLoss(), args.n_eigenfeatures, args.n_eigenrank)
+    eigenmodel = EigenModel(tms_model_p, ZeroOutput, MSELoss(), args.n_eigenfeatures, args.n_eigenrank)
     
     
     # Initialize the trainer and start training

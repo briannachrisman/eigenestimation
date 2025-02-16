@@ -138,8 +138,7 @@ class Trainer:
 
         #L2_error = sum([((reconstruction[name])**2).sum() for name in #reconstruction]).mean()
         
-        
-        L2_error = ((reconstruction['W_in']-gradients['W_in'])**2).sum()/((gradients['W_in']**2).sum()+1e-10)
+        L2_error = ((reconstruction['W_in']-(gradients['W_in']))**2).sum()/((gradients['W_in']**2).sum()+1e-10)
 
         #L2_error = ((A_dot_A*A_dot_A - 2*A_dot_B*A_dot_B + B_dot_B*B_dot_B #+ eps)/(B_dot_B*B_dot_B + eps)).sqrt().mean()
 
@@ -187,7 +186,7 @@ class Trainer:
             
             
             # Fake, easy to solve gradients
-            gradients = {k: torch.ones_like(v) for k, v in gradients.items()}
+            gradients = {k: torch.randn_like(v) for k, v in gradients.items()}
             
             jvp = self.model(gradients)
             reconstruction = self.model.module.reconstruct(jvp)
@@ -208,8 +207,8 @@ class Trainer:
             L.backward()
             self.optimizer.step()
             self.optimizer.zero_grad()
-
-            #self.model.module.normalize_low_ranks()
+            #with torch.no_grad():
+                #self.model.module.normalize_low_ranks()
             
         if self.is_master:
             self.lr_scheduler.step() 
