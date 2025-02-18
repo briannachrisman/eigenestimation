@@ -87,22 +87,31 @@ class MSELoss(nn.Module):
         
         
    
-class MSERandomLoss(nn.Module):
+class MSEVectorLoss(nn.Module):
     def __init__(self, reduction: str = 'none') -> None:
         """
         Args:
             reduction (str): Specifies the reduction to apply to the output:
                              'none' | 'mean' | 'sum'. Default is 'mean'.
         """
-        super(MSERandomLoss, self).__init__()
+        super(MSEVectorLoss, self).__init__()
         self.reduction = reduction
 
     def forward(self, preds: torch.Tensor, truth: torch.Tensor) -> torch.Tensor:
         """
         """
-        # 
-        random_v = 1#torch.where(torch.randn_like(preds) > 0, 1.0, -1.0)
-        per_samples_MSE = (preds * random_v).sum(dim=-1)
+        eps = 1e-10
+        
+        shuffle_indices = torch.randperm(preds.size(0))
+        
+        random_v = (
+            (preds - preds[shuffle_indices,...].detach()))#/
+            #(preds.var(dim=-1, keepdim=True) + eps)).detach() 
+        
+        #random_v = torch.where(torch.randn_like(preds) > 0, 1.0, -1.0) * ((preds**2).sum(dim=-1, keepdim=True)+eps)**-.5
+        
+        #random_v = torch.where(torch.randn_like(preds) > 0, 1.0, -1.0)
+        per_samples_MSE = (preds * random_v).mean(dim=-1)
 
 
         # Apply reduction
@@ -126,7 +135,7 @@ class MSEOutputLoss(nn.Module):
         """
         # 
         preds_mean = preds.mean(dim=0, keepdim=True)
-        per_samples_MSE = (preds * ((preds-preds_mean)/preds_mean).detach()).sum(dim=-1)
+        per_samples_MSE = (preds * preds.detach()).sum(dim=-1)
 
 
         # Apply reduction

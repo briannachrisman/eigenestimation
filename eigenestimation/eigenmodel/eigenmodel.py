@@ -22,25 +22,16 @@ class EigenModel(nn.Module):
         self.loss: Callable = loss
         self.n_features = n_features
         self.param_dict = {name: param.detach().clone() for name, param in model.named_parameters()}
+
+    
+        print("HERE!")
         
-        self.low_rank_decode = dict()
-        self.low_rank_encode = dict()
-        for name, param in self.model.named_parameters():
-            
-            # If the parameter is a 1D tensor, we use a rank 1 adaptor.
-            if len(param.shape) == 1:
-                self.low_rank_decode[name] = [(torch.randn(
-                length, 1, n_features)/n_features).to(device).requires_grad_(True) for length in param.shape]
-                
-            else:
-                # If the parameter is a multi D tensor, we use a rank reduced adaptor.
-                self.low_rank_decode[name] = [(torch.randn(
-                    length, min(reduced_dim, max(param.shape)), n_features)/n_features).to(device).requires_grad_(True) for length in param.shape]
-            self.low_rank_encode[name] = [torch.randn_like(tensor)/n_features for tensor in self.low_rank_decode[name]]
+        self.low_rank_decode = {name: [(torch.randn(length, reduced_dim, n_features)/n_features).to(device).requires_grad_(True) for length in param.shape]
+                         for name, param in self.model.named_parameters()}
         self.normalize_low_ranks()
+        self.low_rank_encode = copy.deepcopy(self.low_rank_decode)
 
-
-    def OLD(self, eps=1e-10):
+    def normalize_low_ranks(self):
         for i, (name, tensors) in enumerate(self.low_rank_decode.items()):
             if i ==0:
                 sum_squares = sum([(t**2).sum(dim=list(range(len(t.shape)-1))) for t in tensors])
@@ -50,27 +41,8 @@ class EigenModel(nn.Module):
         for i, (name, tensors) in enumerate(self.low_rank_decode.items()):
             for t in tensors:
                 # Divide t by a value and keep the gradient stored
-                t.data.div_((sum_squares**.5 + eps))
-    
-    def compute_norm(self, network):
-        return sum([(v**2).sum()**.5 for v in network.values()])**.5
-    
-    
-    
-    def normalize_low_ranks(self, eps=1e-10):
-        #norm_current = self.compute_norms(self.reconstruct_network())
-        #norm_goal = self.compute_norm(self.param_dict)
-        norms = [self.compute_norm(network) for network in self.construct_subnetworks()]
-        
-        for name in self.low_rank_decode:
-            n_low_rank_adaptors = len(self.low_rank_decode[name])
-            for i in range(self.n_features):
-                for d in range(n_low_rank_adaptors):
-                    self.low_rank_decode[name][d][...,i].data.div_(
-                        norms[i]**(1/n_low_rank_adaptors)+ eps)
-        #print(self.compute_norm(self.reconstruct_network()), 'NORM')
-                    
-    
+                t.data.div_(sum_squares**.5)
+                
     def compute_loss(self, x: torch.Tensor, param_dict) -> torch.Tensor:
         outputs: torch.Tensor = functional_call(self.model, param_dict, (x,))
         with torch.no_grad():
@@ -78,42 +50,9 @@ class EigenModel(nn.Module):
         return self.loss(outputs, truth)
 
     def compute_gradients(self, x: torch.Tensor):
-        
         return torch.func.jacrev(self.compute_loss, argnums=-1)(x, self.param_dict)
     
-    
-    
-    def compute_gradients_hessian(self, x):
-        
-        
-        """
-        Compute Hessian-vector product for multiple samples with the same vector.
-        
-        Args:
-            x: Input samples (batch_size x input_dim)
-            v: Vector to compute product with (param_dim)
-            
-        Returns:
-            Hessian-vector product (batch_size x param_dim)
-        """
-        
-        # Make v the same object and shape as parametesr
-        
-        # Create a different v for every sample
-        v =  {
-            name: torch.randn(len(x), *param.shape).to(device=x.device)
-            for name, param in self.param_dict.items()
-        }
 
-        # Create a wrapper to compute the dot product of gradients with vector v
-        def hvp_wrapper(x, param_dict):
-            g = torch.func.jacrev(self.compute_loss, argnums=-1)(x, param_dict)
-            a  = sum([einops.einsum(g[name], v[name], 'b ..., b ... -> b') for name in g])
-            return a
-        # Compute the Hessian-vector product using grad of the dot product
-        hvp = torch.func.jacrev(hvp_wrapper, argnums=-1)(x, self.param_dict)
-    
-        return hvp
     
     def forward(self, gradients: torch.Tensor) -> torch.Tensor:
         jvp_dict = dict({})
