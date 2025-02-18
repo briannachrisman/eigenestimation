@@ -105,12 +105,13 @@ class MSEVectorLoss(nn.Module):
         shuffle_indices = torch.randperm(preds.size(0))
         
         random_v = (
-            (preds - preds[shuffle_indices,...].detach()))#/
-            #(preds.var(dim=-1, keepdim=True) + eps)).detach() 
+            (preds - preds[torch.randint(preds.shape[0], (preds.shape[0],)),...].detach()))#/
+            #(preds.var(dim=0, keepdim=True) + eps)).detach() 
         
         #random_v = torch.where(torch.randn_like(preds) > 0, 1.0, -1.0) * ((preds**2).sum(dim=-1, keepdim=True)+eps)**-.5
         
         #random_v = torch.where(torch.randn_like(preds) > 0, 1.0, -1.0)
+        #random_v = preds.mean(dim=0, keepdim=True).detach()
         per_samples_MSE = (preds * random_v).mean(dim=-1)
 
 

@@ -57,7 +57,7 @@ class Trainer:
         self.checkpoint_epochs = args.checkpoint_epochs
         self.log_epochs = args.log_epochs
         self.epochs = args.epochs
-        self.L0_penalty = args.L0_penalty
+        self.top_k = args.top_k
         self.compute_gradients = compute_gradients
 
         os.makedirs(self.checkpoint_path.parent, exist_ok=True)
@@ -195,13 +195,17 @@ class Trainer:
             # Flatten all of jvp
             jvp_flattened = einops.rearrange(jvp, '... -> (...)')
             # Get the nth highest value of jvp_flattened
-            k = (1/15)
-            nth_highest_value, _ = torch.sort(abs(jvp_flattened), descending=True)#[jvp.shape[0]*k]#torch.kthvalue(jvp_flattened, jvp.shape[0]*k ).values
-            #print(nth_highest_value[-1], 'NTH HIGHEST VALUE!')
-            nth_highest_value = nth_highest_value[round(k*len(jvp_flattened))]
+            with torch.no_grad():
+                top_k = self.top_k
+                sorted_values, _ = torch.sort(abs(jvp_flattened), descending=True)#
+                nth_highest_value = sorted_values[round(top_k*len(jvp_flattened))]
+                nth_lowest_value = sorted_values[-round(top_k*len(jvp_flattened))]
             jvp_topk = jvp*(abs(jvp)>=nth_highest_value).float()
+            jvp_bottomk = jvp*(abs(jvp)<=nth_lowest_value).float()
             
-            reconstruction = self.model.module.reconstruct(jvp_topk)
+            reconstruction = self.model.module.reconstruct(jvp_topk) 
+
+            #reconstruction_aux = self.model.module.reconstruct(jvp_bottomk) 
 
             jvp_einops_shape = ' '.join(["d" + str(i) for i in range(len(jvp.shape)-1)])
 
@@ -211,12 +215,15 @@ class Trainer:
             #], dim=0).mean()
             
             L2_error = self.compute_reconstruction_loss(reconstruction, gradients)
+            
+            aux_error = 0#self.compute_reconstruction_loss(reconstruction_aux, gradients)
+
             eps = 1e-10
             L0_error_baseline = abs(jvp).mean().detach()
-            L0_error = (abs(jvp).mean())#+eps)**.5 #  baseline_L2_error #einops.einsum((abs(jvp)), '... f -> ...').mean()
-            L = L2_error + self.L0_penalty * L0_error
+            #L0_error = (abs(jvp/mean())).mean())#+eps)**.5 #  baseline_L2_error #einops.einsum((abs(jvp)), '... f -> ...').mean()
+            L = L2_error + .1*aux_error #+ self.L0_penalty * L0_error
 
-            sparsity_loss += L0_error.item()
+            sparsity_loss += 0#L0_error.item()
             reconstruction_loss += L2_error.item()
             #baseline_reconstruction_loss += baseline_L2_error.item()
             total_loss += L.item()
@@ -228,7 +235,8 @@ class Trainer:
             L.backward()
             self.optimizer.step()
             
-            self.model.module.normalize_low_ranks()
+            with torch.no_grad():
+                self.model.module.normalize_low_ranks()
             
         if self.is_master:
             self.lr_scheduler.step() 
@@ -272,7 +280,7 @@ class Trainer:
             else: gradients = x            
             # Forward pass
             gradients = {k: v.to(self.device_id) for k, v in gradients.items()}
-            jvp = self.model(gradients).relu()
+            jvp = self.model(gradients)#.relu()
             reconstruction = self.model.module.reconstruct(jvp)#.relu())
             jvp_einops_shape = ' '.join(["d" + str(i) for i in range(len(jvp.shape)-1)])
 
@@ -281,7 +289,7 @@ class Trainer:
                 for name in gradients
             ], dim=0).sum(dim=0).mean()
             L0_error = einops.einsum((abs(jvp)), '... f -> ...').mean()
-            L = L2_error + self.L0_penalty * L0_error
+            L = L2_error# + self.L0_penalty * L0_error
 
             sparsity_loss += L0_error.item()
             reconstruction_loss += L2_error.item()

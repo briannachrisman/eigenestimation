@@ -13,7 +13,7 @@ torchrun  --nnodes=$NNODES --nproc-per-node=$N_PROC  scripts/squared/train_squar
     --wandb-project squared-eigenmodel \
     --checkpoint-path outputs/eigenmodels/squared.pt   \
     --model-path outputs/toy_models/squared.pt   \
-    --n-eigenfeatures 5  --n-eigenrank 10   --L0-penalty 0.01 \
+    --n-eigenfeatures 5  --n-eigenrank 3   --top-k .1 \
     --n-training-datapoints 10000   --n-eval-datapoints 10000   \
     --lr 0.001   --batch-size 32   --sparsity .05 \
     --epochs 1000  --log-epochs 10 --checkpoint-epochs 100 

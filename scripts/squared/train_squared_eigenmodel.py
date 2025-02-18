@@ -64,7 +64,7 @@ def get_args_parser():
     parser.add_argument("--sparsity", type=float, default=.05, help="Sparisty")
 
 
-    parser.add_argument("--L0-penalty", type=float, default=.01, help="Penalty")
+    parser.add_argument("--top-k", type=float, default=.1, help="Top k percent of jvp values to keep")
     
     parser.add_argument("--n-eval-datapoints", type=int, default=100, help="Number of evaluation data points")
         

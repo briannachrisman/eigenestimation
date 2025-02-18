@@ -29,19 +29,27 @@ class EigenModel(nn.Module):
         self.low_rank_decode = {name: [(torch.randn(length, reduced_dim, n_features)/n_features).to(device).requires_grad_(True) for length in param.shape]
                          for name, param in self.model.named_parameters()}
         self.normalize_low_ranks()
+        #self.low_rank_encode = {name: [(torch.randn(length, reduced_dim, #n_features)/n_features).to(device).requires_grad_(True) for length in #param.shape]
+        #                 for name, param in self.model.named_parameters()}
         self.low_rank_encode = copy.deepcopy(self.low_rank_decode)
 
-    def normalize_low_ranks(self):
-        for i, (name, tensors) in enumerate(self.low_rank_decode.items()):
-            if i ==0:
-                sum_squares = sum([(t**2).sum(dim=list(range(len(t.shape)-1))) for t in tensors])
-            else:
-                sum_squares = sum_squares + sum([(t**2).sum(dim=list(range(len(t.shape)-1))) for t in tensors])
 
-        for i, (name, tensors) in enumerate(self.low_rank_decode.items()):
-            for t in tensors:
-                # Divide t by a value and keep the gradient stored
-                t.data.div_(sum_squares**.5)
+    def compute_norm(self, network):
+        return sum([(v**2).sum()**.5 for v in network.values()])**.5
+    
+    
+    def normalize_low_ranks(self, eps=1e-10):
+        #norm_current = self.compute_norms(self.reconstruct_network())
+        #norm_goal = self.compute_norm(self.param_dict)
+        norms = [self.compute_norm(network) for network in self.construct_subnetworks()]
+        
+        for name in self.low_rank_decode:
+            n_low_rank_adaptors = len(self.low_rank_decode[name])
+            for i in range(self.n_features):
+                for d in range(n_low_rank_adaptors):
+                    self.low_rank_decode[name][d][...,i].data.div_(
+                        norms[i]**(1/n_low_rank_adaptors)+ eps)
+        #print(self.compute_norm(self.reconstruct_network()), 'NORM')
                 
     def compute_loss(self, x: torch.Tensor, param_dict) -> torch.Tensor:
         outputs: torch.Tensor = functional_call(self.model, param_dict, (x,))
