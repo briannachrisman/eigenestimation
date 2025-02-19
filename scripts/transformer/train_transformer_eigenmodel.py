@@ -7,6 +7,10 @@ from torch.utils.data import TensorDataset, DataLoader
 import wandb  # Add Weights & Biases for tracking
 import os
 import sys
+import transformer_lens
+from transformers import AutoTokenizer
+from transformer_lens.utils import tokenize_and_concatenate
+from datasets import load_dataset
 
 # Append module directory for imports
 module_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../eigenestimation"))
@@ -15,7 +19,7 @@ sys.path.append(module_dir)
 from eigenmodel.trainer import Trainer
 from eigenmodel.eigenmodel import EigenModel
 from utils.utils import TransformDataLoader
-from utils.loss import MSELoss
+from utils.loss import MSELoss, MSEVectorLoss
 
 from toy_models.tms import SingleHiddenLayerPerceptron, GenerateTMSAdditiveData
 # Ensure correct device usage
@@ -25,6 +29,25 @@ from cycling_utils import TimestampedTimer
 
 timer = TimestampedTimer("Imported TimestampedTimer")
 from utils.uniform_models import ZeroOutput
+
+from eigenmodel.trainer import Trainer
+from eigenmodel.eigenmodel import EigenModel
+from utils.utils import TransformDataLoader, DeleteParams, RetrieveWandBArtifact
+from utils.loss import KLDivergenceVectorLoss
+
+
+from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig
+
+
+from toy_models.transformer_wrapper import TransformerWrapper
+# Ensure correct device usage
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
+from cycling_utils import TimestampedTimer
+
+timer = TimestampedTimer("Imported TimestampedTimer")
+from utils.uniform_models import ZeroOutput
+
 
 def get_args_parser():
     """
@@ -36,13 +59,12 @@ def get_args_parser():
     parser = argparse.ArgumentParser(description="Training configuration")
     parser.add_argument("--epochs", type=int, default=10, help="Number of training epochs")
     parser.add_argument("--lr", type=float, default=0.01, help="Learning rate")
-    parser.add_argument("--batch-size", type=int, default=16, help="Batch size for training")
+    parser.add_argument("--lr-step-epochs", type=int, default=100, help="Learning rate step epochs")
+    parser.add_argument("--lr-decay-rate", type=float, default=0.8, help="Learning rate step factor")
+    parser.add_argument("--batch-size", type=int, default=32, help="Batch size for training")
+    parser.add_argument("--token-length", type=int, default=8, help="Batch size for training")
     parser.add_argument("--checkpoint-path", type=Path, required=True, help="Directory to save checkpoints")
     
-    parser.add_argument("--model-path", type=Path, required=True, help="Filewith model")
-
-    parser.add_argument("--choose-k", type=int, required=True, help="Filewith model")
-
     
     parser.add_argument("--checkpoint-epochs", type=int, required=True, help="Frequency at which to save checkpoints")
     
@@ -58,7 +80,7 @@ def get_args_parser():
 
     parser.add_argument("--n-training-datapoints", type=int, default=100, help="Number of training data points")
 
-    parser.add_argument("--L0-penalty", type=float, default=.01, help="Penalty")
+    parser.add_argument("--top-k", type=float, default=.1, help="Top k percent of jvp values to keep")
     
     parser.add_argument("--n-eval-datapoints", type=int, default=100, help="Number of evaluation data points")
     
@@ -101,31 +123,59 @@ def main(args, timer):
     n_eval_datapoints = args.n_eval_datapoints
     sparsity = args.sparsity
     batch_size = args.batch_size
-    choose_k = args.choose_k
+    token_length = args.token_length
 
-    # Generate training and evaluation data
-    X_train, Y_train, dataloader_train = GenerateTMSAdditiveData(num_features=n_features, num_datapoints=n_training_datapoints, sparsity=sparsity, choose_k=choose_k, batch_size=batch_size)
+    # @title Import pretrained gpt2 (2 layers)
+    # Disable fused kernels (FlashAttention and memory-efficient attention)
+    # We have to disable this to compute second-order gradients on transformer models.
+    torch.backends.cuda.enable_flash_sdp(False)
+    torch.backends.cuda.enable_mem_efficient_sdp(False)
+
+    # Ensure the math kernel is enabled (it is True by default)
+    torch.backends.cuda.enable_math_sdp(True)
+
+
+    tinystories_1m = AutoModelForCausalLM.from_pretrained('roneneldan/TinyStories-1M')
+    tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neo-125M")
+    tokenizer.pad_token = tokenizer.eos_token
+    model = TransformerWrapper(tinystories_1m, tokenizer)
+
+
+    # Make the eigenestimation a little smaller but only looking at a subset of the parameters.
+    # Pick a random subset of tensors to include in paramters, and turn the rest into frozen buffers.
+    params_to_delete = [name for name, param in model.named_parameters()]
+    params_to_delete = [p for p in params_to_delete if #('blocks.4.attn.W' not in p)]# and ('blocks.6.mlp.W' not in p)]#!='transformer.h.1.ln_2.weight']
+    'transformer.blocks.3.attn.W_K' not in p]#!='transformer.h.1.ln_2.weight']
+
+    # Delete 3/4 of the parameters.
+    #for p in (params_to_delete[::20]):
+    #  params_to_delete.remove(p)
+
+    DeleteParams(model, params_to_delete)
+
+    print(sum([p.numel() for p in model.parameters()]))
+    for n,p in model.named_parameters(): print(n, p.shape, p.numel())
+
+    # Load in data.
+    dataset = load_dataset('roneneldan/TinyStories', split="validation[:1%]")
+    X_transformer = tokenize_and_concatenate(dataset, model.tokenizer, max_length = token_length, add_bos_token=False)['tokens']
+    train_dataset = X_transformer[:n_training_datapoints]
+    del X_transformer
     
-    X_eval, Y_eval, dataloader_eval = GenerateTMSAdditiveData(num_features=n_features, num_datapoints=n_eval_datapoints, sparsity=sparsity, choose_k=choose_k, batch_size=batch_size)
+    print("HERE")
     
-    
-    
-    # Create TensorDatasets for DataLoader compatibility
-    train_dataset = X_train
-    eval_dataset = X_eval
-    
-    
-    # Single model
-    model_checkpoint = torch.load(args.model_path, map_location=f"cuda:{args.device_id}")
-    model = model_checkpoint["model"]
-    timer.report("Original model loaded")
+    dataset = load_dataset('roneneldan/TinyStories', split="validation[:1%]")
+    X_transformer = tokenize_and_concatenate(dataset, model.tokenizer, max_length = token_length, add_bos_token=False)['tokens']
+    eval_dataset = X_transformer[:n_training_datapoints+n_eval_datapoints]
+    del X_transformer
 
     
-    eigenmodel = EigenModel(model, ZeroOutput, MSELoss(), args.n_eigenfeatures, args.n_eigenrank)
+    eigenmodel = EigenModel(model, ZeroOutput, KLDivergenceVectorLoss(), 
+                            args.n_eigenfeatures, args.n_eigenrank)
     
     
     # Initialize the trainer and start training
-    trainer = Trainer(eigenmodel, train_dataset, eval_dataset, args, timer, )
+    trainer = Trainer(eigenmodel, train_dataset, eval_dataset, args, timer)
     trainer.train()
 
 if __name__ == "__main__":

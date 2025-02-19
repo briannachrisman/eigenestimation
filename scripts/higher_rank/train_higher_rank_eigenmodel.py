@@ -15,7 +15,7 @@ sys.path.append(module_dir)
 from eigenmodel.trainer import Trainer
 from eigenmodel.eigenmodel import EigenModel
 from utils.utils import TransformDataLoader
-from utils.loss import MSELoss
+from utils.loss import MSEVectorLoss
 
 from toy_models.tms import SingleHiddenLayerPerceptron, GenerateTMSData
 # Ensure correct device usage
@@ -56,8 +56,7 @@ def get_args_parser():
 
     parser.add_argument("--n-training-datapoints", type=int, default=100, help="Number of training data points")
 
-    parser.add_argument("--L0-penalty", type=float, default=.01, help="Penalty")
-    
+    parser.add_argument("--top-k", type=float, default=.1, help="Top k")
     parser.add_argument("--n-eval-datapoints", type=int, default=100, help="Number of evaluation data points")
     
     parser.add_argument("--sparsity", type=float, default=0.1, help="Sparsity level for generated data")
@@ -120,7 +119,7 @@ def main(args, timer):
 
 
     
-    eigenmodel = EigenModel(model, ZeroOutput, MSELoss(), args.n_eigenfeatures, args.n_eigenrank)
+    eigenmodel = EigenModel(model, ZeroOutput, MSEVectorLoss(), args.n_eigenfeatures, args.n_eigenrank)
     
     
     # Initialize the trainer and start training

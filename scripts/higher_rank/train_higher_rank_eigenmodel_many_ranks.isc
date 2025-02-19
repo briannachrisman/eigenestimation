@@ -1,0 +1,20 @@
+isc_project_id = "4c067223-8029-4381-aedf-8f62315ed584"
+experiment_name = "eigenestimation_test"
+gpu_type = "24GB VRAM GPU"
+gpus = 4
+compute_mode = "burst"
+output_path = "~/outputs/eigenestimation_test"
+command = '''
+source ~/.eigenestimation/bin/activate && 
+cd ~/eigenestimation/ && 
+echo $NNODES $N_PROC &&
+rm outputs/eigenmodels/higher_rank.pt &&
+for i in {1,2,4,8}; do
+    torchrun  --nnodes=$NNODES --nproc-per-node=$N_PROC  scripts/higher_rank/train_higher_rank_eigenmodel.py  \
+    --wandb-project higher-rank-eigenmodel --model-path outputs/toy_models/higher_rank.pt \
+    --checkpoint-path outputs/eigenmodels/higher_rank_rank${i}.pt   \
+    --n-eigenfeatures 10  --n-eigenrank $i   --top-k .1 \
+    --n-training-datapoints 10000   --n-eval-datapoints 1000  --sparsity 0.05 \
+    --lr 0.01   --batch-size 32   --lr-step-epochs 100 --lr-decay-rate 0.8 \
+    --epochs 1000  --log-epochs 100 --checkpoint-epochs 100
+'''

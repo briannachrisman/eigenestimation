@@ -1,0 +1,20 @@
+isc_project_id = "4c067223-8029-4381-aedf-8f62315ed584"
+experiment_name = "eigenestimation_test"
+gpu_type = "24GB VRAM GPU"
+gpus = 16
+compute_mode = "burst"
+output_path = "~/outputs/eigenestimation_test"
+command = '''
+source ~/.eigenestimation/bin/activate && 
+cd ~/eigenestimation/ && 
+rm outputs/eigenmodels/transformer.pt &&
+torchrun  --nnodes=$NNODES --nproc-per-node=$N_PROC  scripts/transformer/train_transformer_eigenmodel.py  \
+    --wandb-project transformer \
+    --checkpoint-path outputs/eigenmodels/transformer.pt   \
+    --wandb-project transformer-eigenmodel \
+    --n-eigenfeatures 15  --n-eigenrank 1   --top-k .1 \
+    --n-training-datapoints 100   --n-eval-datapoints 100  --sparsity 0.05 \
+    --lr .01   --batch-size 1    --token-length 1 \
+    --lr-step-epochs 100  --lr-decay-rate 0.8 \
+    --epochs 1000 --log-epochs 10 --checkpoint-epochs 50
+'''

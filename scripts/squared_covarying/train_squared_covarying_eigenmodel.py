@@ -118,6 +118,18 @@ def main(args, timer):
     X_train, _ = GenerateTMSData(num_features=n_features, num_datapoints=args.n_training_datapoints, sparsity=args.sparsity, batch_size=args.batch_size)
     train_dataset = X_train * (2*torch.rand_like(X_train).round() - 1)
     
+    # Make X_train and X_eval not independent
+    choice_A = X_train[:,0]
+    choice_B = X_train[:,1]
+    
+    prob = .5
+    # Choose A or B with 50% probability
+    choice = torch.rand_like(choice_A)
+    X_train[:,0] = (choice < prob) * choice_A + (choice > prob) * choice_B
+    
+    choice = torch.rand_like(choice_A)
+    X_train[:,1] = (choice > prob) * choice_A + (choice < prob) * choice_B
+    
     print(X_train.shape)
     
     X_eval, _ = GenerateTMSData(num_features=n_features, num_datapoints=args.n_eval_datapoints, sparsity=args.sparsity, batch_size=args.batch_size)

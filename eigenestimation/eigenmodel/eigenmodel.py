@@ -49,7 +49,6 @@ class EigenModel(nn.Module):
                 for d in range(n_low_rank_adaptors):
                     self.low_rank_decode[name][d][...,i].data.div_(
                         norms[i]**(1/n_low_rank_adaptors)+ eps)
-        #print(self.compute_norm(self.reconstruct_network()), 'NORM')
                 
     def compute_loss(self, x: torch.Tensor, param_dict) -> torch.Tensor:
         outputs: torch.Tensor = functional_call(self.model, param_dict, (x,))

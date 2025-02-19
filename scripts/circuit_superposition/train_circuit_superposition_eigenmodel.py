@@ -7,7 +7,6 @@ from torch.utils.data import TensorDataset, DataLoader
 import wandb  # Add Weights & Biases for tracking
 import os
 import sys
-import numpy as np
 
 # Append module directory for imports
 module_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../eigenestimation"))
@@ -16,18 +15,16 @@ sys.path.append(module_dir)
 from eigenmodel.trainer import Trainer
 from eigenmodel.eigenmodel import EigenModel
 from utils.utils import TransformDataLoader
-from utils.loss import MSEVectorLoss
+from utils.loss import MSELoss, MSEVectorLoss
 
-from toy_models.parallel_serial_network import CustomMLP, ParallelSerializedModel
-from toy_models.tms import GenerateTMSData
-
+from toy_models.tms import SingleHiddenLayerPerceptron, GenerateTMSAdditiveData
 # Ensure correct device usage
 device = "cuda" if torch.cuda.is_available() else "cpu"
-print(device)
+
 from cycling_utils import TimestampedTimer
 
 timer = TimestampedTimer("Imported TimestampedTimer")
-from utils.uniform_models import ZeroOutput, MeanOutput
+from utils.uniform_models import ZeroOutput
 
 def get_args_parser():
     """
@@ -39,21 +36,23 @@ def get_args_parser():
     parser = argparse.ArgumentParser(description="Training configuration")
     parser.add_argument("--epochs", type=int, default=10, help="Number of training epochs")
     parser.add_argument("--lr", type=float, default=0.01, help="Learning rate")
-    
-    parser.add_argument("--lr-step-epochs", type=int, default=100, help="Learning rate")
-    parser.add_argument("--lr-decay-rate", type=float, default=0.8, help="Learning rate")
-    
+    parser.add_argument("--lr-step-epochs", type=int, default=100, help="Learning rate step epochs")
+    parser.add_argument("--lr-decay-rate", type=float, default=0.8, help="Learning rate step factor")
     parser.add_argument("--batch-size", type=int, default=16, help="Batch size for training")
     parser.add_argument("--checkpoint-path", type=Path, required=True, help="Directory to save checkpoints")
+    
+    parser.add_argument("--model-path", type=Path, required=True, help="Filewith model")
 
-    parser.add_argument("--model-path", type=Path, required=True, help="Directory to save checkpoints")
+    parser.add_argument("--choose-k", type=int, required=True, help="Filewith model")
 
-        
+    
     parser.add_argument("--checkpoint-epochs", type=int, required=True, help="Frequency at which to save checkpoints")
     
     parser.add_argument("--log-epochs", type=int, required=True, help="Frequency at which to save checkpoints")
-        
-    parser.add_argument("--n-networks", type=int, default=2, help="Number of networks")
+    
+    parser.add_argument("--n-features", type=int, default=5, help="Number of input features")
+    parser.add_argument("--n-hidden", type=int, default=2, help="Number of hidden features")
+    
 
     parser.add_argument("--n-eigenfeatures", type=int, default=2, help="Number of networks")
     
@@ -61,20 +60,13 @@ def get_args_parser():
 
     parser.add_argument("--n-training-datapoints", type=int, default=100, help="Number of training data points")
 
-    parser.add_argument("--sparsity", type=float, default=.05, help="Sparisty")
-
-
     parser.add_argument("--top-k", type=float, default=.1, help="Top k percent of jvp values to keep")
     
     parser.add_argument("--n-eval-datapoints", type=int, default=100, help="Number of evaluation data points")
-        
-    parser.add_argument("--wandb-project", type=str, default="tms-autoencoder-training", help="Weights & Biases project name")
-
-
-    # Fully connected layer configurations
-    parser.add_argument("--n-fc-hidden-units", type=int, default=10, help="Number of hidden units in fully connected layers")
-    parser.add_argument("--n-fc-layers", type=int, default=5, help="Number of fully connected layers")
     
+    parser.add_argument("--sparsity", type=float, default=0.1, help="Sparsity level for generated data")
+    
+    parser.add_argument("--wandb-project", type=str, default="tms-autoencoder-training", help="Weights & Biases project name")
     return parser
 
 def setup_distributed_training(args):
@@ -104,34 +96,38 @@ def main(args, timer):
     if args.is_master:
         wandb.init(project=args.wandb_project, config=vars(args))
 
-
-    # Load submodel
-    model = torch.load(args.model_path, map_location=f"cuda:{args.device_id}")['model']
-    
-    
-    n_features = model.layers[0].in_features
-
     # Hyperparameters and model configuration
+    n_features = args.n_features
+    n_hidden = args.n_hidden
     n_training_datapoints = args.n_training_datapoints
     n_eval_datapoints = args.n_eval_datapoints
-    
-    X_train, _ = GenerateTMSData(num_features=n_features, num_datapoints=args.n_training_datapoints, sparsity=args.sparsity, batch_size=args.batch_size)
-    train_dataset = X_train * (2*torch.rand_like(X_train).round() - 1)
-    
-    print(X_train.shape)
-    
-    X_eval, _ = GenerateTMSData(num_features=n_features, num_datapoints=args.n_eval_datapoints, sparsity=args.sparsity, batch_size=args.batch_size)
-    eval_dataset = X_eval * (2*torch.rand_like(X_eval).round() - 1)
+    sparsity = args.sparsity
+    batch_size = args.batch_size
+    choose_k = args.choose_k
 
-
-
+    # Generate training and evaluation data
+    X_train, Y_train, dataloader_train = GenerateTMSAdditiveData(num_features=n_features, num_datapoints=n_training_datapoints, sparsity=sparsity, choose_k=choose_k, batch_size=batch_size)
+    
+    X_eval, Y_eval, dataloader_eval = GenerateTMSAdditiveData(num_features=n_features, num_datapoints=n_eval_datapoints, sparsity=sparsity, choose_k=choose_k, batch_size=batch_size)
     
     
+    
+    # Create TensorDatasets for DataLoader compatibility
+    train_dataset = X_train
+    eval_dataset = X_eval
+    
+    
+    # Single model
+    model_checkpoint = torch.load(args.model_path, map_location=f"cuda:{args.device_id}")
+    model = model_checkpoint["model"]
+    timer.report("Original model loaded")
 
-    eigenmodel = EigenModel(model, MeanOutput, MSEVectorLoss(), args.n_eigenfeatures, args.n_eigenrank)
+    
+    eigenmodel = EigenModel(model, ZeroOutput, MSEVectorLoss(), args.n_eigenfeatures, args.n_eigenrank)
+    
     
     # Initialize the trainer and start training
-    trainer = Trainer(eigenmodel, train_dataset, eval_dataset, args, timer)
+    trainer = Trainer(eigenmodel, train_dataset, eval_dataset, args, timer, )
     trainer.train()
 
 if __name__ == "__main__":

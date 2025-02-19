@@ -11,6 +11,7 @@ from cycling_utils import (
 )
 import wandb  # Add Weights & Biases for logging
 import einops 
+import gc
 
 # Append module directory for imports
 module_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "~/eigenestimation/eigenestimation"))
@@ -256,6 +257,11 @@ class Trainer:
                     training sparsity_loss: {sparsity_loss/total_batches},
 '''
                 )
+        # Clear the cuda cache
+        # Collect garbage
+        torch.cuda.empty_cache()
+        gc.collect()
+    
 
     def compute_sparsity_loss(self, reconstruction):
         L0_error = sum([((reconstruction[name])**2).sum() for name in reconstruction]).mean()

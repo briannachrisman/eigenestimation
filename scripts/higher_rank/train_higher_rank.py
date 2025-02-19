@@ -7,6 +7,7 @@ from torch.utils.data import TensorDataset, DataLoader
 import wandb  # Add Weights & Biases for tracking
 import os
 import sys
+import json 
 
 from cycling_utils import TimestampedTimer
 
@@ -109,6 +110,8 @@ def main(args, timer):
 
     # Initialize the trainer and start training
     trainer = Trainer(model, criterion, train_dataset, eval_dataset, args, timer)
+    # Write coefficients to .np file
+    torch.save(coefs,str(args.checkpoint_path).replace('.pt','_coefs.pt'))
     trainer.train()
         
 

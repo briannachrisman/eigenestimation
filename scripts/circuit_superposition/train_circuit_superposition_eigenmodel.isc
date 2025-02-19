@@ -8,14 +8,13 @@ command = '''
 source ~/.eigenestimation/bin/activate && 
 cd ~/eigenestimation/ && 
 echo $NNODES $N_PROC &&
-rm outputs/eigenmodels/tms_combo.pt &&
-torchrun  --nnodes=$NNODES --nproc-per-node=$N_PROC  scripts/tms/train_tms_combo_eigenmodel.py  \
-    --wandb-project tms-combo-eigenmodel --model-path outputs/toy_models/tms_combo.pt \
-    --checkpoint-path outputs/eigenmodels/tms_combo.pt   \
-    --wandb-project tms-combo-eigenmodel \
+rm outputs/eigenmodels/circuit_superposition.pt &&
+torchrun  --nnodes=$NNODES --nproc-per-node=$N_PROC  scripts/circuit_superposition/train_circuit_superposition_eigenmodel.py  \
+    --wandb-project circuit_superposition-eigenmodel --model-path outputs/toy_models/circuit_superposition.pt \
+    --checkpoint-path outputs/eigenmodels/circuit_superposition.pt   \
     --n-features 3   --n-hidden 2    \
-    --n-eigenfeatures 3  --n-eigenrank 1   --L0-penalty .1 \
+    --n-eigenfeatures 3  --n-eigenrank 1   --top-k .1 \
     --n-training-datapoints 10000   --n-eval-datapoints 1000  --sparsity 0.1 \
-    --lr 0.001   --batch-size 64  --choose-k 2  \
+    --lr 0.01   --batch-size 32  --choose-k 2  \
     --epochs 1000  --log-epochs 100 --checkpoint-epochs 100
 '''
