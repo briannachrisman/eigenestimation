@@ -156,12 +156,12 @@ class Trainer:
                 f'b w1, b w2 -> b w1 w2')
             return tensor_outer_prod
         
-        reconstruction_outer_prod = outer_product(reconstruction)
-        gradients_outer_prod = outer_product(gradients)
+       # reconstruction_outer_prod = outer_product(reconstruction)
+        #gradients_outer_prod = outer_product(gradients)
         
-        diff = ((reconstruction_outer_prod - gradients_outer_prod)**2).sum()
+        #diff = ((reconstruction_outer_prod - gradients_outer_prod)**2).sum()
 
-        baseline = ((gradients_outer_prod)**2).sum()
+        #baseline = ((gradients_outer_prod)**2).sum()
         return L2_error #diff/baseline
     
     

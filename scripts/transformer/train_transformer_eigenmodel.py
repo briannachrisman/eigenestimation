@@ -138,14 +138,15 @@ def main(args, timer):
     tinystories_1m = AutoModelForCausalLM.from_pretrained('roneneldan/TinyStories-1M')
     tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neo-125M")
     tokenizer.pad_token = tokenizer.eos_token
-    model = TransformerWrapper(tinystories_1m, tokenizer)
+    model = TransformerWrapper(tinystories_1m, tokenizer,
+                               outputs_logits=False).to(device)
 
 
     # Make the eigenestimation a little smaller but only looking at a subset of the parameters.
     # Pick a random subset of tensors to include in paramters, and turn the rest into frozen buffers.
     params_to_delete = [name for name, param in model.named_parameters()]
     params_to_delete = [p for p in params_to_delete if #('blocks.4.attn.W' not in p)]# and ('blocks.6.mlp.W' not in p)]#!='transformer.h.1.ln_2.weight']
-    'transformer.blocks.3.attn.W_K' not in p]#!='transformer.h.1.ln_2.weight']
+    'attn' not in p]#!='transformer.h.1.ln_2.weight']
 
     # Delete 3/4 of the parameters.
     #for p in (params_to_delete[::20]):
@@ -157,19 +158,18 @@ def main(args, timer):
     for n,p in model.named_parameters(): print(n, p.shape, p.numel())
 
     # Load in data.
-    dataset = load_dataset('roneneldan/TinyStories', split="validation[:1%]")
+    dataset = load_dataset('roneneldan/TinyStories', split="train[:1%]")
     X_transformer = tokenize_and_concatenate(dataset, model.tokenizer, max_length = token_length, add_bos_token=False)['tokens']
-    train_dataset = X_transformer[:n_training_datapoints]
+    train_dataset = X_transformer[:n_training_datapoints].to(device)
     del X_transformer
-    
-    print("HERE")
-    
+        
     dataset = load_dataset('roneneldan/TinyStories', split="validation[:1%]")
     X_transformer = tokenize_and_concatenate(dataset, model.tokenizer, max_length = token_length, add_bos_token=False)['tokens']
-    eval_dataset = X_transformer[:n_training_datapoints+n_eval_datapoints]
+    eval_dataset = X_transformer[:n_eval_datapoints].to(device)
     del X_transformer
 
     
+    print('device', device)
     eigenmodel = EigenModel(model, ZeroOutput, KLDivergenceVectorLoss(), 
                             args.n_eigenfeatures, args.n_eigenrank)
     

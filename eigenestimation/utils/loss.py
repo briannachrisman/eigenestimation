@@ -103,7 +103,7 @@ class KLDivergenceVectorLoss(nn.Module):
         elif self.reduction == 'sum':
             return per_sample_kl_div.sum()
         else:  # 'none'
-            return per_sample_kl_div
+            return per_sample_kl_div.sum(dim=1)
         
         
         

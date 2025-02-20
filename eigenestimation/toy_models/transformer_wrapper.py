@@ -20,7 +20,7 @@ class TransformerWrapper(nn.Module):
             probs = model_output.softmax(dim=-1) + self.eps
         else: 
             probs = (model_output.logits).softmax(dim=-1) + self.eps
-        return einops.rearrange(probs, 'batch tokens logits -> (batch tokens) logits')
+        return probs#einops.rearrange(probs, 'batch tokens logits -> (batch tokens) logits')
 
 def DeleteParams(model: nn.Module, attributes_to_delete: List[str]) -> None:
     for attribute_to_delete in attributes_to_delete:
