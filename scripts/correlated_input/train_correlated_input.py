@@ -20,6 +20,8 @@ sys.path.append(module_dir)
 from toy_models.trainer import Trainer
 from toy_models.tms import SingleHiddenLayerPerceptron, GenerateTMSPolynomialData
 
+from toy_models.data import GenerateCorrelatedData
+
 # Ensure correct device usage
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -44,6 +46,7 @@ def get_args_parser():
     parser.add_argument("--max-coefficient", type=float, default=5, help="Maximum coefficient for generated data")
     parser.add_argument("--log-epochs", type=int, required=True, help="Frequency at which to save checkpoints")
     
+    parser.add_argument("--correlation-set-size", type=int, default=3, help="Correlation set size")
     parser.add_argument("--n-features", type=int, default=5, help="Number of input features")
     parser.add_argument("--n-outputs", type=int, default=5, help="Number of input features")
     parser.add_argument("--n-hidden", type=int, default=2, help="Number of hidden features")
@@ -91,12 +94,12 @@ def main(args, timer):
     sparsity = args.sparsity
     max_coefficient = args.max_coefficient
     batch_size = args.batch_size
-
+    correlation_set_size = args.correlation_set_size
     # Generate training and evaluation data
     coefs = torch.rand(n_features, n_outputs) * max_coefficient
-    X_train, y_train, _ = GenerateTMSPolynomialData(num_features=n_features, num_datapoints=n_training_datapoints, sparsity=sparsity, batch_size=batch_size, coefs=coefs)
+    X_train, y_train, _ = GenerateCorrelatedData(num_features=n_features, num_datapoints=n_training_datapoints, sparsity=sparsity, batch_size=batch_size, coefs=coefs, correlation_set_size=correlation_set_size)
     
-    X_eval, y_eval, _ = GenerateTMSPolynomialData(num_features=n_features, num_datapoints=n_eval_datapoints, sparsity=sparsity, batch_size=batch_size, coefs=coefs)
+    X_eval, y_eval, _ = GenerateCorrelatedData(num_features=n_features, num_datapoints=n_eval_datapoints, sparsity=sparsity, batch_size=batch_size, coefs=coefs, correlation_set_size=correlation_set_size)
 
 
     

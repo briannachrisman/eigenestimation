@@ -1,5 +1,5 @@
 isc_project_id = "4c067223-8029-4381-aedf-8f62315ed584"
-experiment_name = "train_tms_combo"
+experiment_name = "circuit_superposition"
 gpu_type = "24GB VRAM GPU"
 gpus = 4
 compute_mode = "burst"
@@ -8,6 +8,6 @@ command = '''
 source ~/.eigenestimation/bin/activate && 
 cd ~/eigenestimation/ && 
 echo $NNODES $N_PROC &&
-rm outputs/toy_models/tms_combo.pt &&
-torchrun  --nnodes=$NNODES --nproc-per-node=$N_PROC  scripts/circuit_superposition/train_circuit_superposition.py   --epochs 1000  --lr 0.001   --batch-size 64   --checkpoint-path outputs/toy_models/circuit_superposition.pt  --checkpoint-epochs 100 --n-features 3   --n-hidden 2   --n-training-datapoints 10000   --n-eval-datapoints 1000   --sparsity 0.1  --choose-k 2 --wandb-project tms-combo --log-epochs 100
+rm outputs/toy_models/circuit_superposition.pt &&
+torchrun  --nnodes=$NNODES --nproc-per-node=$N_PROC  scripts/circuit_superposition/train_circuit_superposition.py   --epochs 1000  --lr 0.001   --batch-size 32   --checkpoint-path outputs/toy_models/circuit_superposition.pt  --checkpoint-epochs 500 --n-features 10   --n-hidden 5   --n-training-datapoints 10000   --n-eval-datapoints 10000   --sparsity 0.05  --n-outputs 10 --wandb-project circuit_superposition --log-epochs 100 --max-coefficient 5
 '''

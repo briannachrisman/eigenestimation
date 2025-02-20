@@ -1,5 +1,5 @@
 isc_project_id = "4c067223-8029-4381-aedf-8f62315ed584"
-experiment_name = "circuit_superposition"
+experiment_name = "eigenestimation_test"
 gpu_type = "24GB VRAM GPU"
 gpus = 4
 compute_mode = "burst"
@@ -10,10 +10,11 @@ cd ~/eigenestimation/ &&
 echo $NNODES $N_PROC &&
 rm outputs/eigenmodels/circuit_superposition.pt &&
 torchrun  --nnodes=$NNODES --nproc-per-node=$N_PROC  scripts/circuit_superposition/train_circuit_superposition_eigenmodel.py  \
-    --wandb-project circuit-superposition --model-path outputs/toy_models/circuit_superposition.pt \
+    --wandb-project circuit_superposition-eigenmodel --model-path outputs/toy_models/circuit_superposition.pt \
     --checkpoint-path outputs/eigenmodels/circuit_superposition.pt   \
-    --n-eigenfeatures 10  --n-eigenrank 2   --top-k .1 \
-    --n-training-datapoints 10000   --n-eval-datapoints 1000  --sparsity 0.05 \
-    --lr 0.01   --batch-size 32   --lr-step-epochs 100 --lr-decay-rate 0.8 \
+    --n-features 3   --n-hidden 2    \
+    --n-eigenfeatures 3  --n-eigenrank 1   --top-k .1 \
+    --n-training-datapoints 10000   --n-eval-datapoints 1000  --sparsity 0.1 \
+    --lr 0.01   --batch-size 32  --choose-k 2  \
     --epochs 1000  --log-epochs 100 --checkpoint-epochs 100
 '''
