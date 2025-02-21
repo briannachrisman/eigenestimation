@@ -1,0 +1,20 @@
+isc_project_id = "4c067223-8029-4381-aedf-8f62315ed584"
+experiment_name = "eigenestimation_test"
+gpu_type = "24GB VRAM GPU"
+gpus = 4
+compute_mode = "cycle"
+output_path = "~/outputs/eigenestimation_test"
+command = '''
+source ~/.eigenestimation/bin/activate && 
+cd ~/eigenestimation/ && 
+echo $NNODES $N_PROC &&
+rm outputs/eigenmodels/squared.pt  &&
+torchrun  --nnodes=$NNODES --nproc-per-node=$N_PROC  scripts/squared/train_squared_eigenmodel.py  \
+    --wandb-project squared-eigenmodel \
+    --checkpoint-path outputs/eigenmodels/squared.pt   \
+    --model-path outputs/toy_models/squared.pt   \
+    --n-eigenfeatures 5  --n-eigenrank 3   --top-k .2 \
+    --n-training-datapoints 10000   --n-eval-datapoints 10000   \
+    --lr 0.01   --batch-size 32   --sparsity .05 --lr-step-epochs 100 --lr-decay-rate 0.8 \
+    --epochs 1000  --log-epochs 10 --checkpoint-epochs 100 
+'''

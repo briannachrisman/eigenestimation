@@ -1,0 +1,13 @@
+isc_project_id = "4c067223-8029-4381-aedf-8f62315ed584"
+experiment_name = "eigenestimation_test"
+gpu_type = "24GB VRAM GPU"
+gpus = 4
+compute_mode = "cycle"
+output_path = "~/outputs/eigenestimation_test"
+command = '''
+source ~/.eigenestimation/bin/activate && 
+cd ~/eigenestimation/ && 
+echo $NNODES $N_PROC
+rm outputs/toy_models/tms.pt
+torchrun  --nnodes=$NNODES --nproc-per-node=$N_PROC  scripts/tms/train_tms.py   --epochs 1000  --lr 0.001   --batch-size 32   --checkpoint-path outputs/toy_models/tms.pt  --checkpoint-epochs 1000 --n-features 5   --n-hidden 2   --n-training-datapoints 10000   --n-eval-datapoints 10000   --sparsity 0.05   --wandb-project tms --log-epochs 100 
+'''

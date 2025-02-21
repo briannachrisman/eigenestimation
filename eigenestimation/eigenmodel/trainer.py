@@ -19,6 +19,35 @@ sys.path.append(module_dir)
 
 from utils.utils import TransformDataLoader
 
+def compute_reconstruction_loss(reconstruction, gradients):
+        #'''
+        
+        A_dot_A = (torch.concat([einops.rearrange(
+            reconstruction[name] * reconstruction[name], 
+            f'b ... -> b (...)')
+                                 for name in gradients
+            ], dim=-1).sum(dim=-1)) # batch x params#.mean()#sum(dim=0).mean()
+                    
+            
+        B_dot_B = (torch.concat([einops.rearrange(
+                    gradients[name] * gradients[name], 
+                    f'b ... -> b (...)')
+                for name in gradients
+            ], dim=-1).sum(dim=-1)) # batch x params#.mean()#sum(dim=0).mean()(dim=0).mean()
+            
+        A_dot_B = (torch.concat([einops.rearrange(
+                    reconstruction[name] * gradients[name], 
+                    'b ... -> b (...)')
+                for name in gradients
+            ], dim=-1).sum(dim=-1)) # batch x params#.mean()#sum(dim=0).mean()(dim=0).mean()
+            
+        eps = 1e-10
+
+        L2_error = (A_dot_A*A_dot_A - 2*A_dot_B*A_dot_B + B_dot_B*B_dot_B).sum()/(B_dot_B*B_dot_B + eps).sum()
+
+
+        return L2_error 
+
 class Trainer:
     """
     Trainer class for distributed training of models using PyTorch DDP.
@@ -117,52 +146,9 @@ class Trainer:
         if self.is_master:
             wandb.log({f"{phase}/loss": metrics["loss"], 
                        f"{phase}/reconstruction_loss": metrics["reconstruction_loss"],
-                       f"{phase}/sparsity_loss": metrics["sparsity_loss"], "epoch": epoch})
+                       f"{phase}/sparsity_loss": metrics["sparsity_loss"], "epoch": epoch}, commit=True)
 
-    def compute_reconstruction_loss(self, reconstruction, gradients):
-        #'''
-        
-        A_dot_A = (torch.concat([einops.rearrange(
-            reconstruction[name] * reconstruction[name], 
-            f'b ... -> b (...)')
-                                 for name in gradients
-            ], dim=-1).sum(dim=-1)) # batch x params#.mean()#sum(dim=0).mean()
-                    
-            
-        B_dot_B = (torch.concat([einops.rearrange(
-                    gradients[name] * gradients[name], 
-                    f'b ... -> b (...)')
-                for name in gradients
-            ], dim=-1).sum(dim=-1)) # batch x params#.mean()#sum(dim=0).mean()(dim=0).mean()
-            
-        A_dot_B = (torch.concat([einops.rearrange(
-                    reconstruction[name] * gradients[name], 
-                    'b ... -> b (...)')
-                for name in gradients
-            ], dim=-1).sum(dim=-1)) # batch x params#.mean()#sum(dim=0).mean()(dim=0).mean()
-            
-        eps = 1e-10
 
-        L2_error = (A_dot_A*A_dot_A - 2*A_dot_B*A_dot_B + B_dot_B*B_dot_B).sum()/(B_dot_B*B_dot_B + eps).sum()
-
-        def outer_product(tensor):
-            tensor_flattened = torch.concat([einops.rearrange(
-                tensor[name], 
-                f'b ... -> b (...)')
-                for name in tensor
-            ], dim=-1)
-            tensor_outer_prod = einops.einsum(
-                tensor_flattened, tensor_flattened, 
-                f'b w1, b w2 -> b w1 w2')
-            return tensor_outer_prod
-        
-       # reconstruction_outer_prod = outer_product(reconstruction)
-        #gradients_outer_prod = outer_product(gradients)
-        
-        #diff = ((reconstruction_outer_prod - gradients_outer_prod)**2).sum()
-
-        #baseline = ((gradients_outer_prod)**2).sum()
-        return L2_error #diff/baseline
     
     
     
@@ -215,7 +201,7 @@ class Trainer:
             #    for name in gradients
             #], dim=0).mean()
             
-            L2_error = self.compute_reconstruction_loss(reconstruction, gradients)
+            L2_error = compute_reconstruction_loss(reconstruction, gradients)
             
             aux_error = 0#self.compute_reconstruction_loss(reconstruction_aux, gradients)
 
