@@ -13,11 +13,7 @@ import wandb  # Add Weights & Biases for logging
 import einops 
 import gc
 
-# Append module directory for imports
-module_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "~/eigenestimation/eigenestimation"))
-sys.path.append(module_dir)
-
-from utils.utils import TransformDataLoader
+from eigenestimation.utils.utils import TransformDataLoader
 
 def compute_reconstruction_loss(reconstruction, gradients):
         #'''
@@ -191,23 +187,13 @@ class Trainer:
             jvp_bottomk = jvp*(abs(jvp)<=nth_lowest_value).float()
             
             reconstruction = self.model.module.reconstruct(jvp_topk) 
-
-            #reconstruction_aux = self.model.module.reconstruct(jvp_bottomk) 
-
-            jvp_einops_shape = ' '.join(["d" + str(i) for i in range(len(jvp.shape)-1)])
-
-            #L2_error = torch.stack([
-            #    einops.einsum((reconstruction[name] - gradients[name])**2, f'#{jvp_einops_shape} ... -> ({jvp_einops_shape} ...)') 
-            #    for name in gradients
-            #], dim=0).mean()
             
             L2_error = compute_reconstruction_loss(reconstruction, gradients)
             
-            aux_error = 0#self.compute_reconstruction_loss(reconstruction_aux, gradients)
+            aux_error = 0
 
             eps = 1e-10
             L0_error_baseline = abs(jvp).mean().detach()
-            #L0_error = (abs(jvp/mean())).mean())#+eps)**.5 #  baseline_L2_error #einops.einsum((abs(jvp)), '... f -> ...').mean()
             L = L2_error + .1*aux_error #+ self.L0_penalty * L0_error
 
             sparsity_loss += 0#L0_error.item()

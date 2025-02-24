@@ -13,12 +13,10 @@ from cycling_utils import TimestampedTimer
 
 timer = TimestampedTimer("Imported TimestampedTimer")
 
-# Append module directory for imports
-module_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../eigenestimation"))
-sys.path.append(module_dir)
 
-from toy_models.trainer import Trainer
-from toy_models.tms import SingleHiddenLayerPerceptron, GenerateTMSPolynomialData
+from eigenestimation.toy_models.trainer import Trainer
+from eigenestimation.toy_models.tms import SingleHiddenLayerPerceptron
+from eigenestimation.toy_models.data import GenerateTMSInputs
 
 # Ensure correct device usage
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -93,11 +91,13 @@ def main(args, timer):
     batch_size = args.batch_size
 
     # Generate training and evaluation data
-    coefs = torch.rand(n_features, n_outputs) * max_coefficient
-    X_train, y_train, _ = GenerateTMSPolynomialData(num_features=n_features, num_datapoints=n_training_datapoints, sparsity=sparsity, batch_size=batch_size, coefs=coefs)
+    coefs = torch.rand(n_features, n_outputs, device=args.device_id) * max_coefficient
+    X_train = GenerateTMSInputs(num_features=n_features, num_datapoints=n_training_datapoints, sparsity=sparsity)
+    y_train = X_train @ coefs
     
-    X_eval, y_eval, _ = GenerateTMSPolynomialData(num_features=n_features, num_datapoints=n_eval_datapoints, sparsity=sparsity, batch_size=batch_size, coefs=coefs)
-
+    
+    X_eval = GenerateTMSInputs(num_features=n_features, num_datapoints=n_eval_datapoints, sparsity=sparsity)
+    y_eval = X_eval @ coefs
 
     
     # Create TensorDatasets for DataLoader compatibility

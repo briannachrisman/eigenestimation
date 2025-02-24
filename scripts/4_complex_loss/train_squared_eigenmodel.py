@@ -9,17 +9,15 @@ import os
 import sys
 import numpy as np
 
-# Append module directory for imports
-module_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../eigenestimation"))
-sys.path.append(module_dir)
 
-from eigenmodel.trainer import Trainer
-from eigenmodel.eigenmodel import EigenModel
-from utils.utils import TransformDataLoader
-from utils.loss import MSEVectorLoss
 
-from toy_models.parallel_serial_network import CustomMLP, ParallelSerializedModel
-from toy_models.tms import GenerateTMSData
+from eigenestimation.eigenmodel.trainer import Trainer
+from eigenestimation.eigenmodel.eigenmodel import EigenModel
+from eigenestimation.utils.utils import TransformDataLoader
+from eigenestimation.utils.loss import MSEVectorLoss
+
+from eigenestimation.toy_models.parallel_serial_network import CustomMLP, ParallelSerializedModel
+from eigenestimation.toy_models.data import GenerateTMSInputs
 
 # Ensure correct device usage
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -27,8 +25,8 @@ print(device)
 from cycling_utils import TimestampedTimer
 
 timer = TimestampedTimer("Imported TimestampedTimer")
-from utils.uniform_models import ZeroOutput, MeanOutput
-
+from eigenestimation.utils.uniform_models import ZeroOutput, MeanOutput
+torch.manual_seed(42)
 def get_args_parser():
     """
     Parses command-line arguments for configuring the training process.
@@ -115,12 +113,12 @@ def main(args, timer):
     n_training_datapoints = args.n_training_datapoints
     n_eval_datapoints = args.n_eval_datapoints
     
-    X_train, _ = GenerateTMSData(num_features=n_features, num_datapoints=args.n_training_datapoints, sparsity=args.sparsity, batch_size=args.batch_size)
+    X_train = GenerateTMSInputs(num_features=n_features, num_datapoints=args.n_training_datapoints, sparsity=args.sparsity)
     train_dataset = X_train * (2*torch.rand_like(X_train).round() - 1)
     
     print(X_train.shape)
     
-    X_eval, _ = GenerateTMSData(num_features=n_features, num_datapoints=args.n_eval_datapoints, sparsity=args.sparsity, batch_size=args.batch_size)
+    X_eval = GenerateTMSInputs(num_features=n_features, num_datapoints=args.n_eval_datapoints, sparsity=args.sparsity)
     eval_dataset = X_eval * (2*torch.rand_like(X_eval).round() - 1)
 
 

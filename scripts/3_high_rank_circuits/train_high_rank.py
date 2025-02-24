@@ -13,14 +13,10 @@ from cycling_utils import TimestampedTimer
 
 timer = TimestampedTimer("Imported TimestampedTimer")
 
-# Append module directory for imports
-module_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../eigenestimation"))
-sys.path.append(module_dir)
 
-from toy_models.trainer import Trainer
-from toy_models.tms import SingleHiddenLayerPerceptron, GenerateTMSPolynomialData
-
-from toy_models.data import GenerateCorrelatedData
+from eigenestimation.toy_models.trainer import Trainer
+from eigenestimation.toy_models.tms import SingleHiddenLayerPerceptron
+from eigenestimation.toy_models.data import GenerateCorrelatedData
 
 # Ensure correct device usage
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -53,7 +49,6 @@ def get_args_parser():
     parser.add_argument("--n-training-datapoints", type=int, default=100, help="Number of training data points")
     parser.add_argument("--n-eval-datapoints", type=int, default=100, help="Number of evaluation data points")
     parser.add_argument("--sparsity", type=float, default=0.1, help="Sparsity level for generated data")
-    parser.add_argument("--choose-k", type=int, default=2, help="Sparsity level for generated data")
     parser.add_argument("--wandb-project", type=str, default="tms-additive-training", help="Weights & Biases project name")
     return parser
 
@@ -95,13 +90,19 @@ def main(args, timer):
     max_coefficient = args.max_coefficient
     batch_size = args.batch_size
     correlation_set_size = args.correlation_set_size
+    
     # Generate training and evaluation data
     coefs = torch.rand(n_features, n_outputs) * max_coefficient
-    X_train, y_train, _ = GenerateCorrelatedData(num_features=n_features, num_datapoints=n_training_datapoints, sparsity=sparsity, batch_size=batch_size, coefs=coefs, correlation_set_size=correlation_set_size)
+    X_train = GenerateCorrelatedData(num_features=n_features,
+                                    num_datapoints=n_training_datapoints,
+                                    sparsity=sparsity,
+                                    correlation_set_size=correlation_set_size)
     
-    X_eval, y_eval, _ = GenerateCorrelatedData(num_features=n_features, num_datapoints=n_eval_datapoints, sparsity=sparsity, batch_size=batch_size, coefs=coefs, correlation_set_size=correlation_set_size)
+    X_eval = GenerateCorrelatedData(num_features=n_features,
+                                    num_datapoints=n_eval_datapoints, sparsity=sparsity,correlation_set_size=correlation_set_size)
 
-
+    y_train = X_train @ coefs
+    y_eval = X_eval @ coefs
     
     # Create TensorDatasets for DataLoader compatibility
     train_dataset = TensorDataset(X_train.to(args.device_id), y_train.to(args.device_id))

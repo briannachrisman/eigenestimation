@@ -12,14 +12,11 @@ from cycling_utils import TimestampedTimer
 from torch import Tensor 
 timer = TimestampedTimer("Imported TimestampedTimer")
 
-# Append module directory for imports
-module_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../eigenestimation"))
-sys.path.append(module_dir)
 
-from toy_models.trainer import Trainer
-from toy_models.parallel_serial_network import ParallelSerializedModel, CustomMLP
-from toy_models.tms import GenerateTMSData
-
+from eigenestimation.toy_models.trainer import Trainer
+from eigenestimation.toy_models.parallel_serial_network import CustomMLP
+from eigenestimation.toy_models.data import GenerateTMSInputs
+torch.manual_seed(42)
 
 import argparse
 from pathlib import Path
@@ -99,11 +96,11 @@ def main(args, timer):
     batch_size = args.batch_size
 
     # Generate training and evaluation data
-    X_train, _ = GenerateTMSData(num_features=n_features, num_datapoints=n_training_datapoints, sparsity=sparsity, batch_size=batch_size)
+    X_train = GenerateTMSInputs(num_features=n_features, num_datapoints=n_training_datapoints, sparsity=sparsity)
     X_train = X_train * (2*torch.rand_like(X_train).round() - 1)
     y_train = X_train**2
     
-    X_eval, _ = GenerateTMSData(num_features=n_features, num_datapoints=n_eval_datapoints, sparsity=sparsity, batch_size=batch_size)
+    X_eval = GenerateTMSInputs(num_features=n_features, num_datapoints=n_eval_datapoints, sparsity=sparsity)
     X_eval = X_eval * (2*torch.rand_like(X_eval).round() - 1)
 
     y_eval = X_eval**2

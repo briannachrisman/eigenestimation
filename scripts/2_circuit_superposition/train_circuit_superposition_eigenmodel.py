@@ -12,19 +12,19 @@ import sys
 module_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../eigenestimation"))
 sys.path.append(module_dir)
 
-from eigenmodel.trainer import Trainer
-from eigenmodel.eigenmodel import EigenModel
-from utils.utils import TransformDataLoader
-from utils.loss import MSEVectorLoss
+from eigenestimation.eigenmodel.trainer import Trainer
+from eigenestimation.eigenmodel.eigenmodel import EigenModel
+from eigenestimation.utils.utils import TransformDataLoader
+from eigenestimation.utils.loss import MSEVectorLoss
+from eigenestimation.utils.uniform_models import ZeroOutput
+from eigenestimation.toy_models.data import GenerateTMSInputs
 
-from toy_models.tms import SingleHiddenLayerPerceptron, GenerateTMSData
 # Ensure correct device usage
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 from cycling_utils import TimestampedTimer
 
 timer = TimestampedTimer("Imported TimestampedTimer")
-from utils.uniform_models import ZeroOutput
 
 def get_args_parser():
     """
@@ -105,9 +105,9 @@ def main(args, timer):
     n_features = model.parameters().__next__().shape[0]
 
     # Generate training and evaluation data
-    X_train, _ = GenerateTMSData(num_features=n_features, num_datapoints=n_training_datapoints, sparsity=sparsity, batch_size=batch_size, )
+    X_train = GenerateTMSInputs(num_features=n_features, num_datapoints=n_training_datapoints, sparsity=sparsity)
     
-    X_eval, _ = GenerateTMSData(num_features=n_features, num_datapoints=n_eval_datapoints, sparsity=sparsity, batch_size=batch_size)
+    X_eval  = GenerateTMSInputs(num_features=n_features, num_datapoints=n_eval_datapoints, sparsity=sparsity)
     
     
     

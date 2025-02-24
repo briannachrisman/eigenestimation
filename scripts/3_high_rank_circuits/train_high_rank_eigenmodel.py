@@ -8,25 +8,22 @@ import wandb  # Add Weights & Biases for tracking
 import os
 import sys
 
-# Append module directory for imports
-module_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../eigenestimation"))
-sys.path.append(module_dir)
+from eigenestimation.eigenmodel.trainer import Trainer
+from eigenestimation.eigenmodel.eigenmodel import EigenModel
+from eigenestimation.utils.utils import TransformDataLoader
+from eigenestimation.utils.loss import MSEVectorLoss
 
-from eigenmodel.trainer import Trainer
-from eigenmodel.eigenmodel import EigenModel
-from utils.utils import TransformDataLoader
-from utils.loss import MSEVectorLoss
-
-from toy_models.tms import SingleHiddenLayerPerceptron, GenerateTMSData
-from toy_models.data import GenerateCorrelatedData
+from eigenestimation.toy_models.tms import SingleHiddenLayerPerceptron
+from eigenestimation.toy_models.data import GenerateCorrelatedData
 # Ensure correct device usage
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 from cycling_utils import TimestampedTimer
 
 timer = TimestampedTimer("Imported TimestampedTimer")
-from utils.uniform_models import ZeroOutput
+from eigenestimation.utils.uniform_models import ZeroOutput
 
+torch.manual_seed(42)
 def get_args_parser():
     """
     Parses command-line arguments for configuring the training process.
@@ -110,9 +107,9 @@ def main(args, timer):
     coefs = coefs
 
 
-    X_train, y_train, _ = GenerateCorrelatedData(num_features=n_features, num_datapoints=n_training_datapoints, sparsity=sparsity, batch_size=batch_size, coefs=coefs, correlation_set_size=correlation_set_size)
+    X_train = GenerateCorrelatedData(num_features=n_features, num_datapoints=n_training_datapoints, sparsity=sparsity, correlation_set_size=correlation_set_size)
     
-    X_eval, y_eval, _ = GenerateCorrelatedData(num_features=n_features, num_datapoints=n_eval_datapoints, sparsity=sparsity, batch_size=batch_size, coefs=coefs, correlation_set_size=correlation_set_size)
+    X_eval = GenerateCorrelatedData(num_features=n_features, num_datapoints=n_eval_datapoints, sparsity=sparsity, correlation_set_size=correlation_set_size)
 
     
     

@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from torch.func import jvp
 from functools import partial 
 
-def DrawNeuralNetwork(weights_dict, biases_dict, title=''):
+def DrawNeuralNetwork(weights_dict, biases_dict, title='', label_layers=False):
     """
     Draw a neural network diagram based on a dictionary of weights and biases.
 
@@ -47,7 +47,8 @@ def DrawNeuralNetwork(weights_dict, biases_dict, title=''):
             color = (1, 0, 0, min(1,abs(bias_value))) if bias_value > 0 else (0, 0, 1, min(abs(bias_value), 1))
             
             ax.plot(layer_x, y, 'o', markersize=8, color=color, markeredgecolor='black', markeredgewidth=.5)
-        ax.text(text_x, 1.0, label, ha='center', fontsize=5, color='black')
+        if label_layers:
+            ax.text(text_x, 1.0, label, ha='center', fontsize=5, color='black')
 
     # Draw connections (edges) between nodes based on weights
     def draw_connections(layer_x1, layer_y1, layer_x2, layer_y2, weights):

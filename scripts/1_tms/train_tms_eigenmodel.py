@@ -8,24 +8,22 @@ import wandb  # Add Weights & Biases for tracking
 import os
 import sys
 
-# Append module directory for imports
-module_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../eigenestimation"))
-sys.path.append(module_dir)
 
-from eigenmodel.trainer import Trainer
-from eigenmodel.eigenmodel import EigenModel
-from utils.utils import TransformDataLoader
-from utils.loss import MSELoss, MSEVectorLoss, MSEOutputLoss   
+from eigenestimation.eigenmodel.trainer import Trainer
+from eigenestimation.eigenmodel.eigenmodel import EigenModel
+from eigenestimation.utils.utils import TransformDataLoader
+from eigenestimation.utils.loss import MSELoss, MSEVectorLoss, MSEOutputLoss   
 
-from toy_models.tms import AutoencoderSymmetric, GenerateTMSData, GenerateTMSDataParallel, AutoencoderParallel  # Import your model
-
+from eigenestimation.toy_models.tms import AutoencoderSymmetric, AutoencoderParallel  # Import your model
+from eigenestimation.toy_models.data import GenerateTMSInputs
 # Ensure correct device usage
 device = "cuda" if torch.cuda.is_available() else "cpu"
+torch.manual_seed(42)
 
 from cycling_utils import TimestampedTimer
 
 timer = TimestampedTimer("Imported TimestampedTimer")
-from utils.uniform_models import ZeroOutput, SameOutput, MeanOutput
+from eigenestimation.utils.uniform_models import ZeroOutput, SameOutput, MeanOutput
 
 def get_args_parser():
     """
@@ -104,11 +102,11 @@ def main(args, timer):
     n_eval_datapoints = args.n_eval_datapoints
     sparsity = args.sparsity
     batch_size = args.batch_size
-
+    n_networks = args.n_networks
     # Generate training and evaluation data
-    X_train, _ = GenerateTMSDataParallel(num_features=n_features, num_datapoints=n_training_datapoints, sparsity=sparsity, batch_size=batch_size, n_networks=args.n_networks)
+    X_train = GenerateTMSInputs(num_features=n_features*n_networks, num_datapoints=n_training_datapoints, sparsity=sparsity)
     
-    X_eval, _ = GenerateTMSDataParallel(num_features=n_features, num_datapoints=n_eval_datapoints, sparsity=sparsity, batch_size=batch_size, n_networks=args.n_networks)
+    X_eval = GenerateTMSInputs(num_features=n_features*n_networks, num_datapoints=n_eval_datapoints, sparsity=sparsity)
     
     # Create TensorDatasets for DataLoader compatibility
     train_dataset = X_train

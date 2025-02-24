@@ -12,16 +12,14 @@ from cycling_utils import TimestampedTimer
 
 timer = TimestampedTimer("Imported TimestampedTimer")
 
-# Append module directory for imports
-module_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../eigenestimation"))
-sys.path.append(module_dir)
-
-from toy_models.trainer import Trainer
-from toy_models.tms import AutoencoderSymmetric, GenerateTMSData  # Import your model
+from eigenestimation.toy_models.trainer import Trainer
+from eigenestimation.toy_models.tms import AutoencoderSymmetric  # Import your model
+from eigenestimation.toy_models.data import GenerateTMSInputs
 
 # Ensure correct device usage
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
+torch.manual_seed(42)
 
 def get_args_parser():
     """
@@ -85,11 +83,14 @@ def main(args, timer):
     batch_size = args.batch_size
 
     # Generate training and evaluation data
-    X_train, _ = GenerateTMSData(num_features=n_features, num_datapoints=n_training_datapoints, sparsity=sparsity, batch_size=batch_size)
+    
+    # If X_train.shape[0] < batch_size, sample again
+    X_train  = GenerateTMSInputs(num_features=n_features, num_datapoints=n_training_datapoints, sparsity=sparsity)
     y_train = X_train
     
-    X_eval, _ = GenerateTMSData(num_features=n_features, num_datapoints=n_eval_datapoints, sparsity=sparsity, batch_size=batch_size)
+    X_eval  = GenerateTMSInputs(num_features=n_features, num_datapoints=n_eval_datapoints, sparsity=sparsity)
     y_eval = X_eval 
+    
     
     # Create TensorDatasets for DataLoader compatibility
     train_dataset = TensorDataset(X_train, y_train)
