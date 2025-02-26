@@ -17,7 +17,7 @@ from eigenestimation.toy_models.trainer import Trainer
 from eigenestimation.toy_models.parallel_serial_network import CustomMLP
 from eigenestimation.toy_models.data import GenerateTMSInputs
 torch.manual_seed(42)
-
+np.random.seed(42)
 import argparse
 from pathlib import Path
 device = "cuda" if torch.cuda.is_available() else "cpu"

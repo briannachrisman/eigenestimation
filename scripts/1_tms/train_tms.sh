@@ -4,7 +4,7 @@ NNODES=1
 N_PROC=4  
 
 WANDB_PROJECT="tms-model"
-CHECKPOINT_PATH="~/eigenestimation/outputs/toy_models/tms.pt"
+CHECKPOINT_PATH="/root/eigenestimation/outputs/toy_models/tms.pt"
 
 N_FEATURES=5
 N_HIDDEN=2

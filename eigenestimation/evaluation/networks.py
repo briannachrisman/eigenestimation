@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from torch.func import jvp
 from functools import partial 
 
-def DrawNeuralNetwork(weights_dict, biases_dict, title='', label_layers=False):
+def DrawNeuralNetwork(weights_dict, biases_dict, title='', label_layers=False, ax=None):
     """
     Draw a neural network diagram based on a dictionary of weights and biases.
 
@@ -25,6 +25,9 @@ def DrawNeuralNetwork(weights_dict, biases_dict, title='', label_layers=False):
     input_size = weights_dict[layer_names[0]].shape[1]  # Input size from the first layer's weights
     layer_sizes = [input_size] + [weights_dict[layer].shape[0] for layer in layer_names]  # Output sizes define nodes per layer
 
+    # Get max value in all of weight dict
+    max_weight = max((abs(weights_dict[layer]).max()) for layer in layer_names)
+    
     # Define x-coordinates for each layer
     layer_x = np.linspace(1, len(layer_sizes), len(layer_sizes))
 
@@ -33,9 +36,8 @@ def DrawNeuralNetwork(weights_dict, biases_dict, title='', label_layers=False):
 
     # Create figure
     max_y = .2*max(layer_sizes)
-    
-    #if ax is None:
-    fig, ax = plt.subplots(figsize=(len(weights_dict), 1+max_y))
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(len(weights_dict), 1+max_y))
 
     ax.axis('off')  # Turn off the axis
 
@@ -56,7 +58,7 @@ def DrawNeuralNetwork(weights_dict, biases_dict, title='', label_layers=False):
             for j, y2 in enumerate(layer_y2):
                 weight = weights[j, i]  # Note the order (output, input)
                 color = 'red' if weight > 0 else 'blue'
-                linewidth = 1 * abs(weight)  # Scale line width by weight magnitude
+                linewidth = 1 * abs(weight)/max_weight  # Scale line width by weight magnitude
                 ax.plot([layer_x1, layer_x2], [y1, y2], color=color, linewidth=linewidth)
 
     # Draw layers and connections iteratively
@@ -71,7 +73,5 @@ def DrawNeuralNetwork(weights_dict, biases_dict, title='', label_layers=False):
         # Draw connections from the previous layer to the current layer
         draw_connections(layer_x[i], layer_y[f'layer_{i}'], layer_x[i + 1], layer_y[f'layer_{i + 1}'], weights.cpu().detach().numpy())
 
-    plt.title(title, y=1.1, fontsize=5)
-    plt.show()
-    return fig
-    
+    ax.set_title(title, fontsize=5)
+    return ax

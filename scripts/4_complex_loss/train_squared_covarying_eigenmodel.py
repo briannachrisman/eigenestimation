@@ -26,6 +26,7 @@ from cycling_utils import TimestampedTimer
 timer = TimestampedTimer("Imported TimestampedTimer")
 from eigenestimation.utils.uniform_models import ZeroOutput, MeanOutput
 torch.manual_seed(42)
+np.random.seed(42)
 def get_args_parser():
     """
     Parses command-line arguments for configuring the training process.

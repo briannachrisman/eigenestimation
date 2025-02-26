@@ -7,7 +7,7 @@ from torch.utils.data import TensorDataset, DataLoader
 import wandb  # Add Weights & Biases for tracking
 import os
 import sys
-
+import numpy as np
 from cycling_utils import TimestampedTimer
 
 timer = TimestampedTimer("Imported TimestampedTimer")
@@ -20,7 +20,7 @@ from eigenestimation.toy_models.data import GenerateTMSInputs
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 torch.manual_seed(42)
-
+np.random.seed(42)
 def get_args_parser():
     """
     Parses command-line arguments for configuring the training process.

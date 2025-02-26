@@ -39,7 +39,42 @@ def compute_reconstruction_loss(reconstruction, gradients):
             
         eps = 1e-10
 
-        L2_error = (A_dot_A*A_dot_A - 2*A_dot_B*A_dot_B + B_dot_B*B_dot_B).sum()/(B_dot_B*B_dot_B + eps).sum()
+        L2_error = (A_dot_A - 2*A_dot_B + B_dot_B).sum()/(B_dot_B + eps).sum()
+
+
+        return L2_error 
+    
+def compute_reconstruction_loss_2(reconstruction_1, gradients_1, reconstruction_2, gradients_2):
+        #'''
+        
+        A1_dot_A2 = (torch.concat([einops.rearrange(
+            reconstruction_1[name] * reconstruction_2[name], 
+            f'b ... -> b (...)')
+                                 for name in gradients_1
+            ], dim=-1).sum(dim=-1)) # batch x params#.mean()#sum(dim=0).mean()
+                    
+            
+        B1_dot_B2 = (torch.concat([einops.rearrange(
+                    gradients_1[name] * gradients_2[name], 
+                    f'b ... -> b (...)')
+                for name in gradients_1
+            ], dim=-1).sum(dim=-1)) # batch x params#.mean()#sum(dim=0).mean()(dim=0).mean()
+            
+        A1_dot_B2 = (torch.concat([einops.rearrange(
+                    reconstruction_1[name] * gradients_2[name], 
+                    'b ... -> b (...)')
+                for name in gradients_1
+            ], dim=-1).sum(dim=-1)) # batch x params#.mean()#sum(dim=0).mean()(dim=0).mean()
+        
+        A2_dot_B1 = (torch.concat([einops.rearrange(
+                    reconstruction_2[name] * gradients_1[name], 
+                    'b ... -> b (...)')
+                for name in gradients_2
+            ], dim=-1).sum(dim=-1)) # batch x params#.mean()#sum(dim=0).mean()(dim=0).mean()
+            
+        eps = 1e-10
+
+        L2_error = (A1_dot_A2*A1_dot_A2 - 2*A1_dot_B2*A2_dot_B1 + A2_dot_B1*A2_dot_B1).sum()/(A2_dot_B1*A2_dot_B1 + eps).sum()
 
 
         return L2_error 
@@ -109,7 +144,7 @@ class Trainer:
         self.timer.report("Checkpoint loaded")
         
         
-    def save_checkpoint(self):
+    def save_checkpoint(self, frac_activated=None):
         """
         Saves the current state of the model, optimizer, sampler, scheduler, and metrics to a checkpoint.
         Also logs the checkpoint to Weights & Biases.
@@ -125,6 +160,7 @@ class Trainer:
                     "train_sampler": self.train_sampler.state_dict(),
                     "eval_sampler": self.eval_sampler.state_dict(),
                     "metrics": self.metrics,
+                    "frac_activated": frac_activated,
                 },
                 self.checkpoint_path,
             )
@@ -158,14 +194,15 @@ class Trainer:
         """
         self.model.train()
         
-        
+        total_samples = 0
         total_loss = 0
         total_batches = 0
+        
         sparsity_loss = 0
         reconstruction_loss = 0
         baseline_reconstruction_loss = 0
         train_batches_per_epoch = len(train_dataloader)
-
+        self.sum_activated = torch.zeros(self.model.module.n_features).to(self.device_id)
         for x in train_dataloader:
             # Forward pass
             if self.compute_gradients:
@@ -183,8 +220,14 @@ class Trainer:
                 sorted_values, _ = torch.sort(abs(jvp_flattened), descending=True)#
                 nth_highest_value = sorted_values[round(top_k*len(jvp_flattened))]
                 nth_lowest_value = sorted_values[-round(top_k*len(jvp_flattened))]
+                
             jvp_topk = jvp*(abs(jvp)>=nth_highest_value).float()
-            jvp_bottomk = jvp*(abs(jvp)<=nth_lowest_value).float()
+            self.sum_activated = self.sum_activated +(abs(jvp)>=nth_highest_value).float().mean(dim=0)
+
+            
+        
+            
+            #jvp_bottomk = jvp*((jvp)<=nth_lowest_value).float()
             
             reconstruction = self.model.module.reconstruct(jvp_topk) 
             
@@ -201,7 +244,7 @@ class Trainer:
             #baseline_reconstruction_loss += baseline_L2_error.item()
             total_loss += L.item()
             total_batches = total_batches +1
-            
+            total_samples = total_samples + jvp.shape[1]
             
             # Backpropagation and optimizer step
             self.optimizer.zero_grad()
@@ -213,26 +256,29 @@ class Trainer:
             
         if self.is_master:
             self.lr_scheduler.step() 
-
+        frac_activated = self.sum_activated/total_batches
         # Log to Weights & Biases
         if epoch % self.log_epochs == 0:
             if self.is_master:
                 self.log_metrics_to_wandb({
                     "loss": total_loss/total_batches,
                     "reconstruction_loss": reconstruction_loss/total_batches,
-                    "sparsity_loss": sparsity_loss/total_batches,}, epoch, "train")
+                    "frac_activated": frac_activated,
+                    "sparsity_loss": sparsity_loss/total_batches,}, epoch, "train",)
                 self.timer.report(
                     f'''
                     Epoch {epoch},
                     training loss: {total_loss/total_batches},
                     training reconstruction_loss: {reconstruction_loss/total_batches},
                     training sparsity_loss: {sparsity_loss/total_batches},
+                    training frac_activated: {frac_activated}
 '''
                 )
         # Clear the cuda cache
         # Collect garbage
         torch.cuda.empty_cache()
         gc.collect()
+        return frac_activated
     
 
     def compute_sparsity_loss(self, reconstruction):
@@ -298,11 +344,11 @@ class Trainer:
         """
         for epoch in range(self.train_dataloader.sampler.epoch, self.epochs):
             with self.train_dataloader.sampler.in_epoch(epoch):
-                self.train_one_epoch(self.train_dataloader, epoch)
+                frac_activated = self.train_one_epoch(self.train_dataloader, epoch)
                 if epoch % self.log_epochs == 0:
                     with self.eval_dataloader.sampler.in_epoch(epoch):
                         self.evaluate(epoch)
                 if epoch % self.checkpoint_epochs == 0:
-                    self.save_checkpoint()
+                    self.save_checkpoint(frac_activated)
         if self.is_master:
             self.save_checkpoint()

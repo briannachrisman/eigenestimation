@@ -7,7 +7,7 @@ from torch.utils.data import TensorDataset, DataLoader
 import wandb  # Add Weights & Biases for tracking
 import os
 import sys
-
+import numpy as np
 from eigenestimation.eigenmodel.trainer import Trainer
 from eigenestimation.eigenmodel.eigenmodel import EigenModel
 from eigenestimation.utils.utils import TransformDataLoader
@@ -24,6 +24,7 @@ timer = TimestampedTimer("Imported TimestampedTimer")
 from eigenestimation.utils.uniform_models import ZeroOutput
 
 torch.manual_seed(42)
+np.random.seed(42)
 def get_args_parser():
     """
     Parses command-line arguments for configuring the training process.

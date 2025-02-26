@@ -1,10 +1,13 @@
 #!/bin/bash
 
 NNODES=1
-N_PROC=1
+N_PROC=4
 MODEL_PATH="outputs/toy_models/squared.pt"
 
-N_EIGENRANK=2
+
+
+
+N_EIGENRANK=1
 TOP_K=0.1
 
 SPARSITY=0.05
@@ -17,10 +20,9 @@ CHECKPOINT_EPOCHS=100
 LOG_EPOCHS=10
 N_TRAINING_DATAPOINTS=1000
 N_EVAL_DATAPOINTS=100
-CORRELATION_SET_SIZE=5
 
 
-for N_EIGENFEATURES in 15; do
+for N_EIGENFEATURES in {3,5,10,15}; do
 
     WANDB_PROJECT="squared-network-eigenmodel-features$N_EIGENFEATURES"
     CHECKPOINT_PATH="outputs/eigenmodels/squared_features$N_EIGENFEATURES.pt"

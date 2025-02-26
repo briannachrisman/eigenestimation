@@ -7,7 +7,7 @@ WANDB_PROJECT="high-rank-circuits-eigenmodel"
 MODEL_PATH="outputs/toy_models/high_rank_circuits.pt"
 CHECKPOINT_PATH="outputs/eigenmodels/high_rank_circuits.pt"
 
-N_EIGENFEATURES=10
+N_EIGENFEATURES=8
 N_EIGENRANK=2
 TOP_K=0.1
 
