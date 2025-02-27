@@ -351,4 +351,4 @@ class Trainer:
                 if epoch % self.checkpoint_epochs == 0:
                     self.save_checkpoint(frac_activated)
         if self.is_master:
-            self.save_checkpoint()
+            self.save_checkpoint(frac_activated)

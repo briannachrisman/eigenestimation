@@ -23,7 +23,7 @@ CORRELATION_SET_SIZE=5
 
 
 
-for N_EIGENRANK in 1 2 3 4 5 6 7 8; do
+for N_EIGENRANK in 1 2 3 4 5 6; do
 
     WANDB_PROJECT="high-rank-circuits-eigenmodel-rank$N_EIGENRANK"
     CHECKPOINT_PATH="outputs/eigenmodels/high_rank_circuits_rank$N_EIGENRANK.pt"

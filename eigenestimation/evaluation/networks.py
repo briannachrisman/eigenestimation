@@ -58,8 +58,8 @@ def DrawNeuralNetwork(weights_dict, biases_dict, title='', label_layers=False, a
             for j, y2 in enumerate(layer_y2):
                 weight = weights[j, i]  # Note the order (output, input)
                 color = 'red' if weight > 0 else 'blue'
-                linewidth = 1 * abs(weight)/max_weight  # Scale line width by weight magnitude
-                ax.plot([layer_x1, layer_x2], [y1, y2], color=color, linewidth=linewidth)
+                alpha = abs(weight)/max_weight  # Scale line width by weight magnitude
+                ax.plot([layer_x1, layer_x2], [y1, y2], color=color, linewidth=1, alpha=alpha.item())
 
     # Draw layers and connections iteratively
     for i, (layer_name, weights) in enumerate(weights_dict.items()):
