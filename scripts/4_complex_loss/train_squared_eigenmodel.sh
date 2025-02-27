@@ -8,8 +8,8 @@ MODEL_PATH="outputs/toy_models/squared.pt"
 CHECKPOINT_PATH="outputs/eigenmodels/squared.pt"
 
 N_EIGENFEATURES=5
-N_EIGENRANK=1
-TOP_K=0.2
+N_EIGENRANK=2
+TOP_K=0.1
 
 SPARSITY=0.05
 EPOCHS=1000

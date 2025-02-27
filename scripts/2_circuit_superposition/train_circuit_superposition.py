@@ -35,7 +35,7 @@ def get_args_parser():
     parser.add_argument("--epochs", type=int, default=10, help="Number of training epochs")
     parser.add_argument("--lr", type=float, default=0.01, help="Learning rate")
     parser.add_argument("--lr-step-epochs", type=int, default=100, help="Learning rate step epochs")
-    parser.add_argument("--lr-decay-rate", type=float, default=0.9, help="Learning rate decay rate")
+    parser.add_argument("--lr-decay-rate", type=float, default=1, help="Learning rate decay rate")
     parser.add_argument("--batch-size", type=int, default=16, help="Batch size for training")
     parser.add_argument("--checkpoint-path", type=Path, required=True, help="Directory to save checkpoints")
     parser.add_argument("--checkpoint-epochs", type=int, required=True, help="Frequency at which to save checkpoints")

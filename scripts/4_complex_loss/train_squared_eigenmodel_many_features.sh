@@ -4,9 +4,6 @@ NNODES=1
 N_PROC=4
 MODEL_PATH="outputs/toy_models/squared.pt"
 
-
-
-
 N_EIGENRANK=1
 TOP_K=0.1
 
