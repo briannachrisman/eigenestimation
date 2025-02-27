@@ -3,10 +3,11 @@
 *pycache*
 *env
 *ipynb_checkpoints*
-*writeup
+writeup/*
 *wandb*
 *outputs
 *.pdf
 figures/*
+!/writeup
 !*writeup/writeup.tex
 !*writeup/writeup.pdf
