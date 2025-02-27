@@ -8,5 +8,5 @@
 *outputs
 *.pdf
 figures/*
-!writeup/writeup.tex
-!writeup/writeup.pdf
+!*writeup/writeup.tex
+!*writeup/writeup.pdf
