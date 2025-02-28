@@ -1,0 +1,61 @@
+\begin{thebibliography}{8}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Bereska \& Gavves(2024)Bereska and Gavves]{bereska2024mechanistic}
+Bereska, L. and Gavves, E.
+\newblock Mechanistic interpretability for ai safety--a review.
+\newblock \emph{arXiv preprint arXiv:2404.14082}, 2024.
+
+\bibitem[Braun et~al.(2025)Braun, Bushnaq, Heimersheim, Mendel, and
+  Sharkey]{braun2025interpretability}
+Braun, D., Bushnaq, L., Heimersheim, S., Mendel, J., and Sharkey, L.
+\newblock Interpretability in parameter space: Minimizing mechanistic
+  description length with attribution-based parameter decomposition.
+\newblock \emph{arXiv preprint arXiv:2501.14926}, 2025.
+
+\bibitem[Bricken et~al.(2023)Bricken, Templeton, Batson, Chen, Jermyn, Conerly,
+  Turner, Tamkin, and Carter]{bricken2023towards}
+Bricken, T., Templeton, A., Batson, J., Chen, B., Jermyn, A., Conerly, T.,
+  Turner, N., Tamkin, A., and Carter, S.
+\newblock Towards monosemanticity: Decomposing language models with dictionary
+  learning.
+\newblock \emph{Transformer Circuits Thread}, 2023.
+\newblock Accessed: 2025-02-17.
+
+\bibitem[Bussmann et~al.(2024)Bussmann, Leask, and
+  Nanda]{bussmann2024batchtopk}
+Bussmann, B., Leask, P., and Nanda, N.
+\newblock Batchtopk sparse autoencoders.
+\newblock \emph{arXiv preprint arXiv:2412.06410}, 2024.
+
+\bibitem[Cunningham et~al.(2023)Cunningham, Ewart, Riggs, Huben, and
+  Sharkey]{cunningham2023sparse}
+Cunningham, H., Ewart, A., Riggs, L., Huben, R., and Sharkey, L.
+\newblock Sparse autoencoders find highly interpretable features in language
+  models.
+\newblock \emph{arXiv preprint arXiv:2309.08600}, 2023.
+
+\bibitem[Elhage et~al.(2022)Elhage, Hume, Olsson, Schiefer, Henighan, Kravec,
+  Hatfield-Dodds, Lasenby, Drain, Chen, et~al.]{elhage2022toy}
+Elhage, N., Hume, T., Olsson, C., Schiefer, N., Henighan, T., Kravec, S.,
+  Hatfield-Dodds, Z., Lasenby, R., Drain, D., Chen, C., et~al.
+\newblock Toy models of superposition.
+\newblock \emph{arXiv preprint arXiv:2209.10652}, 2022.
+
+\bibitem[Gao et~al.(2024)Gao, la~Tour, Tillman, Goh, Troll, Radford, Sutskever,
+  Leike, and Wu]{gao2024scaling}
+Gao, L., la~Tour, T.~D., Tillman, H., Goh, G., Troll, R., Radford, A.,
+  Sutskever, I., Leike, J., and Wu, J.
+\newblock Scaling and evaluating sparse autoencoders.
+\newblock \emph{arXiv preprint arXiv:2406.04093}, 2024.
+
+\bibitem[Matena \& Raffel(2023)Matena and Raffel]{matena2023npeff}
+Matena, M. and Raffel, C.
+\newblock Npeff: Non-negative per-example fisher factorization.
+\newblock \emph{arXiv preprint arXiv:2310.04649}, 2023.
+
+\end{thebibliography}

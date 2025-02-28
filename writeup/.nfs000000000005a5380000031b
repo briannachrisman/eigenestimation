@@ -1,0 +1,91 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyperFirstAtBeginDocument{\AtBeginDocument}
+\HyperFirstAtBeginDocument{\ifx\hyper@anchor\@undefined
+\global\let\oldcontentsline\contentsline
+\gdef\contentsline#1#2#3#4{\oldcontentsline{#1}{#2}{#3}}
+\global\let\oldnewlabel\newlabel
+\gdef\newlabel#1#2{\newlabelxx{#1}#2}
+\gdef\newlabelxx#1#2#3#4#5#6{\oldnewlabel{#1}{{#2}{#3}}}
+\AtEndDocument{\ifx\hyper@anchor\@undefined
+\let\contentsline\oldcontentsline
+\let\newlabel\oldnewlabel
+\fi}
+\fi}
+\global\let\hyper@last\relax 
+\gdef\HyperFirstAtBeginDocument#1{#1}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{bereska2024mechanistic}
+\citation{gao2024scaling,cunningham2023sparse,bricken2023towards}
+\citation{engels2024not,engels2024decomposing}
+\citation{merullo2024talking,lindsey2024sparse}
+\citation{pascanu2013difficulty,goodfellow2014generative,ho2020denoising,mnih2015human}
+\citation{watanabe2007almost,watanabe2000algebraic,watanabe2005algebraic,wei2022deep}
+\citation{sharkey2025open}
+\citation{davies2023unifying}
+\citation{wang2024loss,hoogland2024developmental}
+\citation{bushnaq2024using}
+\citation{matena2023npeff}
+\citation{braun2025interpretability}
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:1_hessian_diagram}{{1}{2}{Decomposing a loss landscape into a set of principal directions , where (1) the set of directions can approximately reconstruct any per-sample Hessian and (2) for any given sample, the curvature in most of the principle directions is approximately zero.\relax }{figure.caption.1}{}}
+\newlabel{fig:1_hessian_diagram@cref}{{[figure][1][]1}{[1][2][]2}}
+\citation{elhage2022toy}
+\newlabel{tab:toy_models}{{1}{3}{Toy models and their properties\relax }{table.caption.2}{}}
+\newlabel{tab:toy_models@cref}{{[table][1][]1}{[1][3][]3}}
+\newlabel{fig:2_tms_setup}{{2}{3}{The TMS model architecture and parameter directions learned by encoder, and the slightly more compilicated TMS-in-parallel architecture.\relax }{figure.caption.3}{}}
+\newlabel{fig:2_tms_setup@cref}{{[figure][2][]2}{[1][3][]3}}
+\newlabel{fig:3_tms_subnetworks_first5}{{3}{4}{Selected 5 subnetworks that L3D decomposes the TMS-in-parallel model into\relax }{figure.caption.4}{}}
+\newlabel{fig:3_tms_subnetworks_first5@cref}{{[figure][3][]3}{[1][3][]4}}
+\newlabel{fig:4_tms_intervention}{{4}{4}{The effect of intervening on the TMS-in-parallel model in the direction of $\text {Network}_1$.\relax }{figure.caption.5}{}}
+\newlabel{fig:4_tms_intervention@cref}{{[figure][4][]4}{[1][3][]4}}
+\newlabel{fig:5_circuit_superposition}{{5}{5}{The set up of TMCS, the learned subnetworks, and the coeffcients derived from the subnetworks compared to the true coefficients.\relax }{figure.caption.6}{}}
+\newlabel{fig:5_circuit_superposition@cref}{{[figure][5][]5}{[1][4][]5}}
+\newlabel{fig:6_high_rank_decomposition}{{6}{6}{Rank-3 parameter representations learned by L3D for the high rank circuit decomposition task.\relax }{figure.caption.7}{}}
+\newlabel{fig:6_high_rank_decomposition@cref}{{[figure][6][]6}{[1][5][]6}}
+\newlabel{fig:7_squared_subnetworks}{{7}{7}{Subnetworks learned by L3D for the $X \mapsto X^2$ model, and effect of intervening on each subnetwork\relax }{figure.caption.8}{}}
+\newlabel{fig:7_squared_subnetworks@cref}{{[figure][7][]7}{[1][6][]7}}
+\bibdata{writeup.bib}
+\bibcite{bereska2024mechanistic}{{1}{2024}{{Bereska \& Gavves}}{{Bereska and Gavves}}}
+\bibcite{braun2025interpretability}{{2}{2025}{{Braun et~al.}}{{Braun, Bushnaq, Heimersheim, Mendel, and Sharkey}}}
+\bibcite{bricken2023towards}{{3}{2023}{{Bricken et~al.}}{{Bricken, Templeton, Batson, Chen, Jermyn, Conerly, Turner, Tamkin, and Carter}}}
+\bibcite{bushnaq2024using}{{4}{2024}{{Bushnaq et~al.}}{{Bushnaq, Mendel, Heimersheim, Braun, Goldowsky-Dill, H{\"a}nni, Wu, and Hobbhahn}}}
+\bibcite{cunningham2023sparse}{{5}{2023}{{Cunningham et~al.}}{{Cunningham, Ewart, Riggs, Huben, and Sharkey}}}
+\bibcite{davies2023unifying}{{6}{2023}{{Davies et~al.}}{{Davies, Langosco, and Krueger}}}
+\bibcite{elhage2022toy}{{7}{2022}{{Elhage et~al.}}{{Elhage, Hume, Olsson, Schiefer, Henighan, Kravec, Hatfield-Dodds, Lasenby, Drain, Chen, et~al.}}}
+\bibcite{engels2024not}{{8}{2024{a}}{{Engels et~al.}}{{Engels, Michaud, Liao, Gurnee, and Tegmark}}}
+\bibcite{engels2024decomposing}{{9}{2024{b}}{{Engels et~al.}}{{Engels, Riggs, and Tegmark}}}
+\bibcite{gao2024scaling}{{10}{2024}{{Gao et~al.}}{{Gao, la~Tour, Tillman, Goh, Troll, Radford, Sutskever, Leike, and Wu}}}
+\bibcite{goodfellow2014generative}{{11}{2014}{{Goodfellow et~al.}}{{Goodfellow, Pouget-Abadie, Mirza, Xu, Warde-Farley, Ozair, Courville, and Bengio}}}
+\bibcite{ho2020denoising}{{12}{2020}{{Ho et~al.}}{{Ho, Jain, and Abbeel}}}
+\bibcite{hoogland2024developmental}{{13}{2024}{{Hoogland et~al.}}{{Hoogland, Wang, Farrugia-Roberts, Carroll, Wei, and Murfet}}}
+\bibcite{lindsey2024sparse}{{14}{2024}{{Lindsey et~al.}}{{Lindsey, Templeton, Marcus, Conerly, Batson, and Olah}}}
+\bibcite{matena2023npeff}{{15}{2023}{{Matena \& Raffel}}{{Matena and Raffel}}}
+\bibcite{merullo2024talking}{{16}{2024}{{Merullo et~al.}}{{Merullo, Eickhoff, and Pavlick}}}
+\bibcite{mnih2015human}{{17}{2015}{{Mnih et~al.}}{{Mnih, Kavukcuoglu, Silver, Rusu, Veness, Bellemare, Graves, Riedmiller, Fidjeland, Ostrovski, et~al.}}}
+\bibcite{pascanu2013difficulty}{{18}{2013}{{Pascanu}}{{}}}
+\bibcite{sharkey2025open}{{19}{2025}{{Sharkey et~al.}}{{Sharkey, Chughtai, Batson, Lindsey, Wu, Bushnaq, Goldowsky-Dill, Heimersheim, Ortega, Bloom, et~al.}}}
+\bibcite{wang2024loss}{{20}{2024}{{Wang et~al.}}{{Wang, Farrugia-Roberts, Hoogland, Carroll, Wei, and Murfet}}}
+\bibcite{watanabe2000algebraic}{{21}{2000}{{Watanabe}}{{}}}
+\bibcite{watanabe2005algebraic}{{22}{2005}{{Watanabe}}{{}}}
+\bibcite{watanabe2007almost}{{23}{2007}{{Watanabe}}{{}}}
+\bibcite{wei2022deep}{{24}{2022}{{Wei et~al.}}{{Wei, Murfet, Gong, Li, Gell-Redman, and Quella}}}
+\bibstyle{icml2025}
+\newlabel{fig:s1_jacobian}{{S1}{10}{Identifying principle components of the loss landscape using $\nabla L(f(X_i, \theta ), f(X_j, \theta _0))$.\relax }{figure.caption.11}{}}
+\newlabel{fig:s1_jacobian@cref}{{[figure][1][2147483647]S1}{[1][10][]10}}
+\newlabel{fig:S4_different_ranks}{{A}{10}{Impact Statement}{figure.caption.14}{}}
+\newlabel{fig:S4_different_ranks@cref}{{[appendix][1][2147483647]A}{[1][10][]10}}
+\newlabel{fig:s2_tms_subnetworks}{{S2}{11}{Full TMS-in-parallel model subnetworks.\relax }{figure.caption.12}{}}
+\newlabel{fig:s2_tms_subnetworks@cref}{{[figure][2][2147483647]S2}{[1][10][]11}}
+\newlabel{fig:s3_tms_interventions}{{S3}{12}{Effect of intervening on the first 5 subnetworks of the TMS-in-parallel model.\relax }{figure.caption.13}{}}
+\newlabel{fig:s3_tms_interventions@cref}{{[figure][3][2147483647]S3}{[1][10][]12}}
+\newlabel{fig:S5_squared_intervention_more_deltas}{{S5}{14}{Effects of intervening on each of the 5 subnetworks of the $X \mapsto X^2$ model.\relax }{figure.caption.15}{}}
+\newlabel{fig:S5_squared_intervention_more_deltas@cref}{{[figure][5][2147483647]S5}{[1][10][]14}}
+\newlabel{fig:S6_squared_intervention_middle}{{S6}{15}{Intervening on just the weights and biases of the middle hidden layers in the $X \mapsto X^2$ network.\relax }{figure.caption.16}{}}
+\newlabel{fig:S6_squared_intervention_middle@cref}{{[figure][6][2147483647]S6}{[1][10][]15}}
+\newlabel{fig:S7_squared_intervention_multi_features}{{S7}{16}{Intervening on just the weights and biases of the middle hidden layers in the $X \mapsto X^2$ network.\relax }{figure.caption.17}{}}
+\newlabel{fig:S7_squared_intervention_multi_features@cref}{{[figure][7][2147483647]S7}{[1][10][]16}}
+\newlabel{fig:S8_squared_many_features}{{S8}{17}{Training loss vs number of features for the $X \mapsto X^2$ model, and decompositions for a 3- and 5- subnetwork decomposition.\relax }{figure.caption.18}{}}
+\newlabel{fig:S8_squared_many_features@cref}{{[figure][8][2147483647]S8}{[1][10][]17}}
+\gdef \@abspage@last{17}
