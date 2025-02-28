@@ -17,9 +17,9 @@ class TransformerWrapper(nn.Module):
         model_output: torch.Tensor = self.transformer(tokenized_X)
         # Rearrange the output to a flat batch of logits
         if self.outputs_logits:
-            probs = model_output.softmax(dim=-1) + self.eps
+            probs = model_output
         else: 
-            probs = (model_output.logits).softmax(dim=-1) + self.eps
+            probs = model_output.logits
         return probs#einops.rearrange(probs, 'batch tokens logits -> (batch tokens) logits')
 
 def DeleteParams(model: nn.Module, attributes_to_delete: List[str]) -> None:

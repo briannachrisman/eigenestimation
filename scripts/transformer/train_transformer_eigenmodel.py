@@ -16,37 +16,36 @@ from datasets import load_dataset
 module_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../eigenestimation"))
 sys.path.append(module_dir)
 
-from eigenmodel.trainer import Trainer
-from eigenmodel.eigenmodel import EigenModel
-from utils.utils import TransformDataLoader
-from utils.loss import MSELoss, MSEVectorLoss
+from eigenestimation.eigenmodel.trainer import Trainer
+from eigenestimation.eigenmodel.eigenmodel import EigenModel
+from eigenestimation.utils.utils import TransformDataLoader
+from eigenestimation.utils.loss import MSELoss, MSEVectorLoss, KLDivergenceVectorLoss
 
-from toy_models.tms import SingleHiddenLayerPerceptron, GenerateTMSAdditiveData
 # Ensure correct device usage
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 from cycling_utils import TimestampedTimer
 
 timer = TimestampedTimer("Imported TimestampedTimer")
-from utils.uniform_models import ZeroOutput
+from eigenestimation.utils.uniform_models import ZeroOutput
 
-from eigenmodel.trainer import Trainer
-from eigenmodel.eigenmodel import EigenModel
-from utils.utils import TransformDataLoader, DeleteParams, RetrieveWandBArtifact
-from utils.loss import KLDivergenceVectorLoss
+from eigenestimation.eigenmodel.trainer import Trainer
+from eigenestimation.eigenmodel.eigenmodel import EigenModel
+from eigenestimation.utils.utils import TransformDataLoader, DeleteParams, RetrieveWandBArtifact
+from eigenestimation.utils.loss import KLDivergenceVectorLoss
 
 
 from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig
 
 
-from toy_models.transformer_wrapper import TransformerWrapper
+from eigenestimation.toy_models.transformer_wrapper import TransformerWrapper
 # Ensure correct device usage
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 from cycling_utils import TimestampedTimer
 
 timer = TimestampedTimer("Imported TimestampedTimer")
-from utils.uniform_models import ZeroOutput
+from eigenestimation.utils.uniform_models import ZeroOutput
 
 
 def get_args_parser():
@@ -141,21 +140,22 @@ def main(args, timer):
     model = TransformerWrapper(tinystories_1m, tokenizer,
                                outputs_logits=False).to(device)
 
-
+    vals_to_keep = ['transformer.transformer.h.5.attn.attention.q_proj.weight', 'transformer.transformer.h.5.attn.attention.k_proj.weight', 'transformer.transformer.h.5.attn.attention.v_proj.weight']
+    
     # Make the eigenestimation a little smaller but only looking at a subset of the parameters.
     # Pick a random subset of tensors to include in paramters, and turn the rest into frozen buffers.
     params_to_delete = [name for name, param in model.named_parameters()]
-    params_to_delete = [p for p in params_to_delete if #('blocks.4.attn.W' not in p)]# and ('blocks.6.mlp.W' not in p)]#!='transformer.h.1.ln_2.weight']
-    'attn' not in p]#!='transformer.h.1.ln_2.weight']
+    params_to_delete = [p for p in params_to_delete if p not in vals_to_keep]
 
     # Delete 3/4 of the parameters.
     #for p in (params_to_delete[::20]):
     #  params_to_delete.remove(p)
 
     DeleteParams(model, params_to_delete)
+    DeleteParams(model, ['transformer.lm_head.weight'])
 
-    print(sum([p.numel() for p in model.parameters()]))
     for n,p in model.named_parameters(): print(n, p.shape, p.numel())
+    print(sum([p.numel() for p in model.parameters()]), 'parameters')
 
     # Load in data.
     dataset = load_dataset('roneneldan/TinyStories', split="train[:1%]")

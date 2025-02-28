@@ -236,10 +236,10 @@ Learning a set of full rank parameter parameter directions would be extremely ex
 
 
 \subsection{Training}\label{sec:training}
-We wish to learn the decomposition-related transforms $V^{in}$ and $V^{out}$ that minimize the topK reconstruction loss of our divergence gradient described above. Therefore we use the following L2 norm loss:
+We wish to learn the decomposition-related transforms $V^{in}$ and $V^{out}$ that minimize the topK reconstruction loss of our divergence gradient described above. We use a (normalized) L2 norm loss.
 
 \begin{equation}
-    L = {|| \nabla_W D - V^{out}_{:,\mathcal{K}} V^{in}_{\mathcal{K},:} \nabla_W D ||}_2
+    L = {|| \nabla_W D - V^{out}_{:,\mathcal{K}} V^{in}_{\mathcal{K},:} \nabla_W D ||}_2 /  
 \end{equation}
 
 For each batch of samples, we randomly select a reference sample $x_r$ to be paired with each sample $x_i$ in the batch. We then compute the gradient of divergence of $x_i$ and $x_r$ at the model's current parameters $W_0$. We transform that gradient into the subnetwork space using $V^{in}$, and compute the $\text{topK}$ components. We transform those components back into the original parameter space using $V^{out}$, and compute the loss between the reconstructed gradient and the original gradient. We apply a learning update to $V^{in}$ and $V^{out}$ with the goal of minizing this loss. We also normalize $V^{out}$ to be a unit vector after each update. 

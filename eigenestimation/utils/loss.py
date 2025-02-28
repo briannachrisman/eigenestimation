@@ -82,19 +82,26 @@ class KLDivergenceVectorLoss(nn.Module):
             torch.Tensor: The computed KL Divergence Loss.
         """
         # Convert preds to log-probabilities
-        preds_log = torch.log(preds)
-        truth = preds[torch.randperm(preds.shape[0]),...].detach()
-        truth_log = torch.log(truth)
-
+        
+        # Shuffle all elements of preds
+        flat_preds = preds.flatten(0,1).detach()
+        rand_selection = flat_preds[torch.randint(flat_preds.shape[0], (flat_preds.shape[0],)),...]
+        
+        #print(rand_selection[0,0])
+        # Reshape rand_selection to match preds shape
+        reference = rand_selection.view_as(preds)
+        
+        #truth = preds[torch.randperm(preds.shape[0]),...].detach()
         # Compute KL divergence per sample (without reduction)
-        kl_divergence0 = F.kl_div(truth_log, truth, reduction='none')
-        per_sample_kl_div0 = kl_divergence0.sum(dim=-1)  # Sum over classes for each sample
-
-        kl_divergence = F.kl_div(preds_log, truth, reduction='none')
-        per_sample_kl_div = kl_divergence.sum(dim=-1) - per_sample_kl_div0  # Sum over classes for each sample
+        # = F.kl_div(preds, truth.softmax(dim=-1))
+        per_sample_kl_div = F.kl_div(preds, reference.softmax(dim=-1), reduction='none').sum(dim=-1).flatten(0,1)#.mean(dim=-1)#(0,1)#.mean(dim=1)#(dim=-1)  # Sum over classes for each sample
+        return per_sample_kl_div
+        print(per_sample_kl_div.shape)
+        #kl_divergence = F.kl_div(preds_log, truth, reduction='none')
+        #per_sample_kl_div = kl_divergence.sum(dim=-1) - per_sample_kl_div0  # Sum over classes for each sample
         
 
-        per_sample_kl_div = per_sample_kl_div - per_sample_kl_div0
+        #per_sample_kl_div = per_sample_kl_div - per_sample_kl_div0
 
 
         # Apply reduction
