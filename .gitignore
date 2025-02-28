@@ -8,6 +8,6 @@ writeup/*
 *outputs
 *.pdf
 figures/*
-!/writeup
 !*writeup/writeup.tex
 !*writeup/writeup.pdf
+*.nsf*
