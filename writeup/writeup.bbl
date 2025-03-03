@@ -1,4 +1,4 @@
-\begin{thebibliography}{8}
+\begin{thebibliography}{29}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -26,6 +26,14 @@ Bricken, T., Templeton, A., Batson, J., Chen, B., Jermyn, A., Conerly, T.,
 \newblock \emph{Transformer Circuits Thread}, 2023.
 \newblock Accessed: 2025-02-17.
 
+\bibitem[Bushnaq et~al.(2024)Bushnaq, Mendel, Heimersheim, Braun,
+  Goldowsky-Dill, H{\"a}nni, Wu, and Hobbhahn]{bushnaq2024using}
+Bushnaq, L., Mendel, J., Heimersheim, S., Braun, D., Goldowsky-Dill, N.,
+  H{\"a}nni, K., Wu, C., and Hobbhahn, M.
+\newblock Using degeneracy in the loss landscape for mechanistic
+  interpretability.
+\newblock \emph{arXiv preprint arXiv:2405.10927}, 2024.
+
 \bibitem[Bussmann et~al.(2024)Bussmann, Leask, and
   Nanda]{bussmann2024batchtopk}
 Bussmann, B., Leask, P., and Nanda, N.
@@ -39,12 +47,29 @@ Cunningham, H., Ewart, A., Riggs, L., Huben, R., and Sharkey, L.
   models.
 \newblock \emph{arXiv preprint arXiv:2309.08600}, 2023.
 
+\bibitem[Davies et~al.(2023)Davies, Langosco, and Krueger]{davies2023unifying}
+Davies, X., Langosco, L., and Krueger, D.
+\newblock Unifying grokking and double descent.
+\newblock \emph{arXiv preprint arXiv:2303.06173}, 2023.
+
 \bibitem[Elhage et~al.(2022)Elhage, Hume, Olsson, Schiefer, Henighan, Kravec,
   Hatfield-Dodds, Lasenby, Drain, Chen, et~al.]{elhage2022toy}
 Elhage, N., Hume, T., Olsson, C., Schiefer, N., Henighan, T., Kravec, S.,
   Hatfield-Dodds, Z., Lasenby, R., Drain, D., Chen, C., et~al.
 \newblock Toy models of superposition.
 \newblock \emph{arXiv preprint arXiv:2209.10652}, 2022.
+
+\bibitem[Engels et~al.(2024{\natexlab{a}})Engels, Michaud, Liao, Gurnee, and
+  Tegmark]{engels2024not}
+Engels, J., Michaud, E.~J., Liao, I., Gurnee, W., and Tegmark, M.
+\newblock Not all language model features are linear.
+\newblock \emph{arXiv preprint arXiv:2405.14860}, 2024{\natexlab{a}}.
+
+\bibitem[Engels et~al.(2024{\natexlab{b}})Engels, Riggs, and
+  Tegmark]{engels2024decomposing}
+Engels, J., Riggs, L., and Tegmark, M.
+\newblock Decomposing the dark matter of sparse autoencoders.
+\newblock \emph{arXiv preprint arXiv:2410.14670}, 2024{\natexlab{b}}.
 
 \bibitem[Gao et~al.(2024)Gao, la~Tour, Tillman, Goh, Troll, Radford, Sutskever,
   Leike, and Wu]{gao2024scaling}
@@ -53,9 +78,119 @@ Gao, L., la~Tour, T.~D., Tillman, H., Goh, G., Troll, R., Radford, A.,
 \newblock Scaling and evaluating sparse autoencoders.
 \newblock \emph{arXiv preprint arXiv:2406.04093}, 2024.
 
+\bibitem[Goodfellow et~al.(2014)Goodfellow, Pouget-Abadie, Mirza, Xu,
+  Warde-Farley, Ozair, Courville, and Bengio]{goodfellow2014generative}
+Goodfellow, I., Pouget-Abadie, J., Mirza, M., Xu, B., Warde-Farley, D., Ozair,
+  S., Courville, A., and Bengio, Y.
+\newblock Generative adversarial nets.
+\newblock \emph{Advances in neural information processing systems}, 27, 2014.
+
+\bibitem[Ho et~al.(2020)Ho, Jain, and Abbeel]{ho2020denoising}
+Ho, J., Jain, A., and Abbeel, P.
+\newblock Denoising diffusion probabilistic models.
+\newblock \emph{Advances in neural information processing systems},
+  33:\penalty0 6840--6851, 2020.
+
+\bibitem[Hoogland et~al.(2024)Hoogland, Wang, Farrugia-Roberts, Carroll, Wei,
+  and Murfet]{hoogland2024developmental}
+Hoogland, J., Wang, G., Farrugia-Roberts, M., Carroll, L., Wei, S., and Murfet,
+  D.
+\newblock The developmental landscape of in-context learning.
+\newblock \emph{arXiv preprint arXiv:2402.02364}, 2024.
+
+\bibitem[Kram{\'a}r et~al.(2024)Kram{\'a}r, Lieberum, Shah, and
+  Nanda]{kramar2024atp}
+Kram{\'a}r, J., Lieberum, T., Shah, R., and Nanda, N.
+\newblock Atp*: An efficient and scalable method for localizing llm behaviour
+  to components.
+\newblock \emph{arXiv preprint arXiv:2403.00745}, 2024.
+
+\bibitem[Lindsey et~al.(2024)Lindsey, Templeton, Marcus, Conerly, Batson, and
+  Olah]{lindsey2024sparse}
+Lindsey, J., Templeton, A., Marcus, J., Conerly, T., Batson, J., and Olah, C.
+\newblock Sparse crosscoders for cross-layer features and model diffing.
+\newblock \emph{Transformer Circuits Thread}, 2024.
+
 \bibitem[Matena \& Raffel(2023)Matena and Raffel]{matena2023npeff}
 Matena, M. and Raffel, C.
 \newblock Npeff: Non-negative per-example fisher factorization.
 \newblock \emph{arXiv preprint arXiv:2310.04649}, 2023.
+
+\bibitem[Merullo et~al.(2024)Merullo, Eickhoff, and
+  Pavlick]{merullo2024talking}
+Merullo, J., Eickhoff, C., and Pavlick, E.
+\newblock Talking heads: Understanding inter-layer communication in transformer
+  language models.
+\newblock \emph{arXiv preprint arXiv:2406.09519}, 2024.
+
+\bibitem[Mnih et~al.(2015)Mnih, Kavukcuoglu, Silver, Rusu, Veness, Bellemare,
+  Graves, Riedmiller, Fidjeland, Ostrovski, et~al.]{mnih2015human}
+Mnih, V., Kavukcuoglu, K., Silver, D., Rusu, A.~A., Veness, J., Bellemare,
+  M.~G., Graves, A., Riedmiller, M., Fidjeland, A.~K., Ostrovski, G., et~al.
+\newblock Human-level control through deep reinforcement learning.
+\newblock \emph{nature}, 518\penalty0 (7540):\penalty0 529--533, 2015.
+
+\bibitem[Nanda(2023)]{nanda2023attribution}
+Nanda, N.
+\newblock Attribution patching: Activation patching at industrial scale.
+\newblock \emph{URL: https://www. neelnanda.
+  io/mechanistic-interpretability/attribution-patching}, 2023.
+
+\bibitem[Pascanu(2013)]{pascanu2013difficulty}
+Pascanu, R.
+\newblock On the difficulty of training recurrent neural networks.
+\newblock \emph{arXiv preprint arXiv:1211.5063}, 2013.
+
+\bibitem[Subramani et~al.(2022)Subramani, Suresh, and
+  Peters]{subramani2022extracting}
+Subramani, N., Suresh, N., and Peters, M.~E.
+\newblock Extracting latent steering vectors from pretrained language models.
+\newblock \emph{arXiv preprint arXiv:2205.05124}, 2022.
+
+\bibitem[Syed et~al.(2023)Syed, Rager, and Conmy]{syed2023attribution}
+Syed, A., Rager, C., and Conmy, A.
+\newblock Attribution patching outperforms automated circuit discovery.
+\newblock \emph{arXiv preprint arXiv:2310.10348}, 2023.
+
+\bibitem[Turner et~al.(2023)Turner, Thiergart, Leech, Udell, Vazquez, Mini, and
+  MacDiarmid]{turner2023steering}
+Turner, A.~M., Thiergart, L., Leech, G., Udell, D., Vazquez, J.~J., Mini, U.,
+  and MacDiarmid, M.
+\newblock Steering language models with activation engineering.
+\newblock \emph{arXiv preprint arXiv:2308.10248}, 2023.
+
+\bibitem[Wang et~al.(2024)Wang, Farrugia-Roberts, Hoogland, Carroll, Wei, and
+  Murfet]{wang2024loss}
+Wang, G., Farrugia-Roberts, M., Hoogland, J., Carroll, L., Wei, S., and Murfet,
+  D.
+\newblock Loss landscape geometry reveals stagewise development of
+  transformers.
+\newblock In \emph{High-dimensional Learning Dynamics 2024: The Emergence of
+  Structure and Reasoning}, 2024.
+
+\bibitem[Watanabe(2000)]{watanabe2000algebraic}
+Watanabe, S.
+\newblock Algebraic information geometry for learning machines with
+  singularities.
+\newblock \emph{Advances in neural information processing systems}, 13, 2000.
+
+\bibitem[Watanabe(2005)]{watanabe2005algebraic}
+Watanabe, S.
+\newblock Algebraic geometry of singular learning machines and symmetry of
+  generalization and training errors.
+\newblock \emph{Neurocomputing}, 67:\penalty0 198--213, 2005.
+
+\bibitem[Watanabe(2007)]{watanabe2007almost}
+Watanabe, S.
+\newblock Almost all learning machines are singular.
+\newblock In \emph{2007 IEEE Symposium on Foundations of Computational
+  Intelligence}, pp.\  383--388. IEEE, 2007.
+
+\bibitem[Wei et~al.(2022)Wei, Murfet, Gong, Li, Gell-Redman, and
+  Quella]{wei2022deep}
+Wei, S., Murfet, D., Gong, M., Li, H., Gell-Redman, J., and Quella, T.
+\newblock Deep learning is singular, and that’s good.
+\newblock \emph{IEEE Transactions on Neural Networks and Learning Systems},
+  34\penalty0 (12):\penalty0 10473--10486, 2022.
 
 \end{thebibliography}

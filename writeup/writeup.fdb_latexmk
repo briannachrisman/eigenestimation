@@ -1,12 +1,12 @@
 # Fdb version 3
-["bibtex writeup"] 1740700132 "writeup.aux" "writeup.bbl" "writeup" 1740701301
+["bibtex writeup"] 1741032009 "writeup.aux" "writeup.bbl" "writeup" 1741032019
   "./icml2025.bst" 1737662781 27147 88eb4aed280e585571f8eac50f39a681 ""
-  "writeup.aux" 1740701301 8528 678bf015cb90c1780d0f37bd9dd34e20 "pdflatex"
-  "writeup.bib" 1740693852 7278 78eb3b9487d9242de287f72fbd44bf74 ""
+  "writeup.aux" 1741032018 11066 1047bcfe91d59414832e1f6853098f61 "pdflatex"
+  "writeup.bib" 1741031742 8585 a0e1a124852790cdd145dcf20e90afc5 ""
   (generated)
   "writeup.bbl"
   "writeup.blg"
-["pdflatex"] 1740701300 "/root/eigenestimation/writeup/writeup.tex" "writeup.pdf" "writeup" 1740701301
+["pdflatex"] 1741032017 "/root/eigenestimation/writeup/writeup.tex" "writeup.pdf" "writeup" 1741032019
   "../figures/1a_jacobian_diagram.pdf" 1740627078 188224 aece5b40960b721e0aef543ceb832116 ""
   "../figures/1b_jacobian_diagram.pdf" 1740596178 24294 34669756c0d80957112fe7d8730bfa1c ""
   "../figures/2a_toy_models_setup.pdf" 1740627079 11276 a7b473d94ce64d13d2d07e03c04a419f ""
@@ -43,7 +43,7 @@
   "../figures/s8_squared_intervention_middle_weights.pdf" 1740695429 857842 9c8ec15d974545689173a68a21a72baa ""
   "../figures/s9_squared_intervention_multi_features.pdf" 1740695427 1033914 3e7d9f22d894fb6890b74346844cf3df ""
   "/etc/texmf/web2c/texmf.cnf" 1739426514 475 c0e671620eb5563b2130f56340a5fde8 ""
-  "/root/eigenestimation/writeup/writeup.tex" 1740701298 54188 f06bee089e93c2b30d1f5e9953ffcaff ""
+  "/root/eigenestimation/writeup/writeup.tex" 1741032016 54714 f5ad773e2202ba473d0818e406e6ca65 ""
   "/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/adobe/times/ptmb7t.tfm" 1136768653 2172 fd0c924230362ff848a33632ed45dc23 ""
@@ -245,10 +245,10 @@
   "algorithmic.sty" 1737662793 7615 a7a253154ed6d7d83141571d55bc3515 ""
   "fancyhdr.sty" 1737662782 21006 088e3513a90ac3aa21515dd46e858ae4 ""
   "icml2025.sty" 1737662780 28139 ba15aaa79ee5c55bdfaad9b29c69600a ""
-  "writeup.aux" 1740701301 8528 678bf015cb90c1780d0f37bd9dd34e20 "pdflatex"
-  "writeup.bbl" 1740700132 2745 453c954e8e210d412f0bcbcd4b52904a "bibtex writeup"
-  "writeup.out" 1740701300 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
-  "writeup.tex" 1740701298 54188 f06bee089e93c2b30d1f5e9953ffcaff ""
+  "writeup.aux" 1741032018 11066 1047bcfe91d59414832e1f6853098f61 "pdflatex"
+  "writeup.bbl" 1741032009 8859 e925e629abe214f50c5cbb29391a17ea "bibtex writeup"
+  "writeup.out" 1741032018 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "writeup.tex" 1741032016 54714 f5ad773e2202ba473d0818e406e6ca65 ""
   (generated)
   "writeup.aux"
   "writeup.log"

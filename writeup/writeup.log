@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2025.2.13)  28 FEB 2025 00:08
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2025.2.13)  3 MAR 2025 20:00
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -763,72 +763,84 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) (/usr/share/texlive/texmf-dist/tex/latex/microtype/mt-msb.cfg
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}
+
+
+
+]
 
 pdfTeX warning: pdflatex (file ../figures/1b_jacobian_diagram.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<../figures/1b_jacobian_diagram.pdf, id=19, 497.86pt x 286.06876pt>
+<../figures/1b_jacobian_diagram.pdf, id=96, 497.86pt x 286.06876pt>
 File: ../figures/1b_jacobian_diagram.pdf Graphic file (type pdf)
 <use ../figures/1b_jacobian_diagram.pdf>
-Package pdftex.def Info: ../figures/1b_jacobian_diagram.pdf  used on input line 162.
+Package pdftex.def Info: ../figures/1b_jacobian_diagram.pdf  used on input line 161.
 (pdftex.def)             Requested size: 164.41353pt x 94.47281pt.
-<../figures/1a_jacobian_diagram.pdf, id=20, 461.44395pt x 181.3977pt>
+<../figures/1a_jacobian_diagram.pdf, id=97, 461.44395pt x 181.3977pt>
 File: ../figures/1a_jacobian_diagram.pdf Graphic file (type pdf)
 <use ../figures/1a_jacobian_diagram.pdf>
-Package pdftex.def Info: ../figures/1a_jacobian_diagram.pdf  used on input line 166.
+Package pdftex.def Info: ../figures/1a_jacobian_diagram.pdf  used on input line 165.
 (pdftex.def)             Requested size: 234.8775pt x 92.33168pt.
-[1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}
 
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
-
- <../figures/1b_jacobian_diagram.pdf> <../figures/1a_jacobian_diagram.pdf>] [2]
+ [2 <../figures/1b_jacobian_diagram.pdf> <../figures/1a_jacobian_diagram.pdf>] [3]
 File: ../figures/2a_toy_models_setup.pdf Graphic file (type pdf)
 <use ../figures/2a_toy_models_setup.pdf>
-Package pdftex.def Info: ../figures/2a_toy_models_setup.pdf  used on input line 309.
+Package pdftex.def Info: ../figures/2a_toy_models_setup.pdf  used on input line 311.
 (pdftex.def)             Requested size: 58.53632pt x 84.72826pt.
 File: ../figures/2b_toy_models_setup.pdf Graphic file (type pdf)
 <use ../figures/2b_toy_models_setup.pdf>
-Package pdftex.def Info: ../figures/2b_toy_models_setup.pdf  used on input line 309.
+Package pdftex.def Info: ../figures/2b_toy_models_setup.pdf  used on input line 311.
 (pdftex.def)             Requested size: 97.563pt x 87.95517pt.
 
-Overfull \hbox (11.9985pt too wide) in paragraph at lines 309--309
+Overfull \hbox (11.9985pt too wide) in paragraph at lines 311--311
 []|[]| 
  []
 
 File: ../figures/2c_toy_models_setup.pdf Graphic file (type pdf)
 <use ../figures/2c_toy_models_setup.pdf>
-Package pdftex.def Info: ../figures/2c_toy_models_setup.pdf  used on input line 309.
+Package pdftex.def Info: ../figures/2c_toy_models_setup.pdf  used on input line 311.
 (pdftex.def)             Requested size: 97.563pt x 90.8391pt.
 
-Overfull \hbox (11.9985pt too wide) in paragraph at lines 309--309
+Overfull \hbox (11.9985pt too wide) in paragraph at lines 311--311
 []|[]| 
  []
 
 File: ../figures/2d_toy_models_setup.pdf Graphic file (type pdf)
 <use ../figures/2d_toy_models_setup.pdf>
-Package pdftex.def Info: ../figures/2d_toy_models_setup.pdf  used on input line 309.
+Package pdftex.def Info: ../figures/2d_toy_models_setup.pdf  used on input line 311.
 (pdftex.def)             Requested size: 97.563pt x 83.06334pt.
 
-Overfull \hbox (11.9985pt too wide) in paragraph at lines 309--309
+Overfull \hbox (11.9985pt too wide) in paragraph at lines 311--311
 []|[]| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 309--309
+Underfull \hbox (badness 10000) in paragraph at lines 311--311
 []|\OT1/ptm/m/n/10 (+20) Feature Su-per-po-si-
  []
 
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \vbox (badness 1708) has occurred while \output is active []
 
- [3]
-<../figures/3_tms_first_5_subnetworks.pdf, id=143, 722.7pt x 216.81pt>
+<../figures/3_tms_first_5_subnetworks.pdf, id=189, 722.7pt x 216.81pt>
 File: ../figures/3_tms_first_5_subnetworks.pdf Graphic file (type pdf)
 <use ../figures/3_tms_first_5_subnetworks.pdf>
-Package pdftex.def Info: ../figures/3_tms_first_5_subnetworks.pdf  used on input line 328.
+Package pdftex.def Info: ../figures/3_tms_first_5_subnetworks.pdf  used on input line 330.
 (pdftex.def)             Requested size: 487.8225pt x 146.34705pt.
-<../figures/4_tms_intervention.pdf, id=146, 507.77142pt x 408.19913pt>
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [4]
+<../figures/4_tms_intervention.pdf, id=212, 507.77142pt x 408.19913pt>
 File: ../figures/4_tms_intervention.pdf Graphic file (type pdf)
 <use ../figures/4_tms_intervention.pdf>
-Package pdftex.def Info: ../figures/4_tms_intervention.pdf  used on input line 340.
+Package pdftex.def Info: ../figures/4_tms_intervention.pdf  used on input line 342.
 (pdftex.def)             Requested size: 234.8775pt x 188.82028pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
@@ -836,44 +848,46 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [4 <../figures/2a_toy_models_setup.pdf> <../figures/2b_toy_models_setup.pdf> <../figures/2c_toy_models_setup.pdf> <../figures/2d_toy_models_setup.pdf>]
-<../figures/5_circuit_superposition_decomposition.pdf, id=215, 1134.63902pt x 292.69351pt>
+ [5 <../figures/2a_toy_models_setup.pdf> <../figures/2b_toy_models_setup.pdf> <../figures/2c_toy_models_setup.pdf> <../figures/2d_toy_models_setup.pdf> <../figures/3_tms_first_5_subnetworks.pdf>]
+<../figures/5_circuit_superposition_decomposition.pdf, id=280, 1134.63902pt x 292.69351pt>
 File: ../figures/5_circuit_superposition_decomposition.pdf Graphic file (type pdf)
 <use ../figures/5_circuit_superposition_decomposition.pdf>
-Package pdftex.def Info: ../figures/5_circuit_superposition_decomposition.pdf  used on input line 363.
+Package pdftex.def Info: ../figures/5_circuit_superposition_decomposition.pdf  used on input line 365.
 (pdftex.def)             Requested size: 487.8225pt x 125.83789pt.
-
-Underfull \vbox (badness 1342) has occurred while \output is active []
-
-<../figures/6_circuit_superposition_coefficients.pdf, id=217, 335.65776pt x 205.29654pt>
-File: ../figures/6_circuit_superposition_coefficients.pdf Graphic file (type pdf)
-<use ../figures/6_circuit_superposition_coefficients.pdf>
-Package pdftex.def Info: ../figures/6_circuit_superposition_coefficients.pdf  used on input line 382.
-(pdftex.def)             Requested size: 234.8775pt x 143.65646pt.
- [5 <../figures/3_tms_first_5_subnetworks.pdf> <../figures/4_tms_intervention.pdf>]
-<../figures/7_high_rank_decomposition.pdf, id=426, 1806.75pt x 418.13184pt>
-File: ../figures/7_high_rank_decomposition.pdf Graphic file (type pdf)
-<use ../figures/7_high_rank_decomposition.pdf>
-Package pdftex.def Info: ../figures/7_high_rank_decomposition.pdf  used on input line 400.
-(pdftex.def)             Requested size: 487.8225pt x 112.8971pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [6 <../figures/5_circuit_superposition_decomposition.pdf> <../figures/6_circuit_superposition_coefficients.pdf>]
-<../figures/8_squared_subnetworks.pdf, id=491, 854.59277pt x 125.7498pt>
+<../figures/6_circuit_superposition_coefficients.pdf, id=282, 335.65776pt x 205.29654pt>
+File: ../figures/6_circuit_superposition_coefficients.pdf Graphic file (type pdf)
+<use ../figures/6_circuit_superposition_coefficients.pdf>
+Package pdftex.def Info: ../figures/6_circuit_superposition_coefficients.pdf  used on input line 384.
+(pdftex.def)             Requested size: 234.8775pt x 143.65646pt.
+<../figures/7_high_rank_decomposition.pdf, id=288, 1806.75pt x 418.13184pt>
+File: ../figures/7_high_rank_decomposition.pdf Graphic file (type pdf)
+<use ../figures/7_high_rank_decomposition.pdf>
+Package pdftex.def Info: ../figures/7_high_rank_decomposition.pdf  used on input line 402.
+(pdftex.def)             Requested size: 487.8225pt x 112.8971pt.
+ [6 <../figures/4_tms_intervention.pdf>]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+<../figures/8_squared_subnetworks.pdf, id=501, 854.59277pt x 125.7498pt>
 File: ../figures/8_squared_subnetworks.pdf Graphic file (type pdf)
 <use ../figures/8_squared_subnetworks.pdf>
-Package pdftex.def Info: ../figures/8_squared_subnetworks.pdf  used on input line 427.
+Package pdftex.def Info: ../figures/8_squared_subnetworks.pdf  used on input line 429.
 (pdftex.def)             Requested size: 487.8225pt x 71.78174pt.
-<../figures/9_squared_intervention.pdf, id=494, 713.29567pt x 281.13531pt>
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [7 <../figures/5_circuit_superposition_decomposition.pdf> <../figures/6_circuit_superposition_coefficients.pdf>]
+<../figures/9_squared_intervention.pdf, id=563, 713.29567pt x 281.13531pt>
 File: ../figures/9_squared_intervention.pdf Graphic file (type pdf)
 <use ../figures/9_squared_intervention.pdf>
-Package pdftex.def Info: ../figures/9_squared_intervention.pdf  used on input line 442.
+Package pdftex.def Info: ../figures/9_squared_intervention.pdf  used on input line 444.
 (pdftex.def)             Requested size: 487.8225pt x 192.26765pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [7 <../figures/7_high_rank_decomposition.pdf>] [8 <../figures/8_squared_subnetworks.pdf> <../figures/9_squared_intervention.pdf>] [9
+ [8 <../figures/7_high_rank_decomposition.pdf> <../figures/8_squared_subnetworks.pdf>] [9 <../figures/9_squared_intervention.pdf>] [10
 
 
 ] (./writeup.bbl
@@ -891,142 +905,163 @@ Underfull \hbox (badness 2027) in paragraph at lines 15--19
 \OT1/ptm/m/n/10 (+20) attribution-based pa-ram-e-ter de-com-po-si-tion.  \OT1/ptm/m/it/10 (+20) arXiv
  []
 
-) [10
 
+Underfull \hbox (badness 1019) in paragraph at lines 51--54
+[]\OT1/ptm/m/n/10 (+20) Davies, X., Lan-gosco, L., and Krueger, D.  Uni-fy-
+ []
+
+
+Underfull \hbox (badness 1122) in paragraph at lines 51--54
+\OT1/ptm/m/n/10 (+20) ing grokking and dou-ble de-scent.  \OT1/ptm/m/it/10 (+20) arXiv preprint
+ []
+
+
+Underfull \hbox (badness 1292) in paragraph at lines 134--138
+\OT1/ptm/m/n/10 (+20) at in-dus-trial scale.  \OT1/ptm/m/it/10 (+20) URL: https://www. neel-nanda.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 134--138
+\OT1/ptm/m/it/10 (+20) io/mechanistic-interpretability/attribution-patching\OT1/ptm/m/n/10 (+20) ,
+ []
+
+[11
+
+]) [12
 
 ]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [11
+ [13
 
 ]
-<../figures/s1_high_rank_circuit_setup.pdf, id=639, 147.75468pt x 292.69351pt>
+<../figures/s1_high_rank_circuit_setup.pdf, id=709, 147.75468pt x 292.69351pt>
 File: ../figures/s1_high_rank_circuit_setup.pdf Graphic file (type pdf)
 <use ../figures/s1_high_rank_circuit_setup.pdf>
-Package pdftex.def Info: ../figures/s1_high_rank_circuit_setup.pdf  used on input line 611.
+Package pdftex.def Info: ../figures/s1_high_rank_circuit_setup.pdf  used on input line 613.
 (pdftex.def)             Requested size: 147.75432pt x 292.6928pt.
-<../figures/s2_tms_encoder_directions.pdf, id=640, 210.37973pt x 157.54044pt>
+<../figures/s2_tms_encoder_directions.pdf, id=710, 210.37973pt x 157.54044pt>
 File: ../figures/s2_tms_encoder_directions.pdf Graphic file (type pdf)
 <use ../figures/s2_tms_encoder_directions.pdf>
-Package pdftex.def Info: ../figures/s2_tms_encoder_directions.pdf  used on input line 620.
+Package pdftex.def Info: ../figures/s2_tms_encoder_directions.pdf  used on input line 622.
 (pdftex.def)             Requested size: 210.3792pt x 157.54004pt.
-<../figures/s3_tms_full_subnetworks.pdf, id=641, 574.54652pt x 570.93298pt>
+<../figures/s3_tms_full_subnetworks.pdf, id=711, 574.54652pt x 570.93298pt>
 File: ../figures/s3_tms_full_subnetworks.pdf Graphic file (type pdf)
 <use ../figures/s3_tms_full_subnetworks.pdf>
-Package pdftex.def Info: ../figures/s3_tms_full_subnetworks.pdf  used on input line 628.
+Package pdftex.def Info: ../figures/s3_tms_full_subnetworks.pdf  used on input line 630.
 (pdftex.def)             Requested size: 487.8225pt x 484.7639pt.
-<../figures/s4_tms_intervention_network1.pdf, id=642, 507.77142pt x 408.19913pt>
+<../figures/s4_tms_intervention_network1.pdf, id=712, 507.77142pt x 408.19913pt>
 File: ../figures/s4_tms_intervention_network1.pdf Graphic file (type pdf)
 <use ../figures/s4_tms_intervention_network1.pdf>
-Package pdftex.def Info: ../figures/s4_tms_intervention_network1.pdf  used on input line 645.
+Package pdftex.def Info: ../figures/s4_tms_intervention_network1.pdf  used on input line 647.
 (pdftex.def)             Requested size: 146.34824pt x 117.64597pt.
-<../figures/s4_tms_intervention_network2.pdf, id=643, 507.77142pt x 408.19913pt>
+<../figures/s4_tms_intervention_network2.pdf, id=713, 507.77142pt x 408.19913pt>
 File: ../figures/s4_tms_intervention_network2.pdf Graphic file (type pdf)
 <use ../figures/s4_tms_intervention_network2.pdf>
-Package pdftex.def Info: ../figures/s4_tms_intervention_network2.pdf  used on input line 650.
+Package pdftex.def Info: ../figures/s4_tms_intervention_network2.pdf  used on input line 652.
 (pdftex.def)             Requested size: 146.34824pt x 117.64597pt.
-<../figures/s4_tms_intervention_network3.pdf, id=644, 507.77142pt x 408.19913pt>
+<../figures/s4_tms_intervention_network3.pdf, id=714, 507.77142pt x 408.19913pt>
 File: ../figures/s4_tms_intervention_network3.pdf Graphic file (type pdf)
 <use ../figures/s4_tms_intervention_network3.pdf>
-Package pdftex.def Info: ../figures/s4_tms_intervention_network3.pdf  used on input line 655.
+Package pdftex.def Info: ../figures/s4_tms_intervention_network3.pdf  used on input line 657.
 (pdftex.def)             Requested size: 146.34824pt x 117.64597pt.
-<../figures/s4_tms_intervention_network4.pdf, id=645, 507.77142pt x 408.19913pt>
+<../figures/s4_tms_intervention_network4.pdf, id=715, 507.77142pt x 408.19913pt>
 File: ../figures/s4_tms_intervention_network4.pdf Graphic file (type pdf)
 <use ../figures/s4_tms_intervention_network4.pdf>
-Package pdftex.def Info: ../figures/s4_tms_intervention_network4.pdf  used on input line 661.
+Package pdftex.def Info: ../figures/s4_tms_intervention_network4.pdf  used on input line 663.
 (pdftex.def)             Requested size: 146.34824pt x 117.64597pt.
-<../figures/s4_tms_intervention_network5.pdf, id=646, 507.77142pt x 408.19913pt>
+<../figures/s4_tms_intervention_network5.pdf, id=716, 507.77142pt x 408.19913pt>
 File: ../figures/s4_tms_intervention_network5.pdf Graphic file (type pdf)
 <use ../figures/s4_tms_intervention_network5.pdf>
-Package pdftex.def Info: ../figures/s4_tms_intervention_network5.pdf  used on input line 667.
+Package pdftex.def Info: ../figures/s4_tms_intervention_network5.pdf  used on input line 669.
 (pdftex.def)             Requested size: 146.34824pt x 117.64597pt.
-<../figures/s5_high_rank_circuits_loss_vs_rank.pdf, id=647, 351.73402pt x 208.76369pt>
+<../figures/s5_high_rank_circuits_loss_vs_rank.pdf, id=717, 351.73402pt x 208.76369pt>
 File: ../figures/s5_high_rank_circuits_loss_vs_rank.pdf Graphic file (type pdf)
 <use ../figures/s5_high_rank_circuits_loss_vs_rank.pdf>
-Package pdftex.def Info: ../figures/s5_high_rank_circuits_loss_vs_rank.pdf  used on input line 679.
+Package pdftex.def Info: ../figures/s5_high_rank_circuits_loss_vs_rank.pdf  used on input line 681.
 (pdftex.def)             Requested size: 351.73315pt x 208.76315pt.
-<../figures/s6_high_rank_decompositions_rank1.pdf, id=648, 1134.63902pt x 328.8285pt>
+<../figures/s6_high_rank_decompositions_rank1.pdf, id=718, 1134.63902pt x 328.8285pt>
 File: ../figures/s6_high_rank_decompositions_rank1.pdf Graphic file (type pdf)
 <use ../figures/s6_high_rank_decompositions_rank1.pdf>
-Package pdftex.def Info: ../figures/s6_high_rank_decompositions_rank1.pdf  used on input line 693.
+Package pdftex.def Info: ../figures/s6_high_rank_decompositions_rank1.pdf  used on input line 695.
 (pdftex.def)             Requested size: 146.34824pt x 42.41302pt.
-<../figures/s6_high_rank_decompositions_rank2.pdf, id=649, 1134.63902pt x 328.8285pt>
+<../figures/s6_high_rank_decompositions_rank2.pdf, id=719, 1134.63902pt x 328.8285pt>
 File: ../figures/s6_high_rank_decompositions_rank2.pdf Graphic file (type pdf)
 <use ../figures/s6_high_rank_decompositions_rank2.pdf>
-Package pdftex.def Info: ../figures/s6_high_rank_decompositions_rank2.pdf  used on input line 698.
+Package pdftex.def Info: ../figures/s6_high_rank_decompositions_rank2.pdf  used on input line 700.
 (pdftex.def)             Requested size: 146.34824pt x 42.41302pt.
-<../figures/s6_high_rank_decompositions_rank3.pdf, id=650, 1134.63902pt x 328.8285pt>
+<../figures/s6_high_rank_decompositions_rank3.pdf, id=720, 1134.63902pt x 328.8285pt>
 File: ../figures/s6_high_rank_decompositions_rank3.pdf Graphic file (type pdf)
 <use ../figures/s6_high_rank_decompositions_rank3.pdf>
-Package pdftex.def Info: ../figures/s6_high_rank_decompositions_rank3.pdf  used on input line 703.
+Package pdftex.def Info: ../figures/s6_high_rank_decompositions_rank3.pdf  used on input line 705.
 (pdftex.def)             Requested size: 146.34824pt x 42.41302pt.
-<../figures/s6_high_rank_decompositions_rank4.pdf, id=651, 1134.63902pt x 328.8285pt>
+<../figures/s6_high_rank_decompositions_rank4.pdf, id=721, 1134.63902pt x 328.8285pt>
 File: ../figures/s6_high_rank_decompositions_rank4.pdf Graphic file (type pdf)
 <use ../figures/s6_high_rank_decompositions_rank4.pdf>
-Package pdftex.def Info: ../figures/s6_high_rank_decompositions_rank4.pdf  used on input line 708.
+Package pdftex.def Info: ../figures/s6_high_rank_decompositions_rank4.pdf  used on input line 710.
 (pdftex.def)             Requested size: 146.34824pt x 42.41302pt.
-<../figures/s6_high_rank_decompositions_rank5.pdf, id=652, 1134.63902pt x 328.8285pt>
+<../figures/s6_high_rank_decompositions_rank5.pdf, id=722, 1134.63902pt x 328.8285pt>
 File: ../figures/s6_high_rank_decompositions_rank5.pdf Graphic file (type pdf)
 <use ../figures/s6_high_rank_decompositions_rank5.pdf>
-Package pdftex.def Info: ../figures/s6_high_rank_decompositions_rank5.pdf  used on input line 713.
+Package pdftex.def Info: ../figures/s6_high_rank_decompositions_rank5.pdf  used on input line 715.
 (pdftex.def)             Requested size: 146.34824pt x 42.41302pt.
-<../figures/s7_squared_intervention_more_deltas.pdf, id=653, 713.29567pt x 784.13454pt>
+<../figures/s7_squared_intervention_more_deltas.pdf, id=723, 713.29567pt x 784.13454pt>
 File: ../figures/s7_squared_intervention_more_deltas.pdf Graphic file (type pdf)
 <use ../figures/s7_squared_intervention_more_deltas.pdf>
-Package pdftex.def Info: ../figures/s7_squared_intervention_more_deltas.pdf  used on input line 723.
+Package pdftex.def Info: ../figures/s7_squared_intervention_more_deltas.pdf  used on input line 725.
 (pdftex.def)             Requested size: 487.8225pt x 536.26746pt.
-<../figures/s8_squared_intervention_middle_weights.pdf, id=654, 713.29567pt x 784.13454pt>
+<../figures/s8_squared_intervention_middle_weights.pdf, id=724, 713.29567pt x 784.13454pt>
 File: ../figures/s8_squared_intervention_middle_weights.pdf Graphic file (type pdf)
 <use ../figures/s8_squared_intervention_middle_weights.pdf>
-Package pdftex.def Info: ../figures/s8_squared_intervention_middle_weights.pdf  used on input line 730.
+Package pdftex.def Info: ../figures/s8_squared_intervention_middle_weights.pdf  used on input line 732.
 (pdftex.def)             Requested size: 487.8225pt x 536.26746pt.
-<../figures/s9_squared_intervention_multi_features.pdf, id=655, 770.52419pt x 784.13454pt>
+<../figures/s9_squared_intervention_multi_features.pdf, id=725, 770.52419pt x 784.13454pt>
 File: ../figures/s9_squared_intervention_multi_features.pdf Graphic file (type pdf)
 <use ../figures/s9_squared_intervention_multi_features.pdf>
-Package pdftex.def Info: ../figures/s9_squared_intervention_multi_features.pdf  used on input line 738.
+Package pdftex.def Info: ../figures/s9_squared_intervention_multi_features.pdf  used on input line 740.
 (pdftex.def)             Requested size: 487.8225pt x 496.44823pt.
-<../figures/s10_squared_decompositions_feature3.pdf, id=656, 350.5095pt x 194.86613pt>
+<../figures/s10_squared_decompositions_feature3.pdf, id=726, 350.5095pt x 194.86613pt>
 File: ../figures/s10_squared_decompositions_feature3.pdf Graphic file (type pdf)
 <use ../figures/s10_squared_decompositions_feature3.pdf>
-Package pdftex.def Info: ../figures/s10_squared_decompositions_feature3.pdf  used on input line 755.
+Package pdftex.def Info: ../figures/s10_squared_decompositions_feature3.pdf  used on input line 757.
 (pdftex.def)             Requested size: 146.34824pt x 81.36151pt.
-<../figures/s10_squared_decompositions_feature5.pdf, id=657, 574.54652pt x 194.86613pt>
+<../figures/s10_squared_decompositions_feature5.pdf, id=727, 574.54652pt x 194.86613pt>
 File: ../figures/s10_squared_decompositions_feature5.pdf Graphic file (type pdf)
 <use ../figures/s10_squared_decompositions_feature5.pdf>
-Package pdftex.def Info: ../figures/s10_squared_decompositions_feature5.pdf  used on input line 760.
+Package pdftex.def Info: ../figures/s10_squared_decompositions_feature5.pdf  used on input line 762.
 (pdftex.def)             Requested size: 146.34824pt x 49.6352pt.
-<../figures/s10_squared_decompositions_feature10.pdf, id=658, 1134.63902pt x 194.86613pt>
+<../figures/s10_squared_decompositions_feature10.pdf, id=728, 1134.63902pt x 194.86613pt>
 File: ../figures/s10_squared_decompositions_feature10.pdf Graphic file (type pdf)
 <use ../figures/s10_squared_decompositions_feature10.pdf>
-Package pdftex.def Info: ../figures/s10_squared_decompositions_feature10.pdf  used on input line 765.
+Package pdftex.def Info: ../figures/s10_squared_decompositions_feature10.pdf  used on input line 767.
 (pdftex.def)             Requested size: 146.34824pt x 25.13426pt.
-<../figures/s10_squared_decompositions_feature15.pdf, id=659, 1694.73152pt x 194.86613pt>
+<../figures/s10_squared_decompositions_feature15.pdf, id=729, 1694.73152pt x 194.86613pt>
 File: ../figures/s10_squared_decompositions_feature15.pdf Graphic file (type pdf)
 <use ../figures/s10_squared_decompositions_feature15.pdf>
-Package pdftex.def Info: ../figures/s10_squared_decompositions_feature15.pdf  used on input line 770.
+Package pdftex.def Info: ../figures/s10_squared_decompositions_feature15.pdf  used on input line 772.
 (pdftex.def)             Requested size: 146.34824pt x 16.82654pt.
-<../figures/s11_squared_features_vs_loss.pdf, id=660, 421.86778pt x 208.76369pt>
+<../figures/s11_squared_features_vs_loss.pdf, id=730, 421.86778pt x 208.76369pt>
 File: ../figures/s11_squared_features_vs_loss.pdf Graphic file (type pdf)
 <use ../figures/s11_squared_features_vs_loss.pdf>
-Package pdftex.def Info: ../figures/s11_squared_features_vs_loss.pdf  used on input line 780.
+Package pdftex.def Info: ../figures/s11_squared_features_vs_loss.pdf  used on input line 782.
 (pdftex.def)             Requested size: 487.8225pt x 241.41425pt.
- [12] [13 <../figures/s1_high_rank_circuit_setup.pdf> <../figures/s2_tms_encoder_directions.pdf>] [14 <../figures/s3_tms_full_subnetworks.pdf>] [15 <../figures/s4_tms_intervention_network1.pdf> <../figures/s4_tms_intervention_network2.pdf> <../figures/s4_tms_intervention_network3.pdf> <../figures/s4_tms_intervention_network4.pdf> <../figures/s4_tms_intervention_network5.pdf>] [16 <../figures/s5_high_rank_circuits_loss_vs_rank.pdf> <../figures/s6_high_rank_decompositions_rank1.pdf> <../figures/s6_high_rank_decompositions_rank2.pdf> <../figures/s6_high_rank_decompositions_rank3.pdf> <../figures/s6_high_rank_decompositions_rank4.pdf> <../figures/s6_high_rank_decompositions_rank5.pdf>] [17 <../figures/s7_squared_intervention_more_deltas.pdf>] [18 <../figures/s8_squared_intervention_middle_weights.pdf>] [19 <../figures/s9_squared_intervention_multi_features.pdf>] [20 <../figures/s10_squared_decompositions_feature3.pdf> <../figures/s10_squared_decompositions_feature5.pdf> <../figures/s10_squared_decompositions_feature10.pdf> <../figures/s10_squared_decompositions_feature15.pdf> <../figures/s11_squared_features_vs_loss.pdf>] (./writeup.aux)
+ [14] [15 <../figures/s1_high_rank_circuit_setup.pdf> <../figures/s2_tms_encoder_directions.pdf>] [16 <../figures/s3_tms_full_subnetworks.pdf>] [17 <../figures/s4_tms_intervention_network1.pdf> <../figures/s4_tms_intervention_network2.pdf> <../figures/s4_tms_intervention_network3.pdf> <../figures/s4_tms_intervention_network4.pdf> <../figures/s4_tms_intervention_network5.pdf>] [18 <../figures/s5_high_rank_circuits_loss_vs_rank.pdf> <../figures/s6_high_rank_decompositions_rank1.pdf> <../figures/s6_high_rank_decompositions_rank2.pdf> <../figures/s6_high_rank_decompositions_rank3.pdf> <../figures/s6_high_rank_decompositions_rank4.pdf> <../figures/s6_high_rank_decompositions_rank5.pdf>] [19 <../figures/s7_squared_intervention_more_deltas.pdf>] [20 <../figures/s8_squared_intervention_middle_weights.pdf>] [21 <../figures/s9_squared_intervention_multi_features.pdf>] [22 <../figures/s10_squared_decompositions_feature3.pdf> <../figures/s10_squared_decompositions_feature5.pdf> <../figures/s10_squared_decompositions_feature10.pdf> <../figures/s10_squared_decompositions_feature15.pdf> <../figures/s11_squared_features_vs_loss.pdf>] (./writeup.aux)
 Package rerunfilecheck Info: File `writeup.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 28884 strings out of 480247
- 551798 string characters out of 5896151
- 866650 words of memory out of 5000000
- 45988 multiletter control sequences out of 15000+600000
- 494989 words of font info for 181 fonts, out of 8000000 for 9000
+ 28992 strings out of 480247
+ 554126 string characters out of 5896151
+ 868093 words of memory out of 5000000
+ 46053 multiletter control sequences out of 15000+600000
+ 496314 words of font info for 195 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  94i,17n,94p,1427b,774s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on writeup.pdf (20 pages, 10844463 bytes).
+Output written on writeup.pdf (22 pages, 10859512 bytes).
 PDF statistics:
- 2547 PDF objects out of 2984 (max. 8388607)
- 538 compressed objects within 6 object streams
- 111 named destinations out of 1000 (max. 500000)
+ 2620 PDF objects out of 2984 (max. 8388607)
+ 608 compressed objects within 7 object streams
+ 133 named destinations out of 1000 (max. 500000)
  44732 words of extra memory for PDF output out of 51595 (max. 10000000)
 

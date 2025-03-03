@@ -3,7 +3,6 @@
 *pycache*
 *env
 *ipynb_checkpoints*
-writeup/*
 *wandb*
 *outputs
 *.pdf
