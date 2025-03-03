@@ -455,34 +455,48 @@ A careful reader may have noticed is that it would be very easy to identify para
 
 \section{Discussion}
 
+L3D is one of the earliest parameter-based decomposition methods. For this reason, we have focused our work on demonstrating the fundamentals of L3D on toy models, and showcasing its promise with more complex models. Here we discuss what we believe are simple improvements to L3D that could enhance its performance and real-world use cases to which to extend L3D. Finally, we discuss unresolved challenges and limitations of L3D. 
+
 \subsection{Simple Improvements}
+In this work, we did not focus on optimizing L3D, and we chose nearly identical hyperparameters for all of our decompositions. 
 
 \textbf{Hyperparameter Choice}
 
+For all of our toy model decompositions, we always chose $topFrac=.1$, even when it was clear that certain toy models should have larger numbers of subnetworks activated per sample than others (For example, the $X->X^2$ model with 5 inputs and 5 outputs, decmoposed into 5 networks, should probably have $topFrac>=.2$). Too low of topFrac choice is likely responsible for the high reconstruction loss of some of our models. Similarly, we always chose the ranks of the subnetworks somewhat arbitrarily. There has been some reasarch done into understanding the relationship between rank and superposition budget \cite{}, and a better understanding of this relationship could help us choose better hyperparameters for L3D. 
+
 \textbf{Flexible Rank Choices}
 
-\subsection{Challenges}
-
-\textbf{Interpretation of a circuit}
-
-\textbf{Local Loss Landscape}
-
-\textbf{Relationship to overparameterized models}
+Relatedly, the way L3D makes circuit decomposition computationally feasible is to represent each tensor in the subnetwork as a low-rank tensor. For simplicity, we use the same rank for all tensors. Theoretically, there could be more flexibility across tensors, and we could use different ranks for different blocks of the subnetwork if we believed certain parts of the model were composed of fundamentally higher rank circuits. 
 
 \subsection{Extensions}
 
+There are a also some higher effort extensions to L3D that may give it more real-world relevance. 
+
 \textbf{Finetuning}
+Our intervention experiments showed promise subnetworks of L3D could be perturbed in ways that only affect the predictions of relevant samples. As we described in Section \ref{sec:finetuning}, this could be taken one step further by finetuning a model on a specific set of parameter directions. Using L3D networks, we could finetune a model on a specific set of parameter directions by freezing the current set of weights and learning an adaptor consisting of linear combinations of the subnetworks of choice. This could also benchmark the intervention capabilities of L3D versus other mechanistic intervention strategies such as SAE-derived steering vectors. For example, we might use L3D to identify various subnetworks involved in syncophancy, refusal, and other undesired behaviors. After collecting curated data with the goal of finetuning away such behaviors, we could finetune L3D only in the direction of the behavior-related subnetworks and test how well the model achieves our desired output compared to other intervention strategies. 
 
 \textbf{Identifying Specific Circuits with Constrastive Pairs}
+We developed this method as an unsupervised decomposition method, with goals compareable to those of SAEs. However, the methods of L3D could be easily modified to use supervised signals to identify specific circuits of interest. Rather than using gradients of divergence of random pairs, we could decompose gradients of divergence between curated pairs of samples that isolate a behavior of interest. In this context, we could probably not require the topK constraint, but instead look decompose the network into a very small number of low-rank subnetworks involved in our behavior of interest. 
 
+\subsection{Challenges}
+Although many of the improvements and extensions of L3D are highly addressable, we think there are some fundamental challenges with parameter-based decomposition methods that may not be easily resolved.
+
+
+\textbf{Local Loss Landscape}
+L3D's algorithm hinges on the somewhat surprising phenomenon that local gradient approximations work well as attribution methods. They clearly work to a great extent in the toy models we used for L3D and for the circuits we found in our real world models. However, do they work for all circuits? In our work, we use a randomly selected sample to be our "reference" output with which to compute divergence gradient. By using a randomly selected sample, rather than a single "reference output" such as the mean of the output distribution, we hope that the random noise in the reference sample will average out the effects of any non-convexity in the loss landscape.  However, perhaps, even in this setup, perhaps there are parameter directions that are highly non-convex and will be difficult to perform local attribution on. Quantifying different types of "dark matter" of parameter decomposition by analyzing reconstruction loss (similar to recent work done on SAEs) could better help us characterize these limitations.
+
+\textbf{Relationship to overparameterized models}
+Going one step further, we suspect that the reason local attribution methods work so well is because large models are probably overparameterized. By this we mean that there exists a much smaller network that performs identically to a model, but higher dimensional models learn better, as they have less local minima to get stuck into during the learning process \cite{kawaguchi2016deep,choromanska2015loss,dauphin2014identifying,soudry2017exponentially}. Larger models may have wider loss basins, or more degeneracies near their global minima \cite{keskar2016large,sagun2017empirical}, making local attribution methods less likely to break down as we move through parameter space. If in the future, an learning algorithm is developed that has fundamentally different limitations that stochastic gradient descent and its relatives, we might lose this property. Morever, circuit activations might no longer be sparse. A new learning process might be able to compress subnetworks in such a way that subnetworks have very high levels of interference with each other - removing the degeneracy assumption that underlies L3D. 
+
+\textbf{Interpretation of a circuit}
+
+Finally, we should address the definition of "circuits". It is still not well agreed upon what a "feature" is in relation to large networks, and the definition of what should constitute a circuit or subnetwork is even less clear. Is our definition of a circuit - sparsely active subnetworks that can move outputs within the original output distribution - too restrictive? If there is a circuit that is relevant to every output, a sort of "scaffholding" for more specific circuits - should it be included in the decomposition? If, after identifying the strcuture of subnetworks, we cannot interpret it beyond a description of its end results, are circuits any more informative than they features they are computing? If parameter decomposition is a viable strategy for understanding and intervening with large networks, these questions will be important for the mechanistic interpretability community to address.
 
 \clearpage
 
 \section{Impact Statement}
 
-%This paper presents work whose goal is to advance the field of 
-%Machine Learning. There are many potential societal consequences 
-%of our work, none which we feel must be specifically highlighted here.
+This paper presents work whose goal is to advance the field of Machine Learning. There are many potential societal consequences of our work, none which we feel must be specifically highlighted here.
 
 % In the unusual situation where you want a paper to appear in the
 % references without citing it in the main text, use \nocite

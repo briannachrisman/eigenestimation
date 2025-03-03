@@ -1,4 +1,4 @@
-\begin{thebibliography}{29}
+\begin{thebibliography}{35}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -40,12 +40,26 @@ Bussmann, B., Leask, P., and Nanda, N.
 \newblock Batchtopk sparse autoencoders.
 \newblock \emph{arXiv preprint arXiv:2412.06410}, 2024.
 
+\bibitem[Choromanska et~al.(2015)Choromanska, Henaff, Mathieu, Arous, and
+  LeCun]{choromanska2015loss}
+Choromanska, A., Henaff, M., Mathieu, M., Arous, G.~B., and LeCun, Y.
+\newblock The loss surfaces of multilayer networks.
+\newblock In \emph{Artificial intelligence and statistics}, pp.\  192--204.
+  PMLR, 2015.
+
 \bibitem[Cunningham et~al.(2023)Cunningham, Ewart, Riggs, Huben, and
   Sharkey]{cunningham2023sparse}
 Cunningham, H., Ewart, A., Riggs, L., Huben, R., and Sharkey, L.
 \newblock Sparse autoencoders find highly interpretable features in language
   models.
 \newblock \emph{arXiv preprint arXiv:2309.08600}, 2023.
+
+\bibitem[Dauphin et~al.(2014)Dauphin, Pascanu, Gulcehre, Cho, Ganguli, and
+  Bengio]{dauphin2014identifying}
+Dauphin, Y.~N., Pascanu, R., Gulcehre, C., Cho, K., Ganguli, S., and Bengio, Y.
+\newblock Identifying and attacking the saddle point problem in
+  high-dimensional non-convex optimization.
+\newblock \emph{Advances in neural information processing systems}, 27, 2014.
 
 \bibitem[Davies et~al.(2023)Davies, Langosco, and Krueger]{davies2023unifying}
 Davies, X., Langosco, L., and Krueger, D.
@@ -98,6 +112,18 @@ Hoogland, J., Wang, G., Farrugia-Roberts, M., Carroll, L., Wei, S., and Murfet,
 \newblock The developmental landscape of in-context learning.
 \newblock \emph{arXiv preprint arXiv:2402.02364}, 2024.
 
+\bibitem[Kawaguchi(2016)]{kawaguchi2016deep}
+Kawaguchi, K.
+\newblock Deep learning without poor local minima.
+\newblock \emph{Advances in neural information processing systems}, 29, 2016.
+
+\bibitem[Keskar et~al.(2016)Keskar, Mudigere, Nocedal, Smelyanskiy, and
+  Tang]{keskar2016large}
+Keskar, N.~S., Mudigere, D., Nocedal, J., Smelyanskiy, M., and Tang, P. T.~P.
+\newblock On large-batch training for deep learning: Generalization gap and
+  sharp minima.
+\newblock \emph{arXiv preprint arXiv:1609.04836}, 2016.
+
 \bibitem[Kram{\'a}r et~al.(2024)Kram{\'a}r, Lieberum, Shah, and
   Nanda]{kramar2024atp}
 Kram{\'a}r, J., Lieberum, T., Shah, R., and Nanda, N.
@@ -140,6 +166,19 @@ Nanda, N.
 Pascanu, R.
 \newblock On the difficulty of training recurrent neural networks.
 \newblock \emph{arXiv preprint arXiv:1211.5063}, 2013.
+
+\bibitem[Sagun et~al.(2017)Sagun, Evci, Guney, Dauphin, and
+  Bottou]{sagun2017empirical}
+Sagun, L., Evci, U., Guney, V.~U., Dauphin, Y., and Bottou, L.
+\newblock Empirical analysis of the hessian of over-parametrized neural
+  networks.
+\newblock \emph{arXiv preprint arXiv:1706.04454}, 2017.
+
+\bibitem[Soudry \& Hoffer(2017)Soudry and Hoffer]{soudry2017exponentially}
+Soudry, D. and Hoffer, E.
+\newblock Exponentially vanishing sub-optimal local minima in multilayer neural
+  networks.
+\newblock \emph{arXiv preprint arXiv:1702.05777}, 2017.
 
 \bibitem[Subramani et~al.(2022)Subramani, Suresh, and
   Peters]{subramani2022extracting}
