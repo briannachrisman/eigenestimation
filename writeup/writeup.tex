@@ -115,10 +115,112 @@
 %\printAffiliationsAndNotice{\icmlEqualContribution} % otherwise use the standard text.
 
 \begin{abstract}
-
+This is a test suggested change.
 \end{abstract}
 
 \section{Background}
+
+
+Mechanistic interpretability is somewhat of an emerging field and aims to uncover the internal mechanisms responsible for seemingly black box behavior of large models so that developers can better understand, intervene on, and align model \cite{bereska2024mechanistic}. Within mechanistic interptretabilty, decomposition methods aim decompose model behacvior into subcomponents that are less complex and more human interpretabile, but that still fully express model behavior. The most popular method in this space is Sparse Autoencoders, which have been successful in decomposing compressed features in the activation space of a model \cite{gao2024scaling,cunningham2023sparse,bricken2023towards}.
+
+\subsection{Limitations of Activation Space-Based Methods}
+
+%Sparse autoencoders rely on the activation space of a model, the output of a set of model's neurons during inference. Sparse autoencoders (SAEs) are designed to identify latent features by projecting a model's compressed activation space into a sparsely activated, overcomplete basis. These learned basis vectors represent distinct features, which can then be used to reconstruct the original activations.
+
+
+%Despite their utility, activation-based decomposition methods like SAEs have notable limitations. First, they assume that activation space consists of linear combinations of feature vectors, yet growing evidence suggests that even architectures designed to encourage linearity, such as residual streams, may encode non-linear features \cite{engels2024not,engels2024decomposing}. Second, activation-based approaches generally treat layers and blocks as independent computational modules, reconstructing activations from specific layers without capturing the possibility of cross-layer interactions and superposition \cite{merullo2024talking,lindsey2024sparse}. This limitation is particularly problematic in architectures beyond transformers, such as recurrent networks, adversarial networks, diffusion models, and classic RL models, where the separation of activation spaces is even less well-defined \cite{pascanu2013difficulty,goodfellow2014generative,ho2020denoising,mnih2015human}. Finally, activation-based methods provide little insight into how features emerge during training, making it difficult to link learned behaviors to specific data or optimization dynamics. This lack of connection to the training process limits our ability to intervene in model behavior at an early stage or refine training data to steer a model toward more desirable properties.
+
+
+\subsection{Loss Landscape Geometry}
+
+%An alternative to interpreting models through their activations is to interpret models through their loss landscape geometry, understanding how perturbing parameters, rather than activations, affects model output and behavior. Parameters are the fundamental entities updated during training, capturing information from data in a way that persists beyond individual inferences. Unlike activations, which are transient and input-dependent, the parameter space reflects the cumulative outcome of the training process, potentially providing deeper insights into how models generalize, store knowledge, and develop internal representations.
+
+%A growing body of research explores the relationship between parameter space, data, and model behavior. Singular learning theory (SLT) describes how the structure of high-dimensional parameter space influences generalization and feature formation \cite{watanabe2007almost,watanabe2000algebraic,watanabe2005algebraic,wei2022deep}, while developmental interpretability extends this by analyzing how parameter updates evolve over training\cite{sharkey2025open}. Studying parameter space has already led to key insights, such as the role of sharpness in grokking\cite{davies2023unifying}, phase transitions corresponding to important learning stages in language models\cite{wang2024loss,hoogland2024developmental}, and distinctions between parameters associated with memorization vs. generalization\cite{bushnaq2024using}. These findings suggest that parameter-space analysis may uncover mechanisms that activation-based methods overlook, opening new avenues for interpretability and intervention.
+
+\subsection{Degenerate Loss Landscapes}
+
+We already know that loss landscapes have high levels of degeneracy. Mathematical degeneracy, data distribution degeneracy, etc. We hypothesize that 
+
+\subsection{Contrastive Methods}
+Constrastive/paired methods are common in intepretability. They work
+
+
+\subsection{Loss Landscape Decomposition}
+
+
+%We propose a method for identifying features and the circuits that produce them in large models by analyzing parameter space rather than activations. Our approach identifies directions in parameter space that correspond to specific circuits, drawing on insights from singular learning theory (SLT). Our method aims to identify principle directions in parameter space such that for a given sample, moving model parameters in most of these directions will not meaningfully change the model's output, but for a small subset of directions, the model's output will change dramatically. We hypotheize that these directions, or subnetworks, represent distinct computations. 
+
+To our knowledge, there have only been two prior methods attempting to decompose parameter space for interpretability. In one earlier work\cite{matena2023npeff}, the authors decompose parameter space by computing principal directions of a per-sample Fisher Information matrix to resolve meaningful features. This approach aimed to identify parameter directions most sensitive to individual samples, capturing how different parts of the model contribute to specific tasks. A recent method, Attribution Parameter Decomposition (APD) \cite{braun2025interpretability} used a bi-optimization approach to identify subnetworks where (1) the sum of subnetwork weights is close to the original model parameters, and (2) for any given input, the sum of a smaller set of subnetworks - identified through topk attribution values - has low behavioral loss when compared to the original model.  
+
+%--------------------- FIGURE 1: Jacobian Diagram ---------------------
+% Make two figures on top of each other
+% use svgs
+
+\begin{figure}
+    \begin{subfigure}{\columnwidth}
+        \centering
+        \includegraphics[width=.7\textwidth]{../figures/1b_jacobian_diagram.pdf}
+    \end{subfigure}
+    \begin{subfigure}{\columnwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../figures/1a_jacobian_diagram.pdf}
+    \end{subfigure} \caption{Decomposing a loss landscape into a set of parameter directions , where (1) the set of directions can approximately reconstruct any per-sample-pair gradient of divergence and (2) for any given sample, the curvature in most of the subnetworks directions is approximately zero.}\label{fig:1_jacobian_diagram}
+    
+\end{figure}
+
+
+Local loss landscape decomposition (L3D) aims to decompose a model's gradients of loss between output pairs with respect to parameter space \ref{fig:1_jacobian_diagram}. We seek to identify directions in parameter space such that (1) the set of directions can approximately reconstruct any gradient of paired sample divergences, and (2) for any given pair of samples, an even smaller subset of directions can be used in reconstructing this gradient. To reduce computational complexity, we learn low-rank representations of these parameter directions. In this work, we first describe the mathematical foundation of our approach. We then develop progressively more complex toy models to measure the efficacy of L3D and quantify its limitations. %Finally, we apply L3D to a real-world model to derive insights into model computation that would not have been possible through activation-based methods. We discuss the strenghts and limitations of L3D, and what we see as future work. Background}
+
+
+Mechanistic interpretability is somewhat of an emerging field and aims to uncover the internal mechanisms responsible for seemingly black box behavior of large models so that developers can better understand, intervene on, and align model \cite{bereska2024mechanistic}. Within mechanistic interptretabilty, decomposition methods aim decompose model behacvior into subcomponents that are less complex and more human interpretabile, but that still fully express model behavior. The most popular method in this space is Sparse Autoencoders, which have been successful in decomposing compressed features in the activation space of a model \cite{gao2024scaling,cunningham2023sparse,bricken2023towards}.
+
+\subsection{Limitations of Activation Space-Based Methods}
+
+%Sparse autoencoders rely on the activation space of a model, the output of a set of model's neurons during inference. Sparse autoencoders (SAEs) are designed to identify latent features by projecting a model's compressed activation space into a sparsely activated, overcomplete basis. These learned basis vectors represent distinct features, which can then be used to reconstruct the original activations.
+
+
+%Despite their utility, activation-based decomposition methods like SAEs have notable limitations. First, they assume that activation space consists of linear combinations of feature vectors, yet growing evidence suggests that even architectures designed to encourage linearity, such as residual streams, may encode non-linear features \cite{engels2024not,engels2024decomposing}. Second, activation-based approaches generally treat layers and blocks as independent computational modules, reconstructing activations from specific layers without capturing the possibility of cross-layer interactions and superposition \cite{merullo2024talking,lindsey2024sparse}. This limitation is particularly problematic in architectures beyond transformers, such as recurrent networks, adversarial networks, diffusion models, and classic RL models, where the separation of activation spaces is even less well-defined \cite{pascanu2013difficulty,goodfellow2014generative,ho2020denoising,mnih2015human}. Finally, activation-based methods provide little insight into how features emerge during training, making it difficult to link learned behaviors to specific data or optimization dynamics. This lack of connection to the training process limits our ability to intervene in model behavior at an early stage or refine training data to steer a model toward more desirable properties.
+
+
+\subsection{Loss Landscape Geometry}
+
+%An alternative to interpreting models through their activations is to interpret models through their loss landscape geometry, understanding how perturbing parameters, rather than activations, affects model output and behavior. Parameters are the fundamental entities updated during training, capturing information from data in a way that persists beyond individual inferences. Unlike activations, which are transient and input-dependent, the parameter space reflects the cumulative outcome of the training process, potentially providing deeper insights into how models generalize, store knowledge, and develop internal representations.
+
+%A growing body of research explores the relationship between parameter space, data, and model behavior. Singular learning theory (SLT) describes how the structure of high-dimensional parameter space influences generalization and feature formation \cite{watanabe2007almost,watanabe2000algebraic,watanabe2005algebraic,wei2022deep}, while developmental interpretability extends this by analyzing how parameter updates evolve over training\cite{sharkey2025open}. Studying parameter space has already led to key insights, such as the role of sharpness in grokking\cite{davies2023unifying}, phase transitions corresponding to important learning stages in language models\cite{wang2024loss,hoogland2024developmental}, and distinctions between parameters associated with memorization vs. generalization\cite{bushnaq2024using}. These findings suggest that parameter-space analysis may uncover mechanisms that activation-based methods overlook, opening new avenues for interpretability and intervention.
+
+\subsection{Degenerate Loss Landscapes}
+
+We already know that loss landscapes have high levels of degeneracy. Mathematical degeneracy, data distribution degeneracy, etc. We hypothesize that 
+
+\subsection{Contrastive Methods}
+Constrastive/paired methods are common in intepretability. They work
+
+
+\subsection{Loss Landscape Decomposition}
+
+
+%We propose a method for identifying features and the circuits that produce them in large models by analyzing parameter space rather than activations. Our approach identifies directions in parameter space that correspond to specific circuits, drawing on insights from singular learning theory (SLT). Our method aims to identify principle directions in parameter space such that for a given sample, moving model parameters in most of these directions will not meaningfully change the model's output, but for a small subset of directions, the model's output will change dramatically. We hypotheize that these directions, or subnetworks, represent distinct computations. 
+
+To our knowledge, there have only been two prior methods attempting to decompose parameter space for interpretability. In one earlier work\cite{matena2023npeff}, the authors decompose parameter space by computing principal directions of a per-sample Fisher Information matrix to resolve meaningful features. This approach aimed to identify parameter directions most sensitive to individual samples, capturing how different parts of the model contribute to specific tasks. A recent method, Attribution Parameter Decomposition (APD) \cite{braun2025interpretability} used a bi-optimization approach to identify subnetworks where (1) the sum of subnetwork weights is close to the original model parameters, and (2) for any given input, the sum of a smaller set of subnetworks - identified through topk attribution values - has low behavioral loss when compared to the original model.  
+
+%--------------------- FIGURE 1: Jacobian Diagram ---------------------
+% Make two figures on top of each other
+% use svgs
+
+\begin{figure}
+    \begin{subfigure}{\columnwidth}
+        \centering
+        \includegraphics[width=.7\textwidth]{../figures/1b_jacobian_diagram.pdf}
+    \end{subfigure}
+    \begin{subfigure}{\columnwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../figures/1a_jacobian_diagram.pdf}
+    \end{subfigure} \caption{Decomposing a loss landscape into a set of parameter directions , where (1) the set of directions can approximately reconstruct any per-sample-pair gradient of divergence and (2) for any given sample, the curvature in most of the subnetworks directions is approximately zero.}\label{fig:1_jacobian_diagram}
+    
+\end{figure}
+
+
+Local loss landscape decomposition (L3D) aims to decompose a model's gradients of loss between output pairs with respect to parameter space \ref{fig:1_jacobian_diagram}. We seek to identify directions in parameter space such that (1) the set of directions can approximately reconstruct any gradient of paired sample divergences, and (2) for any given pair of samples, an even smaller subset of directions can be used in reconstructing this gradient. To reduce computational complexity, we learn low-rank representations of these parameter directions. In this work, we first describe the mathematical foundation of our approach. We then develop progressively more complex toy models to measure the efficacy of L3D and quantify its limitations. %Finally, we apply L3D to a real-world model to derive insights into model computation that would not have been possible through activation-based methods. We discuss the strenghts and limitations of L3D, and what we see as future work. Background}
 
 
 Mechanistic interpretability is somewhat of an emerging field and aims to uncover the internal mechanisms responsible for seemingly black box behavior of large models so that developers can better understand, intervene on, and align model \cite{bereska2024mechanistic}. Within mechanistic interptretabilty, decomposition methods aim decompose model behacvior into subcomponents that are less complex and more human interpretabile, but that still fully express model behavior. The most popular method in this space is Sparse Autoencoders, which have been successful in decomposing compressed features in the activation space of a model \cite{gao2024scaling,cunningham2023sparse,bricken2023towards}.
