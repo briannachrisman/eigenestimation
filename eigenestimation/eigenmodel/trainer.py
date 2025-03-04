@@ -271,7 +271,7 @@ class Trainer:
                     training loss: {total_loss/total_batches},
                     training reconstruction_loss: {reconstruction_loss/total_batches},
                     training sparsity_loss: {sparsity_loss/total_batches},
-                    training frac_activated: {frac_activated}
+                    training dead networks: {(frac_activated==0).sum()/len(frac_activated)}
 '''
                 )
         # Clear the cuda cache
@@ -345,9 +345,9 @@ class Trainer:
         for epoch in range(self.train_dataloader.sampler.epoch, self.epochs):
             with self.train_dataloader.sampler.in_epoch(epoch):
                 frac_activated = self.train_one_epoch(self.train_dataloader, epoch)
-                if epoch % self.log_epochs == 0:
-                    with self.eval_dataloader.sampler.in_epoch(epoch):
-                        self.evaluate(epoch)
+                #if epoch % self.log_epochs == 0:
+                #    with self.eval_dataloader.sampler.in_epoch(epoch):
+                #        self.evaluate(epoch)
                 if epoch % self.checkpoint_epochs == 0:
                     self.save_checkpoint(frac_activated)
         if self.is_master:

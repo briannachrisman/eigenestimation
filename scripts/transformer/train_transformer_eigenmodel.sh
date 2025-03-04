@@ -1,23 +1,40 @@
 NNODES=1
 N_PROC=4
 
-WANDB_PROJECT="transformer-eigenmodel"
-CHECKPOINT_PATH="outputs/eigenmodels/transformer.pt"
+WANDB_PROJECT="tinystories-8M-eigenmodel"
+CHECKPOINT_PATH="outputs/eigenmodels/tinystories-8M.pt"
 
-N_EIGENFEATURES=30
-N_EIGENRANK=3
-TOP_K=0.1
+N_EIGENFEATURES=100
+N_EIGENRANK=1
+TOP_K=.3
 
-EPOCHS=1000
+EPOCHS=100
 LEARNING_RATE=0.001
 LR_STEP_EPOCHS=100
-LR_DECAY_RATE=0.8
+LR_DECAY_RATE=1
 BATCH_SIZE=8
-CHECKPOINT_EPOCHS=100
-LOG_EPOCHS=10
-N_TRAINING_DATAPOINTS=1000
-N_EVAL_DATAPOINTS=100
+CHECKPOINT_EPOCHS=1
+LOG_EPOCHS=1
 TOKEN_LENGTH=16
+
+#MODEL="roneneldan/TinyStories-1M"
+#PARAMS="transformer.transformer.h.3.attn.attention.q_proj.weight,transformer.transformer.h.3.attn.attention.k_proj.weight,transformer.transformer.h.3.attn.attention.v_proj.weight"
+#DATASET="roneneldan/TinyStories"
+#TRAIN_SPLIT="train[:1%]"
+#EVAL_SPLIT="validation[:1%]"
+
+
+TOKENIZER="EleutherAI/gpt-neo-125M"
+
+
+MODEL="roneneldan/TinyStories-8M"
+PARAMS="transformer.transformer.h.1.attn.attention.q_proj.weight,transformer.transformer.h.1.attn.attention.k_proj.weight,transformer.transformer.h.1.attn.attention.v_proj.weight"
+
+DATASET="roneneldan/TinyStories"
+TRAIN_SPLIT="train[:1%]"
+EVAL_SPLIT="validation[:1%]"
+N_TRAIN_SAMPLES=10000
+N_EVAL_SAMPLES=10
 
 # Remove previous checkpoint
 if [ -f "$CHECKPOINT_PATH" ]; then
@@ -40,7 +57,13 @@ torchrun --nnodes=$NNODES --nproc-per-node=$N_PROC $current_dir/train_transforme
     --n-eigenrank $N_EIGENRANK \
     --top-k $TOP_K \
     --token-length $TOKEN_LENGTH \
-    --n-training-datapoints $N_TRAINING_DATAPOINTS \
-    --n-eval-datapoints $N_EVAL_DATAPOINTS \
     --wandb-project $WANDB_PROJECT \
-    --log-epochs $LOG_EPOCHS
+    --log-epochs $LOG_EPOCHS \
+    --model $MODEL \
+    --tokenizer $TOKENIZER \
+    --params $PARAMS \
+    --dataset $DATASET \
+    --train-split $TRAIN_SPLIT \
+    --eval-split $EVAL_SPLIT \
+    --n-train-samples $N_TRAIN_SAMPLES \
+    --n-eval-samples $N_EVAL_SAMPLES

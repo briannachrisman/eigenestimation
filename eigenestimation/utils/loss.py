@@ -58,7 +58,7 @@ class KLDivergenceLoss(nn.Module):
             return per_sample_kl_div
         
 
-class KLDivergenceVectorLoss(nn.Module):
+class KLDivergenceSumOverTokensLoss(nn.Module):
     def __init__(self, reduction: str = 'none') -> None:
         """
         KL Divergence Loss with a structure similar to MSELoss.
@@ -67,7 +67,7 @@ class KLDivergenceVectorLoss(nn.Module):
             reduction (str): Specifies the reduction to apply to the output:
                              'none' | 'mean' | 'sum'. Default is 'mean'.
         """
-        super(KLDivergenceVectorLoss, self).__init__()
+        super(KLDivergenceSumOverTokensLoss, self).__init__()
         self.reduction = reduction
 
     def forward(self, preds: torch.Tensor, truth: torch.Tensor) -> torch.Tensor:
@@ -94,7 +94,7 @@ class KLDivergenceVectorLoss(nn.Module):
         #truth = preds[torch.randperm(preds.shape[0]),...].detach()
         # Compute KL divergence per sample (without reduction)
         # = F.kl_div(preds, truth.softmax(dim=-1))
-        per_sample_kl_div = F.kl_div(preds, reference.softmax(dim=-1), reduction='none').sum(dim=-1).flatten(0,1)#.mean(dim=-1)#(0,1)#.mean(dim=1)#(dim=-1)  # Sum over classes for each sample
+        per_sample_kl_div = F.kl_div(preds, reference.softmax(dim=-1), reduction='none').sum(dim=-1).mean(dim=-1)#.flatten(0,1)#.mean(dim=-1)#(0,1)#.mean(dim=1)#(dim=-1)  # Sum over classes for each sample
         return per_sample_kl_div
         print(per_sample_kl_div.shape)
         #kl_divergence = F.kl_div(preds_log, truth, reduction='none')
@@ -112,7 +112,62 @@ class KLDivergenceVectorLoss(nn.Module):
         else:  # 'none'
             return per_sample_kl_div.sum(dim=1)
         
+  
+
+class KLDivergenceFlattenOverTokensLoss(nn.Module):
+    def __init__(self, reduction: str = 'none') -> None:
+        """
+        KL Divergence Loss with a structure similar to MSELoss.
         
+        Args:
+            reduction (str): Specifies the reduction to apply to the output:
+                             'none' | 'mean' | 'sum'. Default is 'mean'.
+        """
+        super(KLDivergenceFlattenOverTokensLoss, self).__init__()
+        self.reduction = reduction
+
+    def forward(self, preds: torch.Tensor, truth: torch.Tensor) -> torch.Tensor:
+        """
+        Forward pass for KL Divergence Loss.
+        
+        Args:
+            preds (torch.Tensor): Predicted logits or probabilities (not softmaxed).
+            truth (torch.Tensor): Target probabilities.
+
+        Returns:
+            torch.Tensor: The computed KL Divergence Loss.
+        """
+        # Convert preds to log-probabilities
+        
+        # Shuffle all elements of preds
+        flat_preds = preds.flatten(0,1).detach()
+        #rand_selection = flat_preds.mean(dim=0).repeat(flat_preds.shape[0],1)
+        rand_selection = flat_preds[torch.randint(flat_preds.shape[0], (flat_preds.shape[0],)),...]
+        
+        # Reshape rand_selection to match preds shape
+        reference = rand_selection.view_as(preds)
+        
+        #truth = preds[torch.randperm(preds.shape[0]),...].detach()
+        # Compute KL divergence per sample (without reduction)
+        # = F.kl_div(preds, truth.softmax(dim=-1))
+        per_sample_kl_div = F.kl_div(preds, reference.softmax(dim=-1), reduction='none').sum(dim=-1).flatten(0,1)#(dim=-1)#.flatten(0,1)#.mean(dim=-1)#(0,1)#.mean(dim=1)#(dim=-1)  # Sum over classes for each sample
+        return per_sample_kl_div
+        print(per_sample_kl_div.shape)
+        #kl_divergence = F.kl_div(preds_log, truth, reduction='none')
+        #per_sample_kl_div = kl_divergence.sum(dim=-1) - per_sample_kl_div0  # Sum over classes for each sample
+        
+
+        #per_sample_kl_div = per_sample_kl_div - per_sample_kl_div0
+
+
+        # Apply reduction
+        if self.reduction == 'mean':
+            return per_sample_kl_div.mean(dim=-1)
+        elif self.reduction == 'sum':
+            return per_sample_kl_div.sum()
+        else:  # 'none'
+            return per_sample_kl_div.sum(dim=1)
+            
         
 class MSELoss(nn.Module):
     def __init__(self, reduction: str = 'none') -> None:

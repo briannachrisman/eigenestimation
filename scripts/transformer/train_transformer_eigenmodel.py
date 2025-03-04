@@ -19,7 +19,7 @@ sys.path.append(module_dir)
 from eigenestimation.eigenmodel.trainer import Trainer
 from eigenestimation.eigenmodel.eigenmodel import EigenModel
 from eigenestimation.utils.utils import TransformDataLoader
-from eigenestimation.utils.loss import MSELoss, MSEVectorLoss, KLDivergenceVectorLoss
+from eigenestimation.utils.loss import MSELoss, MSEVectorLoss, KLDivergenceSumOverTokensLoss, KLDivergenceFlattenOverTokensLoss
 
 # Ensure correct device usage
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -32,7 +32,6 @@ from eigenestimation.utils.uniform_models import ZeroOutput
 from eigenestimation.eigenmodel.trainer import Trainer
 from eigenestimation.eigenmodel.eigenmodel import EigenModel
 from eigenestimation.utils.utils import TransformDataLoader, DeleteParams, RetrieveWandBArtifact
-from eigenestimation.utils.loss import KLDivergenceVectorLoss
 
 
 from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig
@@ -65,6 +64,14 @@ def get_args_parser():
     parser.add_argument("--checkpoint-path", type=Path, required=True, help="Directory to save checkpoints")
     
     
+    parser.add_argument("--dataset", type=str, default='roneneldan/TinyStories', help="Dataset to use")
+    parser.add_argument("--train-split", type=str, default='train[:1%]', help="Train split to use")
+    parser.add_argument("--eval-split", type=str, default='validation[:1%]', help="Eval split to use")
+    
+    parser.add_argument("--n-train-samples", type=int, default=100, help="Number of train samples to use")
+    parser.add_argument("--n-eval-samples", type=int, default=100, help="Number of eval samples to use")
+
+    
     parser.add_argument("--checkpoint-epochs", type=int, required=True, help="Frequency at which to save checkpoints")
     
     parser.add_argument("--log-epochs", type=int, required=True, help="Frequency at which to save checkpoints")
@@ -72,16 +79,17 @@ def get_args_parser():
     parser.add_argument("--n-features", type=int, default=5, help="Number of input features")
     parser.add_argument("--n-hidden", type=int, default=2, help="Number of hidden features")
     
-
+    parser.add_argument("--model", type=str, default='roneneldan/TinyStories-1M', help="Model to use")
+    parser.add_argument("--tokenizer", type=str, default='EleutherAI/gpt-neo-125M', help="Tokenizer to use")
+    
+    parser.add_argument("--params", type=str, default='transformer.transformer.h.5.attn.attention.q_proj.weight,transformer.transformer.h.5.attn.attention.k_proj.weight,transformer.transformer.h.5.attn.attention.v_proj.weight', help="Parameters to keep")
     parser.add_argument("--n-eigenfeatures", type=int, default=2, help="Number of networks")
     
     parser.add_argument("--n-eigenrank", type=int, default=2, help="Number of networks")
 
-    parser.add_argument("--n-training-datapoints", type=int, default=100, help="Number of training data points")
 
     parser.add_argument("--top-k", type=float, default=.1, help="Top k percent of jvp values to keep")
     
-    parser.add_argument("--n-eval-datapoints", type=int, default=100, help="Number of evaluation data points")
     
     parser.add_argument("--sparsity", type=float, default=0.1, help="Sparsity level for generated data")
     
@@ -118,8 +126,6 @@ def main(args, timer):
     # Hyperparameters and model configuration
     n_features = args.n_features
     n_hidden = args.n_hidden
-    n_training_datapoints = args.n_training_datapoints
-    n_eval_datapoints = args.n_eval_datapoints
     sparsity = args.sparsity
     batch_size = args.batch_size
     token_length = args.token_length
@@ -134,14 +140,13 @@ def main(args, timer):
     torch.backends.cuda.enable_math_sdp(True)
 
 
-    tinystories_1m = AutoModelForCausalLM.from_pretrained('roneneldan/TinyStories-1M')
-    tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neo-125M")
+    raw_transformer = AutoModelForCausalLM.from_pretrained(args.model)
+    tokenizer = AutoTokenizer.from_pretrained(args.tokenizer)
     tokenizer.pad_token = tokenizer.eos_token
-    model = TransformerWrapper(tinystories_1m, tokenizer,
+    model = TransformerWrapper(raw_transformer, tokenizer,
                                outputs_logits=False).to(device)
 
-    vals_to_keep = ['transformer.transformer.h.5.attn.attention.q_proj.weight', 'transformer.transformer.h.5.attn.attention.k_proj.weight', 'transformer.transformer.h.5.attn.attention.v_proj.weight']
-    
+    vals_to_keep = args.params.split(',')
     # Make the eigenestimation a little smaller but only looking at a subset of the parameters.
     # Pick a random subset of tensors to include in paramters, and turn the rest into frozen buffers.
     params_to_delete = [name for name, param in model.named_parameters()]
@@ -152,30 +157,29 @@ def main(args, timer):
     #  params_to_delete.remove(p)
 
     DeleteParams(model, params_to_delete)
+    
+    # This is a weird parameter that won't delete right
+    #if 'transformer.lm_head.weight' in params_to_delete:
     DeleteParams(model, ['transformer.lm_head.weight'])
 
     for n,p in model.named_parameters(): print(n, p.shape, p.numel())
     print(sum([p.numel() for p in model.parameters()]), 'parameters')
 
     # Load in data.
-    dataset = load_dataset('roneneldan/TinyStories', split="train[:1%]")
-    X_transformer = tokenize_and_concatenate(dataset, model.tokenizer, max_length = token_length, add_bos_token=False)['tokens']
-    train_dataset = X_transformer[:n_training_datapoints].to(device)
-    del X_transformer
-        
-    dataset = load_dataset('roneneldan/TinyStories', split="validation[:1%]")
-    X_transformer = tokenize_and_concatenate(dataset, model.tokenizer, max_length = token_length, add_bos_token=False)['tokens']
-    eval_dataset = X_transformer[:n_eval_datapoints].to(device)
-    del X_transformer
-
+    dataset = load_dataset(args.dataset, split=args.train_split)
+    X_train = tokenize_and_concatenate(dataset, model.tokenizer, max_length = token_length, add_bos_token=False)['tokens'].to(device)
+    X_train = X_train[torch.randint(len(X_train), (args.n_train_samples,)), :]
+    dataset = load_dataset(args.dataset, split=args.eval_split)
+    X_eval = tokenize_and_concatenate(dataset, model.tokenizer, max_length = token_length, add_bos_token=False)['tokens'].to(device)
+    X_eval = X_eval[torch.randint(len(X_eval), (args.n_eval_samples,)), :]
     
     print('device', device)
-    eigenmodel = EigenModel(model, ZeroOutput, KLDivergenceVectorLoss(), 
+    eigenmodel = EigenModel(model, ZeroOutput, KLDivergenceFlattenOverTokensLoss(), 
                             args.n_eigenfeatures, args.n_eigenrank)
     
     
     # Initialize the trainer and start training
-    trainer = Trainer(eigenmodel, train_dataset, eval_dataset, args, timer)
+    trainer = Trainer(eigenmodel, X_train, X_eval, args, timer)
     trainer.train()
 
 if __name__ == "__main__":

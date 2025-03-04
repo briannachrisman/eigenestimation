@@ -115,11 +115,11 @@
 %\printAffiliationsAndNotice{\icmlEqualContribution} % otherwise use the standard text.
 
 \begin{abstract}
+Much of mechanistic intepretability has focused on the activation space of large models. However, activation-space-based approaches are limited to features linearly reprsented in a single layer, and say little about the underlying circuitry used to compute the features. To better understand the underlying cicruits used by models, we propose decomposing parameter space using local loss landscape decomposition (L3D). Assuming that interesting circuits in a model are those that, when intervened on, move a sample's output within the subspace of the training distribution. Therefore, we decompose the gradient (with resepect to model parameters) of loss between a sample of interest and a fixed reference output, raondmly selected from our dataset. L3D finds a set of low-rank subnetworks, of which a smaller subset, can reconstruct the gradient of divergence between any two output pairs. We design a series of progressively more challenging toy models, with well-defined subnetworks, and show that L3D can nearly perfectly recover the associated subnetworks. Additionally, in our toy models, we simulate intervening on a subnetwork, we perturb model parameters in the direction of our discovered subnetworks and measure the impact of the perturbation on the model's output. Finally, we apply L3D to a real-world transformer model, to demonstrate the promise of L3D identifying interpretable and relevant circuits through the parameter space. 
 
 \end{abstract}
 
 \section{Background}
-
 
 Mechanistic interpretability aims to uncover the internal mechanisms responsible for the so-called black box behavior or large models so that developers can better understand, intervene on, and align models \cite{bereska2024mechanistic}. One goal of the field is to be able to decompose model behavior into subcomponents that are less complex and more human interpretable but that still fully express model behavior. The most popular method in this space are Sparse Autoencoders (SAEs) \cite{gao2024scaling,cunningham2023sparse,bricken2023towards} which have been successful in resolving compressed features from the activation space of a model. SAEs are designed to identify latent features by projecting a model's compressed activation space into a sparsely activated, overcomplete basis. These learned basis vectors represent distinct features, which can then be used to reconstruct the original activations.
 
@@ -163,12 +163,12 @@ Our object of interest is therefore the gradient (with respect to the model para
     \begin{subfigure}{\columnwidth}
         \centering
         \includegraphics[width=\textwidth]{../figures/1a_jacobian_diagram.pdf}
-    \end{subfigure} \caption{Decomposing a loss landscape into a set of parameter directions , where (1) the set of directions can approximately reconstruct any per-sample-pair gradient of divergence and (2) for any given sample, the curvature in most of the subnetworks directions is approximately zero.}\label{fig:1_jacobian_diagram}
+    \end{subfigure} \caption{Decomposing a loss landscape into a set of parameter directions, where a smaller subset of directions can approximately reconstruct any per-sample-pair gradient of divergence.}\label{fig:1_jacobian_diagram}
     
 \end{figure}
 
 
-Local loss landscape decomposition (L3D) aims to decompose a model's gradients of loss between output pairs with respect to parameter space \ref{fig:1_jacobian_diagram}. We seek to identify directions in parameter space such that (1) the set of directions can approximately reconstruct any gradient of paired sample divergences, and (2) for any given pair of samples, an even smaller subset of directions can be used in reconstructing this gradient. To reduce computational complexity, we learn low-rank representations of these parameter directions. In this work, we first describe the mathematical foundation of our approach. We then develop progressively more complex toy models to measure the efficacy of L3D and quantify its limitations. %Finally, we apply L3D to a real-world model to derive insights into model computation that would not have been possible through activation-based methods. We discuss the strenghts and limitations of L3D, and what we see as future work. 
+Local loss landscape decomposition (L3D) aims to decompose a model's gradients of loss between output pairs with respect to parameter space \ref{fig:1_jacobian_diagram}. We seek to identify directions in parameter space such that for any given pair of samples, an even smaller subset of directions can be used in reconstructing this gradient. To reduce computational complexity, we learn low-rank representations of these parameter directions. In this work, we first describe the mathematical foundation of our approach. We then develop progressively more complex toy models to measure the efficacy of L3D and quantify its limitations. Finally, we apply L3D to a real-world model to demonstrate L3D's ability to resolve interpretable circuits through the parameter space. We discuss the strenghts and limitations of L3D, and what we see as future work. 
 
 
 \section{Methodology}
@@ -246,7 +246,7 @@ For each batch of samples, we randomly select a reference sample $x_r$ to be pai
 
 % Algorithm 1
 \begin{algorithm}\label{alg:training}
-\caption{Training Algorithm}
+\caption{Algorithm for decomposing parameter space using L3D.}
 \begin{algorithmic}[1]
 \FOR{each epoch}
     \FOR{each $X$}
@@ -280,7 +280,6 @@ Going one step further, we may want to finetune our model, but constrain our fin
 
 Additionally, we may want to identify which subnetworks were most relevant to the predictions of various samples, or identify which samples most relied on a given subnetwork. We describe this process in Appendix \ref{sec:impact}
 
-
 \section{Results}
 
 
@@ -309,7 +308,7 @@ Our toy models progressively test more complex types of circuits. Table \ref{tab
         Complex Loss Landscape & $\times$ & $\times$ & $\times$ & $\checkmark$ \\  
         \bottomrule
     \end{tabularx}
-    \caption{Toy models and their properties (transposed)}
+    \caption{Our toy models and their various properties.}
     \label{tab:toy_models}
 \end{table*}
 
@@ -341,7 +340,7 @@ Parameter vectors learned by L3D can be used to intervene on model behavior. In 
 \begin{figure}
     \centerline{\includegraphics[width=\columnwidth]{../figures/4_tms_intervention.pdf}}
     \centering
-    \caption{The effect of intervening on the TMS-in-parallel model in the direction of $\text{Network}_1$.}\label{fig:4_tms_intervention}
+    \caption{The effect of intervening on the TMS-in-parallel model in the direction of $\text{Network}_13$. We generate 1000 inputs from the TMS input distribution (x-axis), intervene on each subnetwork with magnitude $\delta$ (color scale) and measure the change in outputs (y-axis) for each sample.}\label{fig:4_tms_intervention}
 \end{figure}
 
 \subsection{Toy Model of Circuit Superposition}
@@ -364,7 +363,7 @@ We decompose TMCS into 10 subnetworks of rank-1 parameter tensors (\ref{fig:5_ci
 \begin{figure*}[htbp]
     \centerline{\includegraphics[width=\textwidth]{../figures/5_circuit_superposition_decomposition.pdf}}
     \centering
-    \caption{The learned subnetworks of TMCS}\label{fig:5_circuit_superposition_decomposition}
+    \caption{The subnetworks L3D decomposes the TMCS model into.}\label{fig:5_circuit_superposition_decomposition}
 \end{figure*}
 
 
@@ -383,7 +382,7 @@ The parameter vectors are normalized to be unit vectors so we expect them to be 
 \begin{figure}[htbp]
     \centerline{\includegraphics[width=\columnwidth]{../figures/6_circuit_superposition_coefficients.pdf}}
     \centering
-    \caption{The coefficients derived from the subnetworks compared to actual coefficients}\label{fig:6_circuit_superposition_coefficients}
+    \caption{The coefficients derived from the subnetworks compared to actual coefficients used to train TMCS.}\label{fig:6_circuit_superposition_coefficients}
 \end{figure}
 
 
@@ -420,7 +419,7 @@ We expect the model to have 5 subnetworks, one for each input feature. Although 
 
 \subsubsection{Decomposition}
 
-We decompose our model into 5 rank-2 parameter tensors in our decomposition and instead of varying rank, we experiment with using different numbers of subnetworks to represent our model. In the 5-subnetwork decomposition (Figure \ref{fig:8_squared_subnetworks}), we see that subnetworks tracing the path of $X_i \mapsto X_i^2$ for each input feature $i$. However, this decomposition has a relatively high reconstruction error of .32. Much of this is probably because we kept our topFrac constant throughout all our our models, using a topFrac of .1 for consistency.  With only 5 subnetworks, this means that on average each sample's reconstruction will use <1 subnetwork - limiting the reconstruction error we can achieve. 
+We decompose our model into 5 rank-2 parameter tensors in our decomposition and instead of varying rank, we experiment with using different numbers of subnetworks to represent our model. In the 5-subnetwork decomposition (Figure \ref{fig:8_squared_subnetworks}), we see that subnetworks tracing the path of $X_i \mapsto X_i^2$ for each input feature $i$. However, this decomposition has a relatively high reconstruction error of .32. Much of this is probably because we kept our $topFrac$ constant throughout all our our models, using $topFrac=.1$ for consistency.  With only 5 subnetworks, this means that on average each sample's reconstruction will use <1 subnetwork - limiting the reconstruction error we can achieve. 
 
 We also experiment with holding rank constant (we drop to rank-1) and decompose the model into different numbers of subnetworks (3,5,10, and 15 subnetworks). In our 3-subnetwork decomposition, L3D still learned subnetworks corresponding to single input features, but can of course only represent 3 out of the 5 inputs. As we add more subnetworks, we are able to successfully learn more expressive decompositions of the model that reduce reconstruction error (Figure \ref{fig:s11_squared_features_vs_loss}). Each decomposition continues to learn input-output pair specific subnetworks, with the larger decompositions resulting in a few more dead subnetworks as well (Fig. \ref{fig:s10_squared_decompositions_features}).
 
@@ -428,7 +427,7 @@ We also experiment with holding rank constant (we drop to rank-1) and decompose 
 \begin{figure*}[htbp]
     \centerline{\includegraphics[width=\textwidth]{../figures/8_squared_subnetworks.pdf}}
     \centering
-    \caption{Subnetworks learned by L3D for the $X \mapsto X^2$ model, and effect of intervening on each subnetwork}\label{fig:8_squared_subnetworks}
+    \caption{Subnetworks learned by L3D for the $X \mapsto X^2$ model/}\label{fig:8_squared_subnetworks}
 \end{figure*}
 
 
@@ -443,7 +442,7 @@ Intervening on these circuits helps us understand how much local loss landscape 
 \begin{figure*}[htbp]
     \centerline{\includegraphics[width=\textwidth]{../figures/9_squared_intervention.pdf}}
     \centering
-    \caption{The effect of intervening on each subnetwork}\label{fig:9_squared_intervention}
+    \caption{The effect of intervening on each subnetwork in the $X \mapsto X^2$ model. We generate 1000 inputs from the TMSC input distribution, intervene on each subnetwork with magnitude $\delta$ and measure the change in outputs for each sample.}\label{fig:9_squared_intervention}
 \end{figure*}
 
 
@@ -460,33 +459,26 @@ L3D is one of the earliest parameter-based decomposition methods. For this reaso
 \subsection{Simple Improvements}
 In this work, we did not focus on optimizing L3D, and we chose nearly identical hyperparameters for all of our decompositions. 
 
-\textbf{Hyperparameter Choice}
+\textbf{Hyperparameter Choice}: For all of our toy model decompositions, we always chose $topFrac=.1$, even when it was clear that certain toy models should have larger numbers of subnetworks activated per sample than others (For example, the $X->X^2$ model with 5 inputs and 5 outputs, decmoposed into 5 networks, should probably have $topFrac>=.2$). Too low of topFrac choice is likely responsible for the high reconstruction loss of some of our models. Similarly, we always chose the ranks of the subnetworks somewhat arbitrarily. There has been some reasarch done into understanding the relationship between rank and superposition budget \cite{}, and a better understanding of this relationship could help us choose better hyperparameters for L3D. 
 
-For all of our toy model decompositions, we always chose $topFrac=.1$, even when it was clear that certain toy models should have larger numbers of subnetworks activated per sample than others (For example, the $X->X^2$ model with 5 inputs and 5 outputs, decmoposed into 5 networks, should probably have $topFrac>=.2$). Too low of topFrac choice is likely responsible for the high reconstruction loss of some of our models. Similarly, we always chose the ranks of the subnetworks somewhat arbitrarily. There has been some reasarch done into understanding the relationship between rank and superposition budget \cite{}, and a better understanding of this relationship could help us choose better hyperparameters for L3D. 
-
-\textbf{Flexible Rank Choices}
-
-Relatedly, the way L3D makes circuit decomposition computationally feasible is to represent each tensor in the subnetwork as a low-rank tensor. For simplicity, we use the same rank for all tensors. Theoretically, there could be more flexibility across tensors, and we could use different ranks for different blocks of the subnetwork if we believed certain parts of the model were composed of fundamentally higher rank circuits. 
+\textbf{Flexible Rank Choices}: Relatedly, the way L3D makes circuit decomposition computationally feasible is to represent each tensor in the subnetwork as a low-rank tensor. For simplicity, we use the same rank for all tensors. Theoretically, there could be more flexibility across tensors, and we could use different ranks for different blocks of the subnetwork if we believed certain parts of the model were composed of fundamentally higher rank circuits. 
 
 \subsection{Extensions}
 
 There are a also some higher effort extensions to L3D that may give it more real-world relevance. 
 
-\textbf{Finetuning}
-Our intervention experiments showed promise subnetworks of L3D could be perturbed in ways that only affect the predictions of relevant samples. As we described in Section \ref{sec:finetuning}, this could be taken one step further by finetuning a model on a specific set of parameter directions. Using L3D networks, we could finetune a model on a specific set of parameter directions by freezing the current set of weights and learning an adaptor consisting of linear combinations of the subnetworks of choice. This could also benchmark the intervention capabilities of L3D versus other mechanistic intervention strategies such as SAE-derived steering vectors. For example, we might use L3D to identify various subnetworks involved in syncophancy, refusal, and other undesired behaviors. After collecting curated data with the goal of finetuning away such behaviors, we could finetune L3D only in the direction of the behavior-related subnetworks and test how well the model achieves our desired output compared to other intervention strategies. 
+\textbf{Finetuning}: Our intervention experiments showed promise subnetworks of L3D could be perturbed in ways that only affect the predictions of relevant samples. As we described in Section \ref{sec:finetuning}, this could be taken one step further by finetuning a model on a specific set of parameter directions. Using L3D networks, we could finetune a model on a specific set of parameter directions by freezing the current set of weights and learning an adaptor consisting of linear combinations of the subnetworks of choice. This could also benchmark the intervention capabilities of L3D versus other mechanistic intervention strategies such as SAE-derived steering vectors. For example, we might use L3D to identify various subnetworks involved in syncophancy, refusal, and other undesired behaviors. After collecting curated data with the goal of finetuning away such behaviors, we could finetune L3D only in the direction of the behavior-related subnetworks and test how well the model achieves our desired output compared to other intervention strategies. 
 
-\textbf{Identifying Specific Circuits with Constrastive Pairs}
+\textbf{Identifying Specific Circuits with Constrastive Pairs}:
 We developed this method as an unsupervised decomposition method, with goals compareable to those of SAEs. However, the methods of L3D could be easily modified to use supervised signals to identify specific circuits of interest. Rather than using gradients of divergence of random pairs, we could decompose gradients of divergence between curated pairs of samples that isolate a behavior of interest. In this context, we could probably not require the topK constraint, but instead look decompose the network into a very small number of low-rank subnetworks involved in our behavior of interest. 
 
 \subsection{Challenges}
 Although many of the improvements and extensions of L3D are highly addressable, we think there are some fundamental challenges with parameter-based decomposition methods that may not be easily resolved.
 
 
-\textbf{Local Loss Landscape}
-L3D's algorithm hinges on the somewhat surprising phenomenon that local gradient approximations work well as attribution methods. They clearly work to a great extent in the toy models we used for L3D and for the circuits we found in our real world models. However, do they work for all circuits? In our work, we use a randomly selected sample to be our "reference" output with which to compute divergence gradient. By using a randomly selected sample, rather than a single "reference output" such as the mean of the output distribution, we hope that the random noise in the reference sample will average out the effects of any non-convexity in the loss landscape.  However, perhaps, even in this setup, perhaps there are parameter directions that are highly non-convex and will be difficult to perform local attribution on. Quantifying different types of "dark matter" of parameter decomposition by analyzing reconstruction loss (similar to recent work done on SAEs) could better help us characterize these limitations.
+\textbf{Local Attribution}: L3D's algorithm hinges on the somewhat surprising phenomenon that local gradient approximations work well as attribution methods. They clearly work to a great extent in the toy models we used for L3D and for the circuits we found in our real world models. However, do they work for all circuits? In our work, we use a randomly selected sample to be our "reference" output with which to compute divergence gradient. By using a randomly selected sample, rather than a single "reference output" such as the mean of the output distribution, we hope that the random noise in the reference sample will average out the effects of any non-convexity in the loss landscape.  However, perhaps, even in this setup, perhaps there are parameter directions that are highly non-convex and will be difficult to perform local attribution on. Quantifying different types of "dark matter" of parameter decomposition by analyzing reconstruction loss (similar to recent work done on SAEs) could better help us characterize these limitations.
 
-\textbf{Relationship to overparameterized models}
-Going one step further, we suspect that the reason local attribution methods work so well is because large models are probably overparameterized. By this we mean that there exists a much smaller network that performs identically to a model, but higher dimensional models learn better, as they have less local minima to get stuck into during the learning process \cite{kawaguchi2016deep,choromanska2015loss,dauphin2014identifying,soudry2017exponentially}. Larger models may have wider loss basins, or more degeneracies near their global minima \cite{keskar2016large,sagun2017empirical}, making local attribution methods less likely to break down as we move through parameter space. If in the future, an learning algorithm is developed that has fundamentally different limitations that stochastic gradient descent and its relatives, we might lose this property. Morever, circuit activations might no longer be sparse. A new learning process might be able to compress subnetworks in such a way that subnetworks have very high levels of interference with each other - removing the degeneracy assumption that underlies L3D. 
+\textbf{Relationship to overparameterized models}: Going one step further, we suspect that the reason local attribution methods work so well is because large models are probably overparameterized. By this we mean that there exists a much smaller network that performs identically to a model, but higher dimensional models learn better, as they have less local minima to get stuck into during the learning process \cite{kawaguchi2016deep,choromanska2015loss,dauphin2014identifying,soudry2017exponentially}. Larger models may have wider loss basins, or more degeneracies near their global minima \cite{keskar2016large,sagun2017empirical}, making local attribution methods less likely to break down as we move through parameter space. If in the future, an learning algorithm is developed that has fundamentally different limitations that stochastic gradient descent and its relatives, we might lose this property. Morever, circuit activations might no longer be sparse. A new learning process might be able to compress subnetworks in such a way that subnetworks have very high levels of interference with each other - removing the degeneracy assumption that underlies L3D. 
 
 \textbf{Interpretation of a circuit}
 
@@ -595,7 +587,7 @@ To finetune a model on a specific set of parameter directions, we would freeze t
     f(X, W_0 + W_{ft} V^{out}_\mathcal{K})
 \end{equation}
 
-\subsubsection{Quantifying Impact}\label{sec:impact}
+\subsection{Quantifying Impact}\label{sec:impact}
 
 We can quantify the impact of a subnetwork in two ways. First, we can compute the impact of a subnetwork on a pair of samples $x_i, x_j$, identyfing the subnetwork that, if intervened upon, would most strongly impact the the divergence of $x_i$'s outputs when compared to $x_j$. The impact of subnetwork $v_k$ on such a pair of samples, $I(x_i, x_j, v_k)$ can be measured by:
 
@@ -626,7 +618,7 @@ To train L3D, we use the same training distributions as in each toy models. Alth
 \begin{figure}[ht]
     \centerline{\includegraphics{../figures/s1_high_rank_circuit_setup.pdf}}
     \centering
-    \caption{Full architecture of high rank circuit toy model.}\label{fig:s1_high_rank_circuit_setup}
+    \caption{The full architecture of high rank circuit toy model (model C).}\label{fig:s1_high_rank_circuit_setup}
 \end{figure}
 
 
@@ -635,7 +627,7 @@ To train L3D, we use the same training distributions as in each toy models. Alth
 \begin{figure}[ht]
     \centerline{\includegraphics{../figures/s2_tms_encoder_directions.pdf}}
     \centering
-    \caption{Encoder directions in TMS}\label{fig:s2_tms_encoder_directions}
+    \caption{Encoder directions in the hidden layer dimension of the TMS toy model.}\label{fig:s2_tms_encoder_directions}
 \end{figure}
 
 
@@ -650,7 +642,7 @@ To train L3D, we use the same training distributions as in each toy models. Alth
 % ---------------------Figure S3: Intervention on TMS-in-parallel-------------------------
 \begin{figure}[ht]
     \centering
-    \caption{Effect of intervening on the first 5 subnetworks of the TMS-in-parallel model.}
+    \caption{Effects of intervening on the first 5 subnetworks of the TMS-in-parallel model.}
     \label{fig:s3_tms_interventions}
 
     \begin{minipage}{\textwidth} % Ensure figures align
@@ -738,14 +730,14 @@ To train L3D, we use the same training distributions as in each toy models. Alth
 \begin{figure}[ht]
     \centerline{\includegraphics[width=\textwidth]{../figures/s7_squared_intervention_more_deltas.pdf}}
     \centering
-    \caption{Effects of intervening on each of the 5 subnetworks of the $X \mapsto X^2$ model.}\label{fig:s7_squared_intervention_more_deltas}
+    \caption{Effects of intervening on each of the subnetworks of the $X \mapsto X^2$ model.}\label{fig:s7_squared_intervention_more_deltas}
 \end{figure}
 
 %--------------------- FIGURE S8: Squared Model Middle Layer Intervention ---------------------
 \begin{figure}[ht]
     \centerline{\includegraphics[width=\textwidth]{../figures/s8_squared_intervention_middle_weights.pdf}}
     \centering
-    \caption{Intervening on just the weights and biases of the middle hidden layers in the $X \mapsto X^2$ network.}\label{fig:s8_squared_intervention_middle_weights}
+    \caption{Effect of intervening using just the weights and biases of the middle hidden layers in the subnetworks of the $X \mapsto X^2$ model.}\label{fig:s8_squared_intervention_middle_weights}
 \end{figure}
 
 
@@ -753,7 +745,7 @@ To train L3D, we use the same training distributions as in each toy models. Alth
 \begin{figure}[ht]
     \centerline{\includegraphics[width=\textwidth]{../figures/s9_squared_intervention_multi_features.pdf}}
     \centering
-    \caption{Intervening on multiple subnetworks at once.}\label{fig:s9_squared_intervention_multi_features}
+    \caption{Effects of intervening with multiple subnetworks ($v_0$ on the x-axis, $v_1$ on the y-axis) at once.}\label{fig:s9_squared_intervention_multi_features}
 \end{figure}
 
 %--------------------- FIGURE S10: Squared Model Decompositions ---------------------
@@ -795,7 +787,7 @@ To train L3D, we use the same training distributions as in each toy models. Alth
 \begin{figure}[ht]
     \centerline{\includegraphics[width=\textwidth]{../figures/s11_squared_features_vs_loss.pdf}}
     \centering
-    \caption{Training loss vs number of features for the $X \mapsto X^2$ model, and decompositions for a 3- and 5- subnetwork decomposition.}\label{fig:s11_squared_features_vs_loss}
+    \caption{Training loss vs. number of features for the $X \mapsto X^2$ model}\label{fig:s11_squared_features_vs_loss}
 \end{figure}
 
 \end{document}
