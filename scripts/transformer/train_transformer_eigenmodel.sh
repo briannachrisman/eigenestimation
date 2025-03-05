@@ -2,7 +2,7 @@ NNODES=1
 N_PROC=4
 
 WANDB_PROJECT="tinystories-8M-eigenmodel"
-CHECKPOINT_PATH="outputs/eigenmodels/tinystories-8M.pt"
+CHECKPOINT_PATH="/root/eigenestimation/outputs/eigenmodels/tinystories-8M.pt"
 
 N_EIGENFEATURES=100
 N_EIGENRANK=1
@@ -33,7 +33,7 @@ PARAMS="transformer.transformer.h.1.attn.attention.q_proj.weight,transformer.tra
 DATASET="roneneldan/TinyStories"
 TRAIN_SPLIT="train[:1%]"
 EVAL_SPLIT="validation[:1%]"
-N_TRAIN_SAMPLES=10000
+N_TRAIN_SAMPLES=100
 N_EVAL_SAMPLES=10
 
 # Remove previous checkpoint

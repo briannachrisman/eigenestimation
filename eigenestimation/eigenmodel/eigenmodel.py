@@ -22,7 +22,6 @@ class EigenModel(nn.Module):
         self.loss: Callable = loss
         self.n_features = n_features
         self.param_dict = {name: param.detach().clone() for name, param in model.named_parameters()}
-
     
         print("HERE!")
         
@@ -56,10 +55,11 @@ class EigenModel(nn.Module):
             truth: torch.Tensor = self.model0(outputs)
         return self.loss(outputs, truth)
 
-    def compute_gradients(self, x: torch.Tensor):
-        return torch.func.jacrev(self.compute_loss, argnums=-1)(x, self.param_dict)
-    
-
+    def compute_gradients(self, x: torch.Tensor,chunk_size=None):
+        with torch.no_grad():
+            grads = torch.func.jacrev(self.compute_loss, argnums=-1, has_aux=False, chunk_size=chunk_size)(x, self.param_dict)
+            torch.cuda.empty_cache()
+            return grads
     
     def forward(self, gradients: torch.Tensor) -> torch.Tensor:
         jvp_dict = dict({})

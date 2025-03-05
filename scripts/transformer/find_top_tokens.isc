@@ -1,0 +1,9 @@
+isc_project_id = "4c067223-8029-4381-aedf-8f62315ed584"
+experiment_name = "train-top-tokens"
+burst_shape_priority_list = ["aws-useast1-l40-spot"]
+gpus = 1
+compute_mode = "burst"
+output_path = "~/outputs/train-top-tokens"
+command = '''
+source ~/.eigenestimation/bin/activate && 
+bash /root/eigenestimation/scripts/transformer/find_top_tokens.sh'''
