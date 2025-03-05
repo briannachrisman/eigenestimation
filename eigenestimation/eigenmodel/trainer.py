@@ -103,7 +103,7 @@ class Trainer:
         self.train_dataloader = DataLoader(train_data, batch_size=args.batch_size, sampler=self.train_sampler)
             
         self.eval_dataloader = DataLoader(eval_data, batch_size=args.batch_size, sampler=self.eval_sampler)
-
+        self.chunk_size = args.chunk_size
             
         self.timer.report("Data loaders initialized")
 
@@ -206,7 +206,7 @@ class Trainer:
         for x in train_dataloader:
             # Forward pass
             if self.compute_gradients:
-                gradients = self.model.module.compute_gradients(x.to(self.device_id))
+                gradients = self.model.module.compute_gradients(x.to(self.device_id), self.chunk_size)
             else: gradients = x
             #gradients = {k: v.to(self.device_id) for k, v in gradients.items()}
             jvp = self.model(gradients)

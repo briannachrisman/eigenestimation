@@ -1,0 +1,10 @@
+isc_project_id = "3356d9b0-d2a5-4f57-9b6a-f63f2bf81106"
+experiment_name = "tinystories-8M-eigenmodel"
+gpu_type = "24GB VRAM GPU"
+gpus = 16
+compute_mode = "cycle"
+output_path = "~/outputs/tinystories-8M-eigenmodel"
+dataset_id = "8d2de5b2-d07f-47ce-a6d6-d217a1cfa369"
+command = '''
+source ~/.eigenestimation/bin/activate && 
+bash /root/eigenestimation/scripts/transformer/train_transformer_eigenmodel.sh'''

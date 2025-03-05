@@ -89,7 +89,7 @@ def get_args_parser():
 
 
     parser.add_argument("--top-k", type=float, default=.1, help="Top k percent of jvp values to keep")
-    
+    parser.add_argument("--chunk-size", type=int, default=10, help="Chunk size for computing gradients")
     
     parser.add_argument("--sparsity", type=float, default=0.1, help="Sparsity level for generated data")
     

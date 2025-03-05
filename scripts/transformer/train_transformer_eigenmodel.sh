@@ -6,34 +6,29 @@ CHECKPOINT_PATH="/root/eigenestimation/outputs/eigenmodels/tinystories-8M.pt"
 
 N_EIGENFEATURES=100
 N_EIGENRANK=1
-TOP_K=.3
+TOP_K=.1
 
 EPOCHS=100
 LEARNING_RATE=0.001
 LR_STEP_EPOCHS=100
 LR_DECAY_RATE=1
-BATCH_SIZE=8
+BATCH_SIZE=32
 CHECKPOINT_EPOCHS=1
 LOG_EPOCHS=1
 TOKEN_LENGTH=16
-
-#MODEL="roneneldan/TinyStories-1M"
-#PARAMS="transformer.transformer.h.3.attn.attention.q_proj.weight,transformer.transformer.h.3.attn.attention.k_proj.weight,transformer.transformer.h.3.attn.attention.v_proj.weight"
-#DATASET="roneneldan/TinyStories"
-#TRAIN_SPLIT="train[:1%]"
-#EVAL_SPLIT="validation[:1%]"
+CHUNK_SIZE=10
 
 
 TOKENIZER="EleutherAI/gpt-neo-125M"
 
 
 MODEL="roneneldan/TinyStories-8M"
-PARAMS="transformer.transformer.h.1.attn.attention.q_proj.weight,transformer.transformer.h.1.attn.attention.k_proj.weight,transformer.transformer.h.1.attn.attention.v_proj.weight"
+PARAMS="transformer.transformer.h.2.attn.attention.q_proj.weight,transformer.transformer.h.2.attn.attention.k_proj.weight,transformer.transformer.h.2.attn.attention.v_proj.weight"
 
 DATASET="roneneldan/TinyStories"
 TRAIN_SPLIT="train[:1%]"
 EVAL_SPLIT="validation[:1%]"
-N_TRAIN_SAMPLES=100
+N_TRAIN_SAMPLES=1000
 N_EVAL_SAMPLES=10
 
 # Remove previous checkpoint
@@ -65,5 +60,6 @@ torchrun --nnodes=$NNODES --nproc-per-node=$N_PROC $current_dir/train_transforme
     --dataset $DATASET \
     --train-split $TRAIN_SPLIT \
     --eval-split $EVAL_SPLIT \
+    --chunk-size $CHUNK_SIZE \
     --n-train-samples $N_TRAIN_SAMPLES \
     --n-eval-samples $N_EVAL_SAMPLES

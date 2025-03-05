@@ -60,56 +60,97 @@ class EigenModel(nn.Module):
             grads = torch.func.jacrev(self.compute_loss, argnums=-1, has_aux=False, chunk_size=chunk_size)(x, self.param_dict)
             torch.cuda.empty_cache()
             return grads
-    
+
+
     def forward(self, gradients: torch.Tensor) -> torch.Tensor:
         jvp_dict = dict({})
+        jvp = None
         for name in self.low_rank_encode:
-            jvp_dict[name] = einops.einsum(gradients[name], self.low_rank_encode[name][-1], '... w , w r f -> ... r f')
-            for tensor in self.low_rank_encode[name][-2::-1]:
-                jvp_dict[name] = einops.einsum(jvp_dict[name], tensor, '... w r f, w r f -> ... r f')
-            jvp_dict[name] = einops.einsum(jvp_dict[name], '... r f -> ... f')
-        jvp = torch.stack([jvp_dict[name] for name in jvp_dict], dim=0).sum(dim=0) # Dimensions = (samples) x features
+            rank = self.low_rank_encode[name][-1][...,-1].shape[-1]
+            for r in range(rank):
+                partial_tmp = einops.einsum(gradients[name], self.low_rank_encode[name][-1][:,r,:], '... w , w f -> ... f')
+                for tensor in self.low_rank_encode[name][-2::-1]:
+                    partial_tmp = einops.einsum(partial_tmp, tensor[...,r,:], '... w f, w f -> ... f')
+                    if jvp is None:
+                        jvp = partial_tmp
+                    else:
+                        jvp += partial_tmp
         return jvp
     
-    def gradients_vector_product(self, gradients, feature_idx):
-        jvp_dict = dict({})
-        for name in self.low_rank_encode:
-            jvp_dict[name] = einops.einsum(gradients[name], self.low_rank_encode[name][-1][...,feature_idx], '... w , w r-> r ...')
-            for tensor in self.low_rank_encode[name][-2::-1]:
-                jvp_dict[name] = einops.einsum(jvp_dict[name], tensor[...,feature_idx], 'r ... w, w r -> r ...')
-            jvp_dict[name] = einops.einsum(jvp_dict[name], 'r ... w -> ...')
+    
 
-        jvp = torch.stack([jvp_dict[name] for name in jvp_dict], dim=0).sum(dim=0) # Dimensions = (samples) x features
-        return jvp
     
     def reconstruct(self, jvp: torch.Tensor) -> torch.Tensor:
-        reconstruction = dict({})
-        for name in self.low_rank_decode:
-            reconstruction[name] = einops.einsum(jvp, self.low_rank_decode[name][0], '... f , w r f -> ... w r f')
-            for tensor in self.low_rank_decode[name][1:]:
-                reconstruction[name] = einops.einsum(reconstruction[name], tensor, '... r f, w r f -> ... w r f')
-            reconstruction[name] = einops.einsum(reconstruction[name], '... w r f -> ... w')
+        reconstruction = {}
+        for name, tensors in self.low_rank_decode.items():
+            temp = None
+
+            # Iterate over feature dimension f to perform contractions in a memory-efficient way
+            for f in range(self.n_features):
+                for r in range(tensors[0][...,-1].shape[-1]):
+                    partial_temp = einops.einsum(jvp[...,f], tensors[0][..., r,f], '... , w -> ... w')
+                    for tensor in tensors[1:]:
+                        partial_temp = einops.einsum(partial_temp, tensor[..., r,f], '..., w -> ... w')
+                    if temp is None:
+                        temp = partial_temp
+                    else: 
+                        temp += partial_temp  # Accumulate over f instead of processing all at once
+
+            reconstruction[name] = temp # Final reduction
         return reconstruction
+
+    
 
 
     def reconstruct_network(self) -> dict:
-        reconstruction = dict({})
-        for name in self.low_rank_decode:
-            reconstruction[name] = self.low_rank_decode[name][0]
-            for tensor in self.low_rank_decode[name][1:]:
-                reconstruction[name] = einops.einsum(reconstruction[name], tensor, '... r f, w r f ->  ... w r f')
-            reconstruction[name] = einops.einsum(reconstruction[name], '... w r f -> ... w')
+        reconstruction = {}
+        for name, tensors in self.low_rank_decode.items():
+            temp = None
+
+            # Iterate over low-rank dimension r
+            for r in range(tensors[0].shape[-2]):
+                partial_temp = None
+
+                # Iterate over feature dimension f
+                for f in range(tensors[0].shape[-1]):
+                    intermediate = tensors[0][:, r, f]  # Extract single element from the first tensor
+                    
+                    # Multiply through the remaining tensors
+                    for tensor in tensors[1:]:
+                        intermediate = einops.einsum(intermediate, tensor[r, :, f], '... w, w -> ... w')
+
+                    # Accumulate over f
+                    if partial_temp is None:
+                        partial_temp = intermediate
+                    else:
+                        partial_temp += intermediate
+
+                # Accumulate over r
+                if temp is None:
+                    temp = partial_temp
+                else:
+                    temp += partial_temp  
+
+            reconstruction[name] = temp  # No need for a final einsum since both `r` and `f` are summed out
+
         return reconstruction
+
     
 
-    def add_to_network(self, feature_coefficients: torch.Tensor) -> dict:
-        reconstruction = dict({})
+    def add_to_network(self, feature_coefficients: dict) -> dict:
+        reconstruction = copy.deepcopy(self.param_dict)
         for name in self.low_rank_decode:
-            reconstruction[name] = self.low_rank_decode[name][0]
-            for tensor in self.low_rank_decode[name][1:]:
-                reconstruction[name] = einops.einsum(reconstruction[name], tensor, '... r f, w r f ->  ... w r f')
-            reconstruction[name] = einops.einsum(reconstruction[name], feature_coefficients, '... w r f, f -> ... w')
-            reconstruction[name] = reconstruction[name] + self.param_dict[name]
+            for feature_idx in feature_coefficients:
+                sum_so_far = None
+                for r in range(self.low_rank_decode[name][0].shape[-2]):
+                    tmp = self.low_rank_decode[name][0][...,r,feature_idx]
+                    for tensor in self.low_rank_decode[name][1:]:
+                        tmp = einops.einsum(tmp, tensor[...,r,feature_idx], '..., w -> ... w')
+                        if sum_so_far is None:
+                            sum_so_far = tmp
+                        else:
+                            sum_so_far += tmp
+                reconstruction[name] = reconstruction[name] + feature_coefficients[feature_idx] * sum_so_far
         return reconstruction
     
     def construct_subnetworks(self) -> dict:
@@ -117,10 +158,16 @@ class EigenModel(nn.Module):
         for i in range(self.n_features):
             reconstruction = dict({})
             for name in self.low_rank_decode:
-                reconstruction[name] = self.low_rank_decode[name][0][...,i]
-                for tensor in self.low_rank_decode[name][1:]:
-                    reconstruction[name] = einops.einsum(reconstruction[name], tensor[...,i], '... r, w r -> ... w r')
-                reconstruction[name] = einops.einsum(reconstruction[name], '... w r -> ... w')
+                for r in range(self.low_rank_decode[name][0].shape[-2]):
+                    sum_so_far = None
+                    tmp = self.low_rank_decode[name][0][...,r,i]
+                    for tensor in self.low_rank_decode[name][1:]:
+                        tmp = einops.einsum(tmp, tensor[...,r,i], '..., w -> ... w')
+                        if sum_so_far is None:
+                            sum_so_far = tmp
+                        else:
+                            sum_so_far += tmp
+                reconstruction[name] = sum_so_far
             networks.append(reconstruction)
         return networks
     
