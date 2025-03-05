@@ -3,7 +3,7 @@ import einops
 from torch.func import functional_call, jacfwd
 import gc
 
-def compute_jacobian(eigenmodel, sample, feature_idx, token_idx, device='cuda'):
+def compute_jacobian(eigenmodel, sample, feature_idx, device='cuda'):
     """
     Computes the Jacobian of the reconstructed network with respect to `coef`.
 
@@ -21,7 +21,7 @@ def compute_jacobian(eigenmodel, sample, feature_idx, token_idx, device='cuda'):
     gc.collect()
     torch.cuda.empty_cache()
 
-    def reconstruct_network(eigenmodel, coef, sample, feature_idx, token_idx):
+    def reconstruct_network(eigenmodel, coef, sample, feature_idx):
         """
         Efficiently reconstruct network weights using eigenmodel and functional_call.
         """
@@ -41,7 +41,7 @@ def compute_jacobian(eigenmodel, sample, feature_idx, token_idx, device='cuda'):
             reconstruction[name] = einops.einsum(recon, '... w r -> ... w') * coef
 
         # Use functional_call for inference with the reconstructed network
-        return functional_call(eigenmodel.model, reconstruction, sample)
+        return functional_call(eigenmodel.model, reconstruction, sample.unsqueeze(0))
 
     # Ensure `coef` is on the correct device and requires gradient
     coef = torch.tensor(0.0, requires_grad=True, device=device)
@@ -49,7 +49,7 @@ def compute_jacobian(eigenmodel, sample, feature_idx, token_idx, device='cuda'):
     # Compute softmax output
 
     # Compute Jacobian efficiently using forward-mode differentiation
-    jacobian_fn = jacfwd(lambda c: reconstruct_network(eigenmodel, c, sample, feature_idx)[0, token_idx, :].softmax(dim=-1))
+    jacobian_fn = jacfwd(lambda c: reconstruct_network(eigenmodel, c, sample, feature_idx)[0, -1, :])
 
     # Compute Jacobian
     jacobian = jacobian_fn(coef)
