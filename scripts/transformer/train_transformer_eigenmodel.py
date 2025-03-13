@@ -46,6 +46,13 @@ from cycling_utils import TimestampedTimer
 timer = TimestampedTimer("Imported TimestampedTimer")
 from eigenestimation.utils.uniform_models import ZeroOutput
 
+param_dict = {
+    'transformer.transformer.h.4.attn.attention.k_proj.weight': [25, 25],
+    'transformer.transformer.h.4.attn.attention.v_proj.weight': [25, 25],
+    'transformer.transformer.h.4.attn.attention.q_proj.weight': [25, 25],
+    'transformer.transformer.h.4.attn.attention.out_proj.weight': [25, 25],
+    'transformer.transformer.h.4.attn.attention.out_proj.bias': [25]
+}
 
 def get_args_parser():
     """
@@ -63,7 +70,7 @@ def get_args_parser():
     parser.add_argument("--token-length", type=int, default=8, help="Batch size for training")
     parser.add_argument("--checkpoint-path", type=Path, required=True, help="Directory to save checkpoints")
     
-    
+    parser.add_argument("--warm-start-epochs", type=int, default=0, help="Number of warm start epochs")
     parser.add_argument("--dataset", type=str, default='roneneldan/TinyStories', help="Dataset to use")
     parser.add_argument("--train-split", type=str, default='train[:1%]', help="Train split to use")
     parser.add_argument("--eval-split", type=str, default='validation[:1%]', help="Eval split to use")
@@ -82,10 +89,8 @@ def get_args_parser():
     parser.add_argument("--model", type=str, default='roneneldan/TinyStories-1M', help="Model to use")
     parser.add_argument("--tokenizer", type=str, default='EleutherAI/gpt-neo-125M', help="Tokenizer to use")
     
-    parser.add_argument("--params", type=str, default='transformer.transformer.h.5.attn.attention.q_proj.weight,transformer.transformer.h.5.attn.attention.k_proj.weight,transformer.transformer.h.5.attn.attention.v_proj.weight', help="Parameters to keep")
     parser.add_argument("--n-eigenfeatures", type=int, default=2, help="Number of networks")
     
-    parser.add_argument("--n-eigenrank", type=int, default=2, help="Number of networks")
 
 
     parser.add_argument("--top-k", type=float, default=.1, help="Top k percent of jvp values to keep")
@@ -146,7 +151,7 @@ def main(args, timer):
     model = TransformerWrapper(raw_transformer, tokenizer,
                                outputs_logits=False).to(device)
 
-    vals_to_keep = args.params.split(',')
+    vals_to_keep = param_dict.keys()
     # Make the eigenestimation a little smaller but only looking at a subset of the parameters.
     # Pick a random subset of tensors to include in paramters, and turn the rest into frozen buffers.
     params_to_delete = [name for name, param in model.named_parameters()]
@@ -175,7 +180,7 @@ def main(args, timer):
     
     print('device', device)
     eigenmodel = EigenModel(model, ZeroOutput, KLDivergenceFlattenOverTokensLoss(), 
-                            args.n_eigenfeatures, args.n_eigenrank)
+                            args.n_eigenfeatures, param_dict)
     
     
     # Initialize the trainer and start training

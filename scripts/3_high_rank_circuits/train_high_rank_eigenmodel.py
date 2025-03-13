@@ -48,6 +48,8 @@ def get_args_parser():
     
     parser.add_argument("--log-epochs", type=int, required=True, help="Frequency at which to save checkpoints")
         
+    parser.add_argument("--warm-start-epochs", type=int, default=0, help="Number of warm start epochs")
+    parser.add_argument("--chunk-size", type=int, default=100, help="Chunk size")
 
     parser.add_argument("--n-eigenfeatures", type=int, default=2, help="Number of networks")
     
@@ -122,8 +124,13 @@ def main(args, timer):
     
 
 
-    
-    eigenmodel = EigenModel(model, ZeroOutput, MSEVectorLoss(), args.n_eigenfeatures, args.n_eigenrank)
+    rank_dict = {
+        "W_in": [args.n_eigenrank, args.n_eigenrank],
+        "W_out": [args.n_eigenrank, args.n_eigenrank],
+        "b": [args.n_eigenrank],
+    }
+
+    eigenmodel = EigenModel(model, ZeroOutput, MSEVectorLoss(), args.n_eigenfeatures, rank_dict)
     
     
     # Initialize the trainer and start training

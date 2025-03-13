@@ -1,17 +1,18 @@
 NNODES=1
 N_PROC=1
+CHECKPOINT_ARTIFACT_PATH="/root/eigenestimation/outputs/eigenmodels"
 
-EIGENMODEL_PATH="/root/eigenestimation/outputs/eigenmodels/tinystories-8M.pt"
+EIGENMODEL_PATH="$CHECKPOINT_ARTIFACT_PATH/tinystories-8M-eigenmodel.pt"
 DATASET="roneneldan/TinyStories"
-SPLIT="validation[:1000]"
-N_SAMPLES=100
+SPLIT="validation[:1%]"
+N_SAMPLES=10000
 PAIRED_ITERS=5
-BATCH_SIZE=32
-ATT_OUTPUT_FILE="/root/eigenestimation/outputs/top_tokens/tinystories-8M-circuit_attributions.pt"
-EXAMPLES_OUTPUT_FILE="/root/eigenestimation/outputs/top_tokens/tinystories-8M-X_data.pt"
+BATCH_SIZE=16
+ATT_OUTPUT_FILE="$CHECKPOINT_ARTIFACT_PATH/tinystories-8M-circuit_attributions.pt"
+EXAMPLES_OUTPUT_FILE="$CHECKPOINT_ARTIFACT_PATH/tinystories-8M-X_data.pt"
 TOKEN_LENGTH=16
 TOP_K=5
-JAC_CHUNK_SIZE=50
+JAC_CHUNK_SIZE=25
 current_dir=$(echo "$(dirname "$(realpath "$0")")")
 echo "current dir: $current_dir"
 # Run training

@@ -5,6 +5,7 @@ toy_models_setup = '/root/eigenestimation/figures/2%s_toy_models_setup.pdf'
 
 tms_first_5_subnetworks = '/root/eigenestimation/figures/3_tms_first_5_subnetworks.pdf'
 tms_intervention = '/root/eigenestimation/figures/4_tms_intervention.pdf'
+tms_intervention_mean = '/root/eigenestimation/figures/4_tms_intervention_mean.pdf'
 
 circuit_superposition_decomposition = '/root/eigenestimation/figures/5_circuit_superposition_decomposition.pdf'
 circuit_superposition_coefficients = '/root/eigenestimation/figures/6_circuit_superposition_coefficients.pdf'
@@ -29,3 +30,5 @@ squared_intervention_middle_weights = '/root/eigenestimation/figures/s8_squared_
 squared_intervention_multi_features = '/root/eigenestimation/figures/s9_squared_intervention_multi_features.pdf'
 squared_decompositions = '/root/eigenestimation/figures/s10_squared_decompositions_feature%i.pdf'
 squared_features_vs_loss = '/root/eigenestimation/figures/s11_squared_features_vs_loss.pdf'
+
+top_images_eigenmodel = '/root/eigenestimation/figures/poster_top_images_feature_%i.svg'

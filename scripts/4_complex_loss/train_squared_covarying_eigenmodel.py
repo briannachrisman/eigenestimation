@@ -61,6 +61,8 @@ def get_args_parser():
 
     parser.add_argument("--sparsity", type=float, default=.05, help="Sparisty")
 
+    parser.add_argument('--warm-start-epochs', type=int, default=0, help='Number of warm start epochs')
+    parser.add_argument('--chunk-size', type=int, default=100, help='Chunk size')
 
     parser.add_argument("--top-k", type=float, default=.1, help="Top k percent of jvp values to keep")
     
@@ -143,9 +145,13 @@ def main(args, timer):
     choice = torch.rand_like(choice_A)
     X_eval[:,1] = (choice > prob) * choice_A + (choice < prob) * choice_B
 
-    
+    rank_dict = {
+        "W_in": [args.n_eigenrank, args.n_eigenrank],
+        "W_out": [args.n_eigenrank, args.n_eigenrank],
+        "b": [args.n_eigenrank],
+    }
 
-    eigenmodel = EigenModel(model, MeanOutput, MSEVectorLoss(), args.n_eigenfeatures, args.n_eigenrank)
+    eigenmodel = EigenModel(model, MeanOutput, MSEVectorLoss(), args.n_eigenfeatures, rank_dict)
     
     # Initialize the trainer and start training
     trainer = Trainer(eigenmodel, train_dataset, eval_dataset, args, timer)

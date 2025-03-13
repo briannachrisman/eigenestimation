@@ -1,36 +1,31 @@
+CHECKPOINT_ARTIFACT_PATH="/root/eigenestimation/outputs/eigenmodels"
 NNODES=1
-N_PROC=4
+N_PROC=1
 
 WANDB_PROJECT="tinystories-8M-eigenmodel"
-CHECKPOINT_PATH="/root/eigenestimation/outputs/eigenmodels/tinystories-8M.pt"
-
 N_EIGENFEATURES=100
-N_EIGENRANK=1
 TOP_K=.1
 
 EPOCHS=100
 LEARNING_RATE=0.001
 LR_STEP_EPOCHS=100
-LR_DECAY_RATE=1
-BATCH_SIZE=32
+LR_DECAY_RATE=.8
+BATCH_SIZE=16
 CHECKPOINT_EPOCHS=1
 LOG_EPOCHS=1
 TOKEN_LENGTH=16
-CHUNK_SIZE=10
-
-
+CHUNK_SIZE=50
+WARM_START_EPOCHS=0
 TOKENIZER="EleutherAI/gpt-neo-125M"
 
-
 MODEL="roneneldan/TinyStories-8M"
-PARAMS="transformer.transformer.h.2.attn.attention.q_proj.weight,transformer.transformer.h.2.attn.attention.k_proj.weight,transformer.transformer.h.2.attn.attention.v_proj.weight"
 
 DATASET="roneneldan/TinyStories"
 TRAIN_SPLIT="train[:1%]"
 EVAL_SPLIT="validation[:1%]"
-N_TRAIN_SAMPLES=1000
+N_TRAIN_SAMPLES=10000
 N_EVAL_SAMPLES=10
-
+CHECKPOINT_PATH="${CHECKPOINT_ARTIFACT_PATH}/${WANDB_PROJECT}.pt"
 # Remove previous checkpoint
 if [ -f "$CHECKPOINT_PATH" ]; then
     echo "Removing previous checkpoint"
@@ -48,15 +43,14 @@ torchrun --nnodes=$NNODES --nproc-per-node=$N_PROC $current_dir/train_transforme
     --batch-size $BATCH_SIZE \
     --checkpoint-path $CHECKPOINT_PATH \
     --checkpoint-epochs $CHECKPOINT_EPOCHS \
+    --warm-start-epochs $WARM_START_EPOCHS \
     --n-eigenfeatures $N_EIGENFEATURES \
-    --n-eigenrank $N_EIGENRANK \
     --top-k $TOP_K \
     --token-length $TOKEN_LENGTH \
     --wandb-project $WANDB_PROJECT \
     --log-epochs $LOG_EPOCHS \
     --model $MODEL \
     --tokenizer $TOKENIZER \
-    --params $PARAMS \
     --dataset $DATASET \
     --train-split $TRAIN_SPLIT \
     --eval-split $EVAL_SPLIT \

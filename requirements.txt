@@ -8,5 +8,8 @@ numpy==1.26.4
 ipykernel
 jupyters
 wandb
+timm
+seaborn
+pandas
 torchvision==0.16.2 --index-url https://download.pytorch.org/whl/cu118
 git+https://github.com/StrongResearch/cycling_utils.git

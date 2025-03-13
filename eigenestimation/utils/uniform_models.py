@@ -10,3 +10,7 @@ def MeanOutput(outputs):
 
 def UniformProbs(outputs):
     return (0*outputs+1).softmax()
+
+
+def UniformLogits(outputs):
+    return (0*outputs+1)

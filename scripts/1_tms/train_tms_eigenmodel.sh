@@ -1,16 +1,16 @@
 #!/bin/bash
 
 NNODES=1
-N_PROC=4
+N_PROC=1
 
 WANDB_PROJECT="tms-eigenmodel"
 MODEL_PATH="outputs/toy_models/tms.pt"
-CHECKPOINT_PATH="outputs/eigenmodels/tms_parallel.pt"
+CHECKPOINT_PATH="outputs/eigenmodels/tms.pt"
 
 N_FEATURES=5
 N_HIDDEN=2
-N_NETWORKS=3
-N_EIGENFEATURES=15
+N_NETWORKS=1
+N_EIGENFEATURES=5
 N_EIGENRANK=1
 TOP_K=0.1
 

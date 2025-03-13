@@ -27,6 +27,8 @@ from cycling_utils import TimestampedTimer
 timer = TimestampedTimer("Imported TimestampedTimer")
 torch.manual_seed(42)
 np.random.seed(42)
+
+
 def get_args_parser():
     """
     Parses command-line arguments for configuring the training process.
@@ -54,9 +56,9 @@ def get_args_parser():
     parser.add_argument("--n-eigenfeatures", type=int, default=2, help="Number of networks")
     
     parser.add_argument("--n-eigenrank", type=int, default=2, help="Number of networks")
-
+    parser.add_argument("--chunk-size", type=int, default=100, help="Chunk size")
     parser.add_argument("--n-training-datapoints", type=int, default=100, help="Number of training data points")
-
+    parser.add_argument("--warm-start-epochs", type=int, default=0, help="Number of warm start epochs")
     parser.add_argument("--top-k", type=float, default=.1, help="Top k")
     parser.add_argument("--n-eval-datapoints", type=int, default=100, help="Number of evaluation data points")
     
@@ -117,10 +119,14 @@ def main(args, timer):
     eval_dataset = X_eval
     
     
-
+    rank_dict = {
+        "W_in": [args.n_eigenrank, args.n_eigenrank],
+        "W_out": [args.n_eigenrank, args.n_eigenrank],
+        "b": [args.n_eigenrank],
+    }
 
     
-    eigenmodel = EigenModel(model, ZeroOutput, MSEVectorLoss(), args.n_eigenfeatures, args.n_eigenrank)
+    eigenmodel = EigenModel(model, ZeroOutput, MSEVectorLoss(), args.n_eigenfeatures, rank_dict)
     
     
     # Initialize the trainer and start training

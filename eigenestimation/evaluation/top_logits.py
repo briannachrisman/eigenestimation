@@ -3,7 +3,7 @@ import einops
 from torch.func import functional_call, jacfwd
 import gc
 
-def compute_jacobian(eigenmodel, sample, feature_idx, device='cuda'):
+def compute_jacobian(eigenmodel, sample, feature_idx, device='cuda', has_token_dim=True):
     """
     Computes the Jacobian of the reconstructed network with respect to `coef`.
 
@@ -21,38 +21,32 @@ def compute_jacobian(eigenmodel, sample, feature_idx, device='cuda'):
     gc.collect()
     torch.cuda.empty_cache()
 
-    def reconstruct_network(eigenmodel, coef, sample, feature_idx):
+    def wrapper_fn(eigenmodel, coef, sample, feature_idx):
         """
         Efficiently reconstruct network weights using eigenmodel and functional_call.
         """
-        # Direct access to low-rank decomposed weights
-        low_rank_decode = eigenmodel.low_rank_decode
-        reconstruction = {}
+        coefficients = torch.zeros(eigenmodel.n_features, device=device)
+        coefficients[feature_idx] = 1
         
-        for name in low_rank_decode:
-            # Extract the first component
-            recon = low_rank_decode[name][0][..., feature_idx]
-
-            # Efficient einsum application
-            for tensor in low_rank_decode[name][1:]:
-                recon = einops.einsum(recon, tensor[..., feature_idx], '... r, w r -> ... w r')
-
-            # Final summation
-            reconstruction[name] = einops.einsum(recon, '... w r -> ... w') * coef
-
+        reconstruction = eigenmodel.add_to_network(coef * coefficients)
         # Use functional_call for inference with the reconstructed network
         return functional_call(eigenmodel.model, reconstruction, sample.unsqueeze(0))
 
     # Ensure `coef` is on the correct device and requires gradient
     coef = torch.tensor(0.0, requires_grad=True, device=device)
-
     # Compute softmax output
 
     # Compute Jacobian efficiently using forward-mode differentiation
-    jacobian_fn = jacfwd(lambda c: reconstruct_network(eigenmodel, c, sample, feature_idx)[0, -1, :])
+    if has_token_dim:
+        jacobian_fn = jacfwd(lambda c: wrapper_fn(eigenmodel, c, sample, feature_idx)[0, -1, ...])
+    else:
+        jacobian_fn = jacfwd(lambda c: wrapper_fn(eigenmodel, c, sample, feature_idx)[0, ...])
 
     # Compute Jacobian
     jacobian = jacobian_fn(coef)
 
     return jacobian
+
+
+
 

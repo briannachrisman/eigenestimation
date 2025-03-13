@@ -21,7 +21,7 @@ CHECKPOINT_EPOCHS=100
 LOG_EPOCHS=10
 N_TRAINING_DATAPOINTS=1000
 N_EVAL_DATAPOINTS=100
-
+WARM_START_EPOCHS=10
 # Remove previous checkpoint
 if [ -f "$CHECKPOINT_PATH" ]; then
     echo "Removing previous checkpoint"
@@ -47,5 +47,6 @@ torchrun --nnodes=$NNODES --nproc-per-node=$N_PROC $current_dir/train_squared_ei
     --n-eval-datapoints $N_EVAL_DATAPOINTS \
     --sparsity $SPARSITY \
     --wandb-project $WANDB_PROJECT \
+    --warm-start-epochs $WARM_START_EPOCHS \
     --log-epochs $LOG_EPOCHS
 

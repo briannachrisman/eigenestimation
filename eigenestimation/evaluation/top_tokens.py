@@ -34,7 +34,7 @@ def compute_circuit_vals(eigenmodel, dataloader, iters, jac_chunk_size=None):
             each_circuit_val = torch.zeros(X_batch.shape[0] * X_batch.shape[1], eigenmodel.n_features)
             for _ in range(iters):
                 grads = eigenmodel.compute_gradients(X_batch.to('cuda' if torch.cuda.is_available() else 'cpu'), chunk_size=jac_chunk_size)
-                each_circuit_val += abs(eigenmodel(grads))[:, :eigenmodel.n_features].to(each_circuit_val.device)
+                each_circuit_val += (eigenmodel(grads))[:, :eigenmodel.n_features].to(each_circuit_val.device)
                 gc.collect()
                 torch.cuda.empty_cache()
             circuit_vals.append(each_circuit_val.view(X_batch.shape[0], X_batch.shape[1], eigenmodel.n_features))

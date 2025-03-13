@@ -97,19 +97,24 @@ class Trainer:
         self.device_id = args.device_id
         self.is_master = args.is_master
         # Data loaders and samplers
-        self.train_sampler = InterruptableDistributedSampler(train_data)
-        self.eval_sampler = InterruptableDistributedSampler(eval_data)
-        
+        self.train_sampler = InterruptableDistributedSampler(train_data, shuffle=True)
+        self.eval_sampler = InterruptableDistributedSampler(eval_data, shuffle=True)
         self.train_dataloader = DataLoader(train_data, batch_size=args.batch_size, sampler=self.train_sampler)
             
         self.eval_dataloader = DataLoader(eval_data, batch_size=args.batch_size, sampler=self.eval_sampler)
         self.chunk_size = args.chunk_size
-            
+        self.warm_start_epochs = args.warm_start_epochs
         self.timer.report("Data loaders initialized")
 
         # Model and training utilities setup
         self.model = DDP(eigenmodel.to(self.device_id), device_ids=[self.device_id])
-        params_to_optimize = [*[t for name in self.model.module.low_rank_encode for t in self.model.module.low_rank_encode[name]]] + [*[t for name in self.model.module.low_rank_decode for t in self.model.module.low_rank_decode[name]]]
+        params_to_optimize = (
+            [t for name in self.model.module.low_rank_encode for t in self.model.module.low_rank_encode[name]['transform_tensors']] +
+            [t for name in self.model.module.low_rank_decode for t in self.model.module.low_rank_decode[name]['transform_tensors']] + 
+            [self.model.module.low_rank_decode[name]['core_tensor'] for name in self.model.module.low_rank_decode] + 
+            [self.model.module.low_rank_encode[name]['core_tensor'] for name in self.model.module.low_rank_encode]
+        )
+            
         self.optimizer = torch.optim.Adam(params_to_optimize, lr=args.lr)
         self.lr_scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer, step_size=args.lr_step_epochs, gamma=args.lr_decay_rate)
 
@@ -210,24 +215,20 @@ class Trainer:
             else: gradients = x
             #gradients = {k: v.to(self.device_id) for k, v in gradients.items()}
             jvp = self.model(gradients)
-            
             # Set topk of jvp values to 1 and the rest to zero.
             # Flatten all of jvp
             jvp_flattened = einops.rearrange(jvp, '... -> (...)')
             # Get the nth highest value of jvp_flattened
             with torch.no_grad():
                 top_k = self.top_k
+                if epoch <= self.warm_start_epochs: top_k = .999
                 sorted_values, _ = torch.sort(abs(jvp_flattened), descending=True)#
-                nth_highest_value = sorted_values[round(top_k*len(jvp_flattened))]
-                nth_lowest_value = sorted_values[-round(top_k*len(jvp_flattened))]
+                nth_highest_value = sorted_values[int(top_k*len(jvp_flattened))]
+                nth_lowest_value = sorted_values[-int(top_k*len(jvp_flattened))]
                 
             jvp_topk = jvp*(abs(jvp)>=nth_highest_value).float()
             self.sum_activated = self.sum_activated +(abs(jvp)>=nth_highest_value).float().mean(dim=0)
 
-            
-        
-            
-            #jvp_bottomk = jvp*((jvp)<=nth_lowest_value).float()
             
             reconstruction = self.model.module.reconstruct(jvp_topk) 
             

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 NNODES=1
-N_PROC=4
+N_PROC=1
 
 WANDB_PROJECT="circuit-superposition-eigenmodel"
 MODEL_PATH="outputs/toy_models/circuit_superposition.pt"
@@ -21,7 +21,7 @@ CHECKPOINT_EPOCHS=100
 LOG_EPOCHS=10
 N_TRAINING_DATAPOINTS=1000
 N_EVAL_DATAPOINTS=1000
-
+CHUNK_SIZE=100
 
 # Remove previous checkpoint
 if [ -f "$CHECKPOINT_PATH" ]; then
@@ -48,5 +48,7 @@ torchrun --nnodes=$NNODES --nproc-per-node=$N_PROC $current_dir/train_circuit_su
     --n-eval-datapoints $N_EVAL_DATAPOINTS \
     --sparsity $SPARSITY \
     --wandb-project $WANDB_PROJECT \
+    --chunk-size $CHUNK_SIZE \
+    --warm-start-epochs 1 \
     --log-epochs $LOG_EPOCHS
 

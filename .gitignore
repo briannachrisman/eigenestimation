@@ -11,3 +11,4 @@ figures/*
 !*writeup/writeup.tex
 !*writeup/writeup.pdf
 *.nsf*
+data
