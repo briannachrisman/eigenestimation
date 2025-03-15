@@ -32,3 +32,9 @@ squared_decompositions = '/root/eigenestimation/figures/s10_squared_decompositio
 squared_features_vs_loss = '/root/eigenestimation/figures/s11_squared_features_vs_loss.pdf'
 
 top_images_eigenmodel = '/root/eigenestimation/figures/poster_top_images_feature_%i.svg'
+
+fav_circuits_cnn = '/root/eigenestimation/figures/favorite_cnn_circuits.pdf'
+all_circuits_cnn = '/root/eigenestimation/figures/100_cnn_circuits.pdf'
+
+fav_circuits_transformer = '/root/eigenestimation/figures/favorite_transformer_circuits.pdf'
+all_circuits_transformer = '/root/eigenestimation/figures/100_transformer_circuits.pdf'

@@ -148,7 +148,7 @@ def main(args, timer):
     batch_size = args.batch_size
 
     model = torchvision.models.mobilenet_v3_small(pretrained=True).to(args.device_id)
-    replace_all_batch_norm_modules_(model)
+    model.eval()
 
     # read in args.param_dict as dictionary
     vals_to_keep = param_dict.keys()
@@ -166,7 +166,7 @@ def main(args, timer):
     # Define transformations for normalization
     transform = transforms.Compose([
         transforms.ToTensor(),
-        transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         transforms.Resize((224, 224), antialias=True)  # Normalize to [-1, 1]
     ])
 

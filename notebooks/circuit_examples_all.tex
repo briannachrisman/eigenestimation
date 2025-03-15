@@ -1,0 +1,626 @@
+
+\documentclass{article}
+\usepackage[utf8]{inputenc}  % Ensure UTF-8 encoding
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage[a4paper, margin=1in]{geometry} % Better margins
+\usepackage{adjustbox} % For text fitting
+\usepackage{multirow} % Allows merging cells
+\begin{document}
+
+\section*{Circuit Analysis Examples}
+
+\noindent Below is a unified table of all circuits.
+
+\begin{adjustbox}{max width=\textwidth}
+\small
+\begin{tabular}{p{0.1\textwidth} p{0.5\textwidth} p{0.4\textwidth}}
+\toprule
+\textbf{Id ($P_{act}$)} & \textbf{Input Text} & \textbf{Top Logits} \\
+\midrule
+\multirow{5}{*}{\textbf{0 (0.059)}} & to play in & her,  his,  a, .,  their \\
+ & to play games with his friends in & a,  his,  school,  their,  class \\
+ & the mineral and decided to keep it in & her,  a,  the,  its, . \\
+ & that the judge was hoping to find a good home for all the dogs in & his,  need,  her,  it,  their \\
+ & to play with his friends in & a,  his,  their,  school,  another \\
+\midrule
+\multirow{5}{*}{\textbf{1 (0.034)}} & She did not see her & mom,  dad,  brother,  friends,  friend \\
+ & said "Doll Factory". She got very excited and asked her & mom,  dad,  daddy,  m,  friends \\
+ & went to the park with her mom and saw her & friend,  friends,  dad,  dog,  neighbor \\
+ & see over it. She saw her & mom,  friend,  dad,  friends,  brother \\
+ & bag and went to the car with her & mom,  dad,  friends,  t,  toy \\
+\midrule
+\multirow{5}{*}{\textbf{2 (0.185)}} & teddy bear and had a lot of & toys,  friends,  stories,  other,  hugs \\
+ & They see the box and the paper. They are & not,  still,  in,  proud,  inside \\
+ & a bench to sit and eat their ice cream. They l & icks, oll, unch, ipped, he \\
+ & -cream, and had lots of & y,  different,  sprink,  flavors,  them \\
+ & .Lily likes to play with her dolls. She has many & dresses,  clothes,  girls,  skirts,  rooms \\
+\midrule
+\multirow{5}{*}{\textbf{3 (0.204)}} & with her mom. One & day,  winter,  days,  months,  nights \\
+ & the park with her friends. One & day, ations, tops, Staff, Mal \\
+ & !" she said.  One & day, ations, ometers, apers, asers \\
+ & and they pretended it was a treasure.  One & day,  sunny,  summer,  winter, ations \\
+ & just made a loud noise. Timmy was confused and sad.  One & day, ations, ometers, sters,  Chips \\
+\midrule
+\multirow{5}{*}{\textbf{4 (0.109)}} & came up to him and asked, "What are & those,  these,  we,  your,  they \\
+ & very happy. Toot asked, "Why are & the,  we,  there,  all,  your \\
+ & in the car and drove to the vet. They did & not,  repairs,  does, ends,  sticky \\
+ & Benny asked, "What are & we,  those,  these,  they,  all \\
+ & for a walk and they passed by & a,  an,  trees,  buildings,  traffic \\
+\midrule
+\multirow{5}{*}{\textbf{5 (0.073)}} & happy." & <|endoftext|>, The, They, Tom, " \\
+ & it?" & The, ", Her, Tom, M \\
+ & me." & The, <|endoftext|>, ", Tom, L \\
+ & you want some?" & The, ", M, L, Her \\
+ & y with a bee." & The, ", <|endoftext|>, L, Tom \\
+\midrule
+\multirow{5}{*}{\textbf{6 (0.147)}} & , they got tired and sat down on the soft grass. They looked at each & other,  others,  of,  one,  another \\
+ & . Buzzy loved to fly around the big tree and play with the & leaves,  birds,  ball,  little,  bugs \\
+ & be scared. I won't hurt you. I just want to be your & friends,  sister,  brother,  daughter,  pet \\
+ & at the shell. They looked at their mom. They looked at each & others, .,  one, other,  another \\
+ & went to the park with her mom and saw her & dad,  uncle,  little,  new,  favorite \\
+\midrule
+\multirow{5}{*}{\textbf{7 (0.063)}} & .Once upon a time, there was a little girl named & Lucy,  Amy,  Sarah,  Emma,  Emily \\
+ & . The end.Once upon a time, there was a little boy named & Jack,  Max,  John,  Andy,  he \\
+ & ."Once upon a time, there was a boy named & Tim,  Jack,  Max,  Billy,  Will \\
+ & them disappear again.Once upon a time, there was a little girl named & Lucy,  Sarah,  Emma,  Amy,  Emily \\
+ & in the park.Once upon a time, there was a little girl named & Lucy,  Sarah,  Amy,  Emma,  Emily \\
+\midrule
+\multirow{5}{*}{\textbf{8 (0.097)}} & , Spot's owner, a little girl named & Lily,  Sally,  Emily,  Jane,  Emma \\
+ & Lily's little & brother, inning, bling, ator, ushing \\
+ & them disappear again.Once upon a time, there was a little girl named & Mia,  Sally,  Anna,  Amy,  Tim \\
+ & with a smile.Once upon a time, there was a little girl named & Mia,  Sally,  Amy,  Anna,  Jane \\
+ & .Once upon a time, there was a little girl named & Sally,  Mia,  Amy,  Anna,  Lucy \\
+\midrule
+\multirow{5}{*}{\textbf{9 (0.105)}} & , Lily said, & ", ime, iner, ayer, cher \\
+ & back. Timmy said, & ", apper, iner, overs, ime \\
+ & my said, & ", ime, ayer, appers, iner \\
+ & Lily nodded and said, & ", attered, cher, ayed, atter \\
+ & Ben smiled and said, & ", overs, ime, attered, ayer \\
+\midrule
+\multirow{5}{*}{\textbf{10 (0.066)}} & them fight. & One, L, Tim, She, When \\
+ &  & One, L, When, The, As \\
+ & She whispers in his ear. & ", One, L, She, M \\
+ & basket and the knife behind. & L, The, One, She, When \\
+ & It is new and red. Can we play with it?" & L, Her, M, Anna, Tim \\
+\midrule
+\multirow{5}{*}{\textbf{11 (0.074)}} & importance of sharing and being kind to his friends.Once upon a time & there,  at,  in,  with,  later \\
+ & proud of herself for helping her furry friend.Once upon a time & there,  at,  in,  it,  with \\
+ & always want more.Once upon a time & there,  in,  it,  at,  he \\
+ & hear that?" Her friend listened carefully and said, "I don & , `, ´, â, y \\
+ & the park and went home with her mommy.Once upon a time & there,  at,  in,  they,  it \\
+\midrule
+\multirow{5}{*}{\textbf{12 (0.056)}} & . Tim saw his friend, a big dog & named,  Tommy,  Su, ister,  Jackie \\
+ & noises. Tom had a small car that could go fast and be & ep, eps, v, vy, ini \\
+ & but Emily said no. Lily felt sad because she couldn & 't, ned, oes, ning, ner \\
+ & other treasures she found.Once upon a time, there was a dog & named, chair, illa, ep,  pound \\
+ & , Timmy's trumpet playing got better and & better,  shin,  worse,  harder,  older \\
+\midrule
+\multirow{5}{*}{\textbf{13 (0.067)}} & cup. She cried all the & time,  noise,  tears,  day,  hard \\
+ & her mommy said, trying to calm her & .,  little, ,,  daughter,  and \\
+ & .  Lily and Ben look at each & other,  shadow,  noise,  threat,  thunder \\
+ & Tim decided to go to his friend's house to watch TV. But on his & dream,  day,  surprise,  chance,  birthday \\
+ & grass. They were very happy.  But on the & other,  next,  end,  day,  last \\
+\midrule
+\multirow{5}{*}{\textbf{14 (0.063)}} & them disappear again.Once upon a time, there was a little girl named & Lily,  Lucy,  Princess,  Li,  Candy \\
+ & little boy's excitement.Once upon a time, there was a little girl named & Lily,  Sue,  Lucy,  Lisa,  L \\
+ & with a smile.Once upon a time, there was a little girl named & Lily,  Lucy,  L,  Princess,  Sara \\
+ & having fun.Once upon a time, there was a little girl named & Lily,  Lucy,  L,  Princess,  Lena \\
+ & .Once upon a time, there was a little girl named & Lily,  Lucy,  L,  Lisa,  Princess \\
+\midrule
+\multirow{5}{*}{\textbf{15 (0.065)}} & with a smile.Once upon a time, there was a little girl named & Lucy,  Sally,  Sue,  Jane,  Mia \\
+ & them disappear again.Once upon a time, there was a little girl named & Lucy,  Sally,  True,  Emma,  Mia \\
+ & The end.Once upon a time, there was a little girl named & Lucy,  Sally,  Sue,  Jane,  Mia \\
+ & fun day at the park.Once upon a time, there was a boy named & Tom,  Jack,  John,  Mark,  Billy \\
+ & .Once upon a time, there was a little girl named & Lucy,  Sally,  Sue,  Mia,  Jane \\
+\midrule
+\multirow{5}{*}{\textbf{16 (0.061)}} & car is so bright and clean!" Kitty smiled and replied, "Thank & you,  background,  compromised,  indoors,  conclusion \\
+ & "No, thank & you,  background,  manageable,  motivation,  enjoyable \\
+ & . The man's wife was very happy and said, "Thank & you,  YOU,  technique, ptions,  background \\
+ & , dad, thank & you, ptions,  manageable, osc,  relocation \\
+ & , "Thank & you, ptions,  background,  technique,  underway \\
+\midrule
+\multirow{5}{*}{\textbf{17 (0.054)}} & Lily felt happy that they could help.  Later that day & came,  after,  at,  fell,  and \\
+ & birds and Lily. One day, & the,  a,  her,  it,  while \\
+ & One day, & the,  a,  while,  he,  his \\
+ & . One day, & while,  the,  they,  a,  he \\
+ & and dad. One day, & the,  a,  their,  when,  he \\
+\midrule
+\multirow{5}{*}{\textbf{18 (0.108)}} & the ball with his strong legs. The ball flew into the goal! Spot was & surprised,  scared,  sad,  amazed,  excited \\
+ & and finally, they found the belt under Tom's bed. Tom was so & excited,  proud,  grateful,  surprised,  glad \\
+ & box! Inside, he found a toy car. Tim was & happy,  very,  excited,  sad,  a \\
+ & friend. At last, she found him near a big tree. Tom was & happy,  scared,  surprised,  sad,  not \\
+ & with his big, hairy paw.   The little bird was very & curious,  sad,  proud,  scared,  brave \\
+\midrule
+\multirow{5}{*}{\textbf{19 (0.070)}} & I'm the last of my family. The other sw & an, immers, am, ies, ins \\
+ & sip. He liked it. He saw the cel & y, iflower, ade, ish, - \\
+ & him. The rabbit asked B & ess, aa, ucky, un, ola \\
+ & "You see, Mitt & ie, ., ,", ba, ." \\
+ & get his ac & orn, he,  ac, -, ak \\
+\midrule
+\multirow{5}{*}{\textbf{20 (0.097)}} & help others when they need it.Once upon a time, & there,  near,  here,  where,  against \\
+ & dad very much.Once upon a time, & there,  where,  fell, aining, ixtures \\
+ & proud of herself for helping her furry friend.Once upon a time, & there,  where,  earthquakes,  houses,  yards \\
+ & best friends.Once upon a time, & there,  where,  fires,  earthquakes, id \\
+ & But his mom and & his,  the,  Dad,  daddy,  grandma \\
+\midrule
+\multirow{5}{*}{\textbf{21 (0.064)}} & plates. She also gave them some cheese and broccoli. They said, & ,  ',  ,  thank, \\
+ & Her mom said, & ,  ',  ,  ,  in \\
+ & said. Tom smiled and said, & ,  ',  ,  thank,  yes \\
+ & corn move back and & the,  it,  make,  they,  he \\
+ & . She said, & ,  ',  ,  in, \\
+\midrule
+\multirow{5}{*}{\textbf{22 (0.197)}} & were stuck. Lily started & to,  sinking,  choke,  SH,  fuss \\
+ & too close to the water. And don & 't, â, ions, uck,  hurt \\
+ & lost my toy car, and I can & 't,  not,  no,  hurt,  regret \\
+ & .   Lily said, "I kn & o, el, ead, irl, udge \\
+ & night, Timmy practiced playing the trumpet. He tried and tried, & but,  lost,  upset,  mistakes,  trouble \\
+\midrule
+\multirow{5}{*}{\textbf{23 (0.068)}} & said she didn't know.  Lily looked everywhere for her cup, & under,  the,  even,  her,  in \\
+ & and went outside to eat by & the,  her,  his,  itself,  its \\
+ & want to pack a picnic and eat it by & eating,  the,  hand,  saying,  licking \\
+ & They tried to roll the rock, & the,  they,  one,  and,  swing \\
+ & , Anna was feeling bossy. She wanted to water the plant by & itself,  her,  mistake,  accident,  the \\
+\midrule
+\multirow{5}{*}{\textbf{24 (0.064)}} & shoes before going outside to play.Once upon a & week,  few,  while,  day,  little \\
+ & help others when they need it.Once upon a & week,  few,  day,  little,  kind \\
+ & be extra careful not to bite anyone again.Once upon a & few,  week,  little,  long,  while \\
+ & pond, happy and clean. The end.Once upon a & week,  long,  few,  beautiful,  day \\
+ & beautiful gifts for their loved ones. The end.Once upon a & week,  few,  day,  long,  while \\
+\midrule
+\multirow{5}{*}{\textbf{25 (0.104)}} & very scared. She did & not, ippers, ographs,  redesigned, aters \\
+ & want to play anymore. This is too difficult." But Lily did & not, nt,  ask, ter,  invite \\
+ & Lily sees a hole in the tree. She wants & to, aults, yles,  circumstance, ical \\
+ & ily was eager & to,  Northern,  lifetime,  poverty, \\
+ & might fall in!"  Ben did & not,  to,  gonna,  always, ter \\
+\midrule
+\multirow{5}{*}{\textbf{26 (0.080)}} & told her not to worry and that she would take care & of,  buds,  friends, mates,  children \\
+ & you want." Tim said, "I promise to take care & of, king,  pals,  children, dates \\
+ & . His mom and & dad,  friends,  dads,  members,  elders \\
+ & played in the garden and took care & of, care, king,  generations,  gn \\
+ & that day on, Timmy and his cushion were the best of & friends, ers, mates, ese, holes \\
+\midrule
+\multirow{5}{*}{\textbf{27 (0.125)}} & He also gave him a bath and brushed his & fur,  hair,  head,  body,  off \\
+ & . He ate his celery. He was happy. He said, & ,  ',  thank,  I, \\
+ & , but it was very slippery. She tried again and & again,  Again,  tighter,  everyday,  third \\
+ & water. The cat purred and l & apped, uzz, umbered, uttered, ily \\
+ & upon a time, there was a little boy named Timmy. & Tim,  Today,  Every,  , \\
+\midrule
+\multirow{5}{*}{\textbf{28 (0.253)}} & tiles. She liked the colors and the shapes. She liked how the water spark & led,  Pets,  DJ,  consideration,  rifle \\
+ & to investigate and found shiny rocks that spark & led, o, ari, urous,  Pets \\
+ & wand. They blew bubbles and watched & them,  funny,  videos,  stars,  movies \\
+ & . They played on the & swings,  sand,  blocks,  slides,  rides \\
+ & a stool and looked inside. She saw water, soap, bubbles & and,  \&,  dresses, nd, vre \\
+\midrule
+\multirow{5}{*}{\textbf{29 (0.216)}} & and scared.  "Who are & you,  glory,  chrome, ilt,  satisfaction \\
+ & asked Fluffy. "Yes, I want to come with & you, aned, heartedly, rily, tted \\
+ & and see the world outside the garden. Do & you,  guts, ainted,  barracks,  Sahara \\
+ & "I'm sorry. Will you forgive & me, Out, inated, ationally, Working \\
+ & . He offered Tim a ride on his back. "I can carry & you,  destructive, rozen, iqu, remove \\
+\midrule
+\multirow{5}{*}{\textbf{30 (0.049)}} & Anna and Ben stopped fighting. & She,  Mom,  ",  Anna,  It \\
+ & try something new. He sees a big hill near his house. & He,  Lily,  Sara,  Maybe,  L \\
+ & my's truck was faster, but Johnny's & mom,  dad,  car,  daddy,  smile \\
+ & were the best of friends, and they climbed and played together all the time & .,  they,  until,  together,  that \\
+ & They pretended to be kings and & queens,  she,  her,  She,  angels \\
+\midrule
+\multirow{5}{*}{\textbf{31 (0.057)}} & she should have been more careful. From that & day, cers, neys, acas, ts \\
+ & not good. From that & day, cers, IN, ify, inges \\
+ & . From that & day, acas, cers,  Balls, umm \\
+ & From that & day, pt, chy, ches,  Balls \\
+ & tummy hurt. From that & day,  Balls, acas, cers, chers \\
+\midrule
+\multirow{5}{*}{\textbf{32 (0.056)}} & "I'm sorry. Will you forgive me?" Her friend thought about & what,  how,  that,  his,  he \\
+ & animals like lions and & elephants,  tigers,  lions,  sharks,  whales \\
+ & walking towards him. He was so scared that he didn't know what to & do,  did,  does,  grab,  possibly \\
+ & The ball went far, far away. Tom was sad because he could & no,  never,  only,  lose,  see \\
+ & Lily asked her mom, " & Can, Do, Please, Will, Are \\
+\midrule
+\multirow{5}{*}{\textbf{33 (0.091)}} & share. Billy got upset and they started to argue. Timmy's & friend,  car,  friends,  toy,  truck \\
+ & , but they were too messy.   Timmy's & friend,  friends,  dad,  sister,  brother \\
+ & his toy car wasn't gone forever!  Timmy's & friend,  friends,  dad,  little,  brother \\
+ & would make it feel better.  Timmy's & friend,  friends,  dad,  sister,  brother \\
+ & !" Lily said. "Yes, it is," her & friend,  brother,  dad,  friends,  grandma \\
+\midrule
+\multirow{5}{*}{\textbf{34 (0.075)}} & touch a baby shark! After that, Timmy wasn & 't,  antennas,  rights, women, mon \\
+ & it?"  "I don & 't, osing, umbers,  fixtures,  votes \\
+ & , but this time he wasn & 't,  throats, women, ors,  tongues \\
+ & "I don & 't, osing, umbers, aces,  throats \\
+ & The man replied, "I don & 't, osing, ets, aces, estone \\
+\midrule
+\multirow{5}{*}{\textbf{35 (0.072)}} & noises. Tom had a small car that could go fast and be & ep,  smoothly, attle,  reliably, ag \\
+ & , there was a little boy named Timmy. Timmy loved to run and & run,  jump,  race,  he,  speed \\
+ & went to the circus again.Once upon a time, there was & her,  the,  his,  their,  Lily \\
+ & , Mitt & ens, ittens, itten,  nods, opsy \\
+ & my jewelry, but we have to give it & back,  upside,  compass, con, anging \\
+\midrule
+\multirow{5}{*}{\textbf{36 (0.061)}} & , adm & iring, ucking, ays, his, amp \\
+ & . He hissed and scratched Rex's nose. He tried to run away, & but,  mistake,  effort,  grease,  efforts \\
+ & sorry for him. She said, "Ben, why did you n & apped, udge, aught, apping, ailing \\
+ & too because she helped the bird. From that & day,  moment,  night,  evening,  morning \\
+ & not good. From that & day,  moment,  morning,  gift,  star \\
+\midrule
+\multirow{5}{*}{\textbf{37 (0.105)}} & .  The moral of the & day,  lesson,  experience,  tale,  stories \\
+ & became stronger and healthier.  The moral of the & day,  experience,  lesson,  tale,  moral \\
+ & or brush his & hair,  fur,  toys,  clothes,  feelings \\
+ & her mommy said, trying to calm her & daughter, .,  little, ,,  and \\
+ & walking on the & beach,  ground,  hill,  river,  grass \\
+\midrule
+\multirow{5}{*}{\textbf{38 (0.067)}} & even higher!Once upon a time, there was a big, strong robot made & .,  out, -,  up,  from \\
+ & day on, Lily made & a,  the,  it,  many,  her \\
+ & and showed it to her dog.   Later that day, & they,  the,  Tim,  she,  when \\
+ & told her that if she drew a picture of their house, & they,  it,  then,  her,  maybe \\
+ & it first!" Sara says. "We want to see the treasure!" & , .", !", ,", ". \\
+\midrule
+\multirow{5}{*}{\textbf{39 (0.052)}} & . It was a beautiful cloud. They smiled and cl & apped, anging, ailed, ites, en \\
+ & hill very fast. Tim and Sue laughed and cl & apping, anging, attered, ug, acking \\
+ & my jewelry, but we have & no,  nothing,  so,  each,  too \\
+ & up on the fridge. From that & moment,  morning, ,,  time,  afternoon \\
+ & , you can," Lily and Tom said, nodding. "But you have & been,  a,  so,  too,  no \\
+\midrule
+\multirow{5}{*}{\textbf{40 (0.072)}} & noise. It was a car that zoom & past, -,  by, !,  across \\
+ & a little girl named Lily. She loved going to the shop with & her,  Her, Her,  home, s \\
+ & She loved to walk on the trail with & her,  Her,  home, Her, year \\
+ & little girl named Lily. She liked to play in the garden with & her,  she, Her, s, os \\
+ & .Lily likes to play with her dolls. She has many & toys,  doll,  clothes,  of,  cars \\
+\midrule
+\multirow{5}{*}{\textbf{41 (0.157)}} & made sure to chew her food carefully before swallowing.Once upon & first,  the,  time,  it,  how \\
+ & her if she shared her cereal with Timmy. Lily said yes, & please,  she,  because,  they,  yes \\
+ & other treasures she found.Once upon a time, there was a dog named & Spot,  True,  Ben,  Dog,  Spike \\
+ & I will lead the way." Max ran fast and Sue followed him. They j & agged, igg, ig, umbled, ived \\
+ & prize. Lily was very excited and started drawing right & in,  on,  next,  with,  her \\
+\midrule
+\multirow{5}{*}{\textbf{42 (0.089)}} & you for being so persistent, daddy."Once upon & a,  an, ocular, ud, orse \\
+ & and Max became good friends, and they played together every day.Once upon & a,  an, light,  titles,  volume \\
+ & toys and forget about that scary nightmare."Once upon & a,  an, ocular,  voice,  contemplation \\
+ & shoes before going outside to play.Once upon & a,  an, ocular,  below, place \\
+ & best friends.Once upon & a,  an,  below, SEC, clip \\
+\midrule
+\multirow{5}{*}{\textbf{43 (0.070)}} & couldn't wait to eat them.  At dinner time, Lily sat in & front,  her,  line,  proudly,  at \\
+ & a time, there was a little girl named Lily. & She,  He,  Max,  Tim,  Tom \\
+ & .Once upon a time, there was a little girl named Lily. & She,  He,  Max,  Tim,  Ben \\
+ & girl named Lily. She loved & playing,  going,  her,  ice,  the \\
+ & colors and shapes. We can & play,  pretend,  have,  learn, 't \\
+\midrule
+\multirow{5}{*}{\textbf{44 (0.215)}} & to play with it. You are mean," Tom & says,  said,  IT, sels,  2021 \\
+ & falling down. Roxy & saw,  was,  felt,  ran,  said \\
+ & a bench and ate some crackers together. Timmy & felt,  said,  thought, 's,  didn \\
+ & mom. We played nice," Lily says.  "Me too," Ben & says,  begs,  insists,  urges,  shrug \\
+ & , but the line was so long that it delayed me." Timmy & didn,  understood,  frowned,  asked,  wasn \\
+\midrule
+\multirow{5}{*}{\textbf{45 (0.101)}} & noise. It was a car that zoom & ed, ked, zed, awed, fed \\
+ & lots of fun pudd & ling, oms, ops, as, ins \\
+ & I'm the last of my family. The other sw & ans, amps, igators, els, ucks \\
+ & the frog played together in the rain, creating lots of wet pudd & les, ling, ashes, as, ives \\
+ & was smaller than the other sw & ans, igators, ishes, ippers, amps \\
+\midrule
+\multirow{5}{*}{\textbf{46 (0.153)}} & soup. He saw the celery. He did & not,  hazard, uttered,  orb, iour \\
+ & might fall in!"  Ben did & not,  generation, cled, ographs,  earnings \\
+ & floor. They are sorry. They do & not,  fought, Page, Ele,  enemies \\
+ & Ben and Tom do not want to make the man more angry. They do & not,  qu,  fought,  argued, ib \\
+ & to hurt you. Please forgive us."  The plant did & not, gg, Ele,  dice, Pierre \\
+\midrule
+\multirow{5}{*}{\textbf{47 (0.077)}} & the park and went home with her mommy.Once upon & a,  over, A, lled, Suddenly \\
+ & to his mom and be careful when playing outside.Once upon & a, A, lled, der, An \\
+ & , Monkey always kept his room tidy just like Ellie's.Once upon & a, A, Or, An, der \\
+ & Then, Lily's daddy had an & idea,  imaginative,  inventive,  error,  imagining \\
+ & made sure to chew her food carefully before swallowing.Once upon & a, A,  Easter,  Australia, der \\
+\midrule
+\multirow{5}{*}{\textbf{48 (0.109)}} & time, & there,  two,  swimming,  deep,  sea \\
+ & time, & there,  two,  swimming,  deep,  sea \\
+ & didn & 't, na, â, Ah, apy \\
+ & didn & 't, na, â, Ah, apy \\
+ & couldn & 't, na, â, Imagine, Ah \\
+\midrule
+\multirow{5}{*}{\textbf{49 (0.119)}} & a yummy treat?"  Her mom smiled and & gave,  took,  handed,  bought,  agreed \\
+ & sorry for him. She said, "Ben & is,  and,  was, ., ! \\
+ & Mom said, "Lily & and, !, .,  is, 's \\
+ & are you sad, Tom & ., .",  and, !", , \\
+ & . It looked happy and friendly.  "See, Lily and Ben & ., ,", ,, !", ! \\
+\midrule
+\multirow{5}{*}{\textbf{50 (0.085)}} & behind the reeds.  "Come on, sw & an, ter, ang, ish, oops \\
+ & . "Don & , 's,  anything, ´, t \\
+ & lost my toy car, and I can & get,  help,  find,  make,  fix \\
+ & on, they went for walks in the park together and became good & friends,  helpers, er,  team,  teammates \\
+ & said that Lily could be anything she & needed,  wants,  loved,  liked,  asked \\
+\midrule
+\multirow{5}{*}{\textbf{51 (0.095)}} & in his dog house. He bark & and,  at, ks, ,, hed \\
+ & ran to hide behind a tree. She peek & out,  behind,  and,  around,  through \\
+ & . Lily pet & the,  him,  her,  his,  it \\
+ & his arm. Mittens sat on Timmy's lap and pur & r, rs, ring, pered, bled \\
+ & bought some more ice cream. They gave some to the dog. They pet & the,  him,  it,  his,  and \\
+\midrule
+\multirow{5}{*}{\textbf{52 (0.087)}} & Tom felt sad and angry. He wanted to make Lily share. He had & a,  worked,  another,  no,  many \\
+ & car. Lily sat in the back seat with her brother, Max. & They,  She,  He, They, they \\
+ & so pretty and sparkly, and Lily loved to wear it every day. & She,  From,  , She, From \\
+ & . Lily said she wanted spaghetti and meatballs. & She,  They,  ,  Her,  But \\
+ & with his big, hairy paw. & He,  ,  The,   ,  They \\
+\midrule
+\multirow{5}{*}{\textbf{53 (0.071)}} & poured it over Ducky. & ,   ,  From,  She,  Tim \\
+ & , she met a rude man who said mean things to her. & She,  Lily,  He,  ,  The \\
+ & 't work in the elevator. & He,  The,  She,  ,  We \\
+ & with his big, hairy paw. & He,  ,  The,   ,  They \\
+ & , but they were too messy. & They,  The,   ,  ,  Tim \\
+\midrule
+\multirow{5}{*}{\textbf{54 (0.037)}} & Mommy will be angry. He says, " & I, Don, L, S, Oh \\
+ & Lily. He said, " & Don, I, You, Hello, Can \\
+ & and said, " & Don, You, Wow, I, Thank \\
+ & Tom, saying, " & You, Don, Hello, Please, Wow \\
+ & also purple. She said, " & Wow, I, This, You, Don \\
+\midrule
+\multirow{5}{*}{\textbf{55 (0.048)}} & Mom was speech & less, lessness, pers, ry, hetic \\
+ & "Ben, Ben, grab the stick!" she & shouted,  shouts,  calls,  yelled,  yells \\
+ & went to the park with her mom and saw her friends playing hide-and- & and, go, ider, pack, ite \\
+ & "Wow, look at that!" Lily & says,  said,  asks,  runs,  requested \\
+ & "Wow, look at this!" Sara & says,  shouts,  asks,  asked,  runs \\
+\midrule
+\multirow{5}{*}{\textbf{56 (0.141)}} & bag and went to the car with her mom and & daddy,  got,  her,  saw,  took \\
+ & places and see new things. One day, he went on a trip with his & family,  friends,  parents,  friend,  dad \\
+ & played with the orange ball. But then, Sue's big & dog,  sister,  cat,  red, , \\
+ & the park with their & friends,  parents,  ball,  toy,  bikes \\
+ & She loved to walk on the trail with & the,  all,  it,  his,  a \\
+\midrule
+\multirow{5}{*}{\textbf{57 (0.123)}} & came up to him and asked, "What are & those,  these,  we,  your,  they \\
+ & Benny asked, "What are & we,  those,  these,  they,  all \\
+ & . He ate his celery. He was happy. He said, & ',  ,  thank,  I,  he \\
+ & named Timmy. They loved to play together all the & time,  joy,  kn,  rhythms,  contests \\
+ & Mommy will be angry. He says, & ',  I,  he,  ,  we \\
+\midrule
+\multirow{5}{*}{\textbf{58 (0.165)}} & might fall in!"  Ben did & not, Ten,  interests,  Wizard,  Models \\
+ & always said mean things to Tommy and his mom. She did & not, irling, lor, ayed, irled \\
+ & it?"  "I don & 't,  tremendous,  fixtures,  votes,  forms \\
+ & want to play anymore. This is too difficult." But Lily did & not, 't,  Not, Stop, Not \\
+ & . He knows mom will be & angry,  worried,  very,  sad,  upset \\
+\midrule
+\multirow{5}{*}{\textbf{59 (0.052)}} & . It was a beautiful cloud. They smiled and cl & ap, ink, ucked, amb, icked \\
+ & me."  Lily smiles and cl & apped, ap, ink, s, amb \\
+ & . Tim ate the sandwich and felt happy. He played with his clean, red & ball,  toy,  car,  shirt,  toys \\
+ & .  Her friends asked her to come and play, & but,  But,  however, But,  mistakes \\
+ & boy named Timmy. Timmy loved to swim in the & pool,  river,  lake,  pond,  bath \\
+\midrule
+\multirow{5}{*}{\textbf{60 (0.062)}} & carrot didn & , t,  not, iest, 's \\
+ & But don't be sad if she doesn & , .,  not, ',  or \\
+ & Timmy didn & ,  not, t,  never, on \\
+ & said she didn & , .,  not,  over, ! \\
+ & my didn & ,  not, t,  never, 's \\
+\midrule
+\multirow{5}{*}{\textbf{61 (0.140)}} & , there & were,  is, ,,  are, 's \\
+ & a time, there & were,  is,  was, ,, 's \\
+ & noise. It was a car that zoom & past, ing,  by, !,  across \\
+ & , there & were,  is, ,,  are, 's \\
+ & in a small house, there & was,  were,  is,  are, 's \\
+\midrule
+\multirow{5}{*}{\textbf{62 (0.131)}} & Lily's mom asked her if she wanted to & try,  come,  see,  join,  be \\
+ & wanted to & see,  make,  try,  know,  take \\
+ & 't want to & ., ,,  stop,  do,  let \\
+ & sky, hoping to & see,  make,  be,  come,  reach \\
+ & Okay, Tommy. If you really want to & ,,  be,  get, ., ." \\
+\midrule
+\multirow{5}{*}{\textbf{63 (0.081)}} & had a hook that they found in & a,  dad,  another,  Dad,  one \\
+ & . He looked inside, and saw something shiny. He reached for it with & both,  one,  a,  the,  all \\
+ & . Mia was so tired that she closed the book and put it back on & her, .,  its, ,,  and \\
+ & ety.  Fluffy and Tweety went through the hole in & their,  Fl,  Twe,  a,  Lily \\
+ & put the luggage on & and, .,  a,  it, , \\
+\midrule
+\multirow{5}{*}{\textbf{64 (0.072)}} & .  Sara and & her,  Tom,  the,  Sam,  Max \\
+ & in the sky. From that & day, Yesterday, umm,  Raf, oons \\
+ & up on the fridge. From that & day, ters, anes, acas,  Raf \\
+ & the park with her friends. One & day,  Sunday,  afternoon, ations, tops \\
+ & it is not polite to make marks on the wall.  One & day, ations, sters, heit, ites \\
+\midrule
+\multirow{5}{*}{\textbf{65 (0.203)}} & , a little & bird,  mouse,  bug,  dog,  red \\
+ & a little & bird,  bit,  scared,  while,  house \\
+ & a little & bird,  bit,  scared,  while,  house \\
+ & a little & bird,  bit,  scared,  while,  house \\
+ & . The next & morning,  time, ,,  thing,  one \\
+\midrule
+\multirow{5}{*}{\textbf{66 (0.087)}} & and said, "Yes, I can help you. But first, we have & to,  paid, Have, nce, kick \\
+ & see many things inside. There are books, toys & ,, ,,,  helpers,  ba,  12 \\
+ & .  The moral of the & day,  experience,  lesson,  game,  stories \\
+ & she could help her mom.  The moral of the & day,  experience,  lesson,  tale,  news \\
+ & before! The end & !, .", !",  was,  is \\
+\midrule
+\multirow{5}{*}{\textbf{67 (0.076)}} & corn move back and & forth, Wind, appers,  unfairly, apper \\
+ & carrot didn & , t,  not, iest, ' \\
+ & his toy car wasn & ,  over, 's, t,  gone \\
+ & he could play with his trucks too. They were both friends and didn & , `, ´, uts,  not \\
+ & anymore. When it was time to go home, Lily still didn & ,  not, t, `, ´ \\
+\midrule
+\multirow{5}{*}{\textbf{68 (0.060)}} & tall man comes to the tree. He has a hat and a coat. & ,  The,  Tom,  It,  Ben \\
+ & felt bad. They said sorry to their mom. & ,  She,  Their,  Mom,  But \\
+ & floor. They are sorry. They do not want to make mom sad. & ,  But,  Mom,  We,  Maybe \\
+ & . He did not want to make Mia angry. & ,  But,  So,  They,  She \\
+ & cream. They felt sorry for the dog. & ,  But,  He,  The,  Maybe \\
+\midrule
+\multirow{5}{*}{\textbf{69 (0.064)}} & and Max became good friends, and they played together every day.Once upon & a, A, ching, History, Sean \\
+ & them disappear again.Once upon & a, orse, irled, SEC, Medic \\
+ & dad very much.Once upon & a, irled, clip, SEC, orse \\
+ & , Monkey always kept his room tidy just like Ellie's.Once upon & a, ching,  backdrop,  spir, ship \\
+ & was more important than being bossy.Once upon & a, orse, ud, isp, irled \\
+\midrule
+\multirow{5}{*}{\textbf{70 (0.217)}} & such a good helper, Lily." Lily smiled and said & ,, ,", ;,  With,  smiled \\
+ & . He ate his celery. He was happy. He said, & ",  "",  "[,  Danny,  rewarding \\
+ & . She gives each doll a cup and a plate. She says, & ",  "",  Paula,  Lucia,  Gina \\
+ & "Sure, you can play hide-and- & and,  seek, ear, out, ury \\
+ & better care of himself. He realized he had been selfish and rude. He sh & oo, ined, ushed, il, orted \\
+\midrule
+\multirow{5}{*}{\textbf{71 (0.066)}} & corn move back and & forth, appers,  unfairly, apper, EST \\
+ & upon a time, there was a little bunny named Fluffy. Fl & oppy, opsy, appy, aj,  Fl \\
+ & the hole. The nail is dry and rusty. Lily cries. Spot bar & sees, s, ases, icks, ows \\
+ & Max saw a big plane flying in the sky.  Max bark & red, hed, owed, ked,  and \\
+ & to play in the garden and eat carrots. One day, while Fl & oppy, opsy, ens, ies, ishes \\
+\midrule
+\multirow{5}{*}{\textbf{72 (0.056)}} & my. Tim & was,  loved,  and,  wanted,  had \\
+ & my and daddy. One day, while swimming, Tim & saw,  and,  accidentally,  found,  got \\
+ & my come to see the volcano. He was very excited and happy. Tim & and,  was, 's,  wanted,  said \\
+ & my. Tim & was,  loved,  and,  wanted,  had \\
+ & 's toy and asked if she could play with it. Tim & said,  was,  thought,  didn, 's \\
+\midrule
+\multirow{5}{*}{\textbf{73 (0.064)}} & "Can I touch the butterfly?" Her mom replied, "No, Lily. & Butter,  Cater,  That,  A,  P \\
+ & to the kitchen.  They threw the ball to & the,  a,  Mom,  Lily,  their \\
+ & a drawing of him and Ben playing with cars and balls and & blocks,  paper,  dolls,  trains,  trucks \\
+ & at the vegetables and said, "No, thank & God,  goodness,  your,  not,  the \\
+ & Lily's favorite were the monkeys. They were swinging and jumping from tree to & tree,  trees,  fruit,  oak,  huge \\
+\midrule
+\multirow{5}{*}{\textbf{74 (0.051)}} & family in the world.Once upon a time, there was a little duck named & D,  Ben,  B,  L,  Tom \\
+ & catch the mouse.Once upon a time, there was a little gray mouse named & S,  Tom,  Mom,  Milo,  L \\
+ & other treasures she found.Once upon a time, there was a dog named & Spot,  Tom,  True,  Buddy,  Bow \\
+ & little boy's excitement.Once upon a time, there was a little girl named & Lily,  Mia,  Anna,  Amy,  Sue \\
+ & there was a rabbit named & Bob,  Benny,  Red,  Ben,  B \\
+\midrule
+\multirow{5}{*}{\textbf{75 (0.113)}} & He saw Rex and Tom, both hurt and scared. He picked & up,  Po,  Spike,  Brown,  Carl \\
+ & to the park with Mom and Dad. They liked to play on the swings & and,  communities,  fortune,  underest,  fats \\
+ & chicken too. They are all good for you."  Tom shook his head & and, .", ,", ok,  agree \\
+ & You wasted a lot of food and drinks. You have to clean & up, acity,  sighting, ively,  WHAT \\
+ & and juicy and crunchy. She wanted to have one. She climbed the tree & and,  into, aw,  apart, ie \\
+\midrule
+\multirow{5}{*}{\textbf{76 (0.083)}} & them disappear again.Once upon a time, there was a little girl named & Lucy,  Jane,  she,  Sally,  her \\
+ & things. The end.Once upon a time, there was a little boy named & Jack,  Tim,  Billy,  he,  John \\
+ & .Once upon a time, there was a little girl named & Lucy,  Jane,  Sally,  Daisy,  True \\
+ & upon a time, there was a little fish named & Fin,  Bub,  T,  Finn,  Tiny \\
+ & a time, there was a little girl named & Lucy,  Jane,  Sally,  Daisy,  Amy \\
+\midrule
+\multirow{5}{*}{\textbf{77 (0.067)}} & to swim in the ocean with his friends. & They,  ,  He,  But, \\
+ & independent and liked to run ahead of Lily. & L, As, They, ", So \\
+ & me healthy and strong. Amen." & ,  They,  She,  He,  Then \\
+ & She helped her mom clean up the paint. & They,  Her,  Then,  When, \\
+ & and explore the world outside the garden. & The, But, When, He, As \\
+\midrule
+\multirow{5}{*}{\textbf{78 (0.049)}} & and they pretended it was a treasure.  One & day, ations, heit, Staff, ometers \\
+ & it is not polite to make marks on the wall.  One & day, ations, sters, heit, ites \\
+ & liked to make her friends laugh.  One & day, ations, Staff, ometers, apers \\
+ & and make pretty pictures. One & day, ations, heit, ppers, umbers \\
+ & his friends. One & day, ations, Staff, apers,  Zealand \\
+\midrule
+\multirow{5}{*}{\textbf{79 (0.074)}} & pond, happy and clean. The end.Once upon & the,  time,  then,  ,  first \\
+ & things. The end.Once upon & time,  the,  then,  first, \\
+ & so happy. He and Buddy played together all day long.Once upon & the,  time,  playing,  ,  first \\
+ & . The end.Once upon & the,  time,  then,  first, , \\
+ & . The end.Once upon & the,  time,  then,  first, , \\
+\midrule
+\multirow{5}{*}{\textbf{80 (0.090)}} & up the ball with its be & ep, ady, on, aked, aks \\
+ &  & , L, ", But, \\
+ &  & , L, ", But, \\
+ & you for the treat!" Spot bark & ed, agged,  was, ted,  came \\
+ &  & , L, ", But, \\
+\midrule
+\multirow{5}{*}{\textbf{81 (0.089)}} & Ben. He is sad and bored. He misses Ben a lot. & <|endoftext|>, ", He, They, The \\
+ & , she met a rude man who said mean things to her. & She,  Lily,  He,  ,  The \\
+ & They think the man is mean. They wish they could see the treasure. & <|endoftext|>, They, But, The, < \\
+ & wants to open it. She is curious. & <|endoftext|>, She, ",  She, ." \\
+ & They do not know what to say. & <|endoftext|>, They, The, But, " \\
+\midrule
+\multirow{5}{*}{\textbf{82 (0.076)}} & then Tim hurt his foot. He was sad and didn't & feel,  get,  like,  understand,  say \\
+ & sad and didn't & understand,  have,  get,  mean,  want \\
+ & met a little fish named Finny.  " & Hi, Hello, Did, Sometimes, hi \\
+ & away. They were scared and didn't & understand,  want,  see,  like,  think \\
+ & to read books, but she didn't & understand,  like,  feel,  find,  remember \\
+\midrule
+\multirow{5}{*}{\textbf{83 (0.087)}} & time, there & was,  bookstore,  ceremony,  represented,  owed \\
+ & time, there & was,  bookstore,  ceremony,  represented,  owed \\
+ & a time, there & was,  bookstore,  vows,  ceremony,  represented \\
+ & time, there & was,  bookstore,  ceremony,  represented,  owed \\
+ & upon a time, there & was,  ceremony,  bookstore,  vows,  represented \\
+\midrule
+\multirow{5}{*}{\textbf{84 (0.207)}} & in the living & room,  floor,  piles,  machines,  rail \\
+ & a bench and ate some crack & ers,  bread,  food, ied,  leaves \\
+ & catch the mouse.Once upon a time, there was a little gray mouse named & Tim,  Remy,  Mickey,  Jerry,  Min \\
+ & swan. His name & was,  made,  would,  sounded,  looked \\
+ & but there was none. The sun was getting hotter and the goat was getting thirst & ier, Clock, ror, issors,  perspective \\
+\midrule
+\multirow{5}{*}{\textbf{85 (0.077)}} & you have to share the bread with the other swans. Deal & ?, ,, .", !", ?". \\
+ & noises. Tom had a small car that could go fast and beep. Lily & had,  ate,  received,  bought,  printed \\
+ & Ben. He is sad and bored. He misses Ben a & chance,  time,  long,  fun,  new \\
+ & me."  Lily smiles and claps her & hands,  lips,  hand,  fingers,  fork \\
+ & had. He picked up & his,  a,  her,  another,  their \\
+\midrule
+\multirow{5}{*}{\textbf{86 (0.174)}} & want to play anymore. This is too difficult." But Lily did & it, .,  what,  something,  her \\
+ & might fall in!"  Ben did & what,  as,  the,  a,  just \\
+ & had to pick some onions for dinner. Sara did & as,  what,  her,  the,  it \\
+ & blue crayon and strike the wall."  Ben does & what,  as,  the,  a,  that \\
+ & ask God to help you eat your soup."  Tom did & what,  as,  his,  just,  a \\
+\midrule
+\multirow{5}{*}{\textbf{87 (0.067)}} & ."Once upon a & few,  while,  long,  little,  week \\
+ & on her bike rides.Once upon a & few,  long,  while,  nice,  lot \\
+ & time at the lab with his friend Spot.Once upon a & week,  nice,  tim,  few,  long \\
+ & behind.Once upon a & few,  long,  while,  little,  nice \\
+ & best friends.Once upon a & week,  few,  long,  day,  nice \\
+\midrule
+\multirow{5}{*}{\textbf{88 (0.147)}} & play with her dolls, her blocks, and her teddy bear. & She,  One,  Yesterday,  Lisa,  These \\
+ & to. & He,  She,  They,  It,  One \\
+ & football. & He,  She,  It,  They,  One \\
+ & of flowers. & She,  They,  One,  He,  It \\
+ & and flowers and bugs. & They,  She,  One,  He,  Do \\
+\midrule
+\multirow{5}{*}{\textbf{89 (0.235)}} & , you can," Lily and Tom said, nodding. "But you have & been,  a,  something,  no,  too \\
+ & and said, "Yes, I can help you. But first, we have & a,  something,  some,  enough,  no \\
+ & 's okay, Lily. You don't have & a,  any,  enough,  anything,  the \\
+ & "That's better. Now, why & are,  do,  did,  can,  not \\
+ & Lily's mom told her that it's & not,  okay,  a,  wrong,  time \\
+\midrule
+\multirow{5}{*}{\textbf{90 (0.042)}} & lots of fun pudd & les, ers, lers, s, ades \\
+ & even higher!Once upon a time, there was a big, strong robot made & .,  out,  up, -,  from \\
+ & went off to explore the rest & room,  area,  world, .,  place \\
+ & the rain. She would jump in all the puddl & s,  pools,  roads,  places,  times \\
+ & time, there was a man who had no hair on & anyone,  a,  the,  its, . \\
+\midrule
+\multirow{5}{*}{\textbf{91 (0.060)}} & outside to play and saw a pile & of, ated, unts, ixtures,  functions \\
+ & to play and run all day. One day, Tim found a big bag & of, king, unts, pour,  impact \\
+ & to hop and play all day long. One day, Benny saw a shiny piece & of, unts,  unison,  bonds, ime \\
+ & . Inside the barn, there was a lot & of, unts, sets, pots, ooters \\
+ & and sounds for their toys. They were having a lot & of, ks, unts, ugs,  Statue \\
+\midrule
+\multirow{5}{*}{\textbf{92 (0.068)}} & up on the fridge. From that & day,  afternoon,  nightmare,  dream,  crush \\
+ & not good. From that & day,  afternoon, IN, cers, ify \\
+ & keep it. From that & day,  afternoon,  natural,  crush,  frustrations \\
+ & tummy hurt. From that & day,  nightmare, But,  embarrassment,  frustrations \\
+ & she should have been more careful. From that & day,  crush,  frustrations, acas, cers \\
+\midrule
+\multirow{5}{*}{\textbf{93 (0.103)}} & carrots.Once upon & the,  time,  ,  there,  first \\
+ & .Once upon & the,  time,  ,  so,  then \\
+ & dad very much.Once upon & time,  the,  then,  ,  so \\
+ & together happily.Once upon & the,  time,  ,  so,  an \\
+ & .Once upon & the,  time,  ,  so,  then \\
+\midrule
+\multirow{5}{*}{\textbf{94 (0.527)}} & of jewelry on the ground. He picked it & out,  and,  off,  from,  carefully \\
+ & She recognized it as something special and picked it & out,  from, .,  for,  carefully \\
+ & . He picked it & out,  and,  from,  carefully,  off \\
+ & young boy named Tim found a dull, round rock. He picked it & and,  from,  out, ,,  with \\
+ & floor. They are sorry & and,  for,  to, ,,  they \\
+\midrule
+\multirow{5}{*}{\textbf{95 (0.057)}} & he accidentally bumped into the barrel and it started rolling. Tim & my, mi, itate,  judgments,  generations \\
+ & my come to see the volcano. He was very excited and happy. Tim & my, uer,  receiver, ipment, INGS \\
+ & young boy named Tim & my,  slightest,  circ,  gy, ISON \\
+ & to the park and saw a little girl sitting alone on a bench. Tim & my, ari, inks, udd, ions \\
+ & to play with his blocks, they were gone! Tim & my, mi,  receiver,  Marilyn, itate \\
+\midrule
+\multirow{5}{*}{\textbf{96 (0.080)}} & little boy's excitement.Once upon a time, there & was, ixtures, manship, yles, Shadow \\
+ & a time, there & was, sy, ixtures,  accurate, yles \\
+ & them disappear again.Once upon a time, there & was, manship, yles, ixtures,  tripod \\
+ & the candy store.Once upon a time, there & was, manship, Shadow,  defense,  tactics \\
+ & ."Once upon a time, there & was, manship, ixtures, yles,  extingu \\
+\midrule
+\multirow{5}{*}{\textbf{97 (0.072)}} & The woman asked, "Why are & the,  your,  there,  we,  they \\
+ & squirrel stopped and froze. Lily was confused and didn't know & why,  where,  how,  the,  which \\
+ & saw a big dog running towards her. She was frightened and didn't know & how,  if,  where,  why,  the \\
+ & y with a bee."  Buzzy thought for & another,  some,  the,  awhile,  " \\
+ & away. They were scared and didn't know & where,  how,  why,  the,  if \\
+\midrule
+\multirow{5}{*}{\textbf{98 (0.056)}} & to sleep." Tom gave back the jewelry and said, "Thank & for,  God,  Lily,  it,  You \\
+ & . It tasted good.  "Thank & ,,  for,  goodness,  You,  God \\
+ & car is so bright and clean!" Kitty smiled and replied, "Thank & You,  goodness,  my,  ye,  it \\
+ & led them to help the little bird. The bird said, "Thank & goodness,  Tom,  Lily,  the,  my \\
+ & . The man's wife was very happy and said, "Thank & goodness,  us,  we,  God,  my \\
+\midrule
+\multirow{5}{*}{\textbf{99 (0.093)}} & rolled everywhere. The tank stopped making noises.  "Hey, what are & you, lier, ainted, ately, rated \\
+ & sees the box and the children.  "Hey, what are & you,  predators, arse, lier, ainted \\
+ & came up to him and asked, "What are & you, lier, cer, ainted, fed \\
+ & very happy. Toot asked, "Why are & you, lier, ainted, aved, ussed \\
+ & Anna and Ben are playing with crayons in their & room,  house,  classroom,  lab,  kitchen \\
+\midrule
+
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\end{document}

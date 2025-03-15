@@ -1,0 +1,14 @@
+----- circuit_idx: 0 activation: 0.059 -----
+ to play in --> 59.854 top_logits [' the', ' her', ' his', ' a', '.']
+ to play games with his friends in --> 56.125 top_logits [' the', ' a', ' his', ' school', ' their']
+ the mineral and decided to keep it in --> 54.804 top_logits [' his', ' their', ' her', ' a', ' the']
+ that the judge was hoping to find a good home for all the dogs in --> 54.741 top_logits [' the', ' his', ' need', ' her', ' it']
+ to play with his friends in --> 54.335 top_logits [' the', ' a', ' his', ' their', ' school']
+
+
+----- circuit_idx: 1 activation: 0.034 -----
+ She did not see her --> 206.746 top_logits [' mom', '.', ' and', ' dad', ' brother']
+ said "Doll Factory". She got very excited and asked her --> 198.354 top_logits [' mom', ' mum', ' dad', ' Mom', ' parents']
+ went to the park with her mom and saw her --> 177.597 top_logits [' friend', ' uncle', ' favorite', '.', ' daughter']
+ see over it. She saw her --> 162.97 top_logits [' mom', ' friend', ' dad', ' friends', ' brother']
+ bag and went to the car with her --> 159.457 top_logits [' mom', '.', ' mum', ' grandma', ' friend']

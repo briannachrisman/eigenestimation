@@ -1,0 +1,86 @@
+
+\documentclass{article}
+\usepackage[utf8]{inputenc}  % Ensure UTF-8 encoding
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage[a4paper, margin=1in]{geometry} % Better margins
+\usepackage{adjustbox} % For text fitting
+\usepackage{multirow} % Allows merging cells
+\begin{document}
+
+\section*{Circuit Analysis Examples}
+
+\noindent Below is a unified table of all circuits.
+
+\begin{adjustbox}{max width=\textwidth}
+\small
+\begin{tabular}{p{0.1\textwidth} p{0.5\textwidth} p{0.4\textwidth}}
+\toprule
+\textbf{Id ($P_{act}$)} & \textbf{Input Text} & \textbf{Top Logits} \\
+\midrule
+\multirow{5}{*}{\textbf{0 (0.059)}} & to play in & her,  his,  a, .,  their \\
+ & to play games with his friends in & a,  his,  school,  their,  class \\
+ & the mineral and decided to keep it in & her,  a,  the,  its, . \\
+ & that the judge was hoping to find a good home for all the dogs in & his,  need,  her,  it,  their \\
+ & to play with his friends in & a,  his,  their,  school,  another \\
+\midrule
+\multirow{5}{*}{\textbf{1 (0.034)}} & She did not see her & mom,  dad,  brother,  friends,  friend \\
+ & said "Doll Factory". She got very excited and asked her & mom,  dad,  daddy,  m,  friends \\
+ & went to the park with her mom and saw her & friend,  friends,  dad,  dog,  neighbor \\
+ & see over it. She saw her & mom,  friend,  dad,  friends,  brother \\
+ & bag and went to the car with her & mom,  dad,  friends,  t,  toy \\
+\midrule
+\multirow{5}{*}{\textbf{2 (0.185)}} & teddy bear and had a lot of & toys,  friends,  stories,  other,  hugs \\
+ & They see the box and the paper. They are & not,  still,  in,  proud,  inside \\
+ & a bench to sit and eat their ice cream. They l & icks, oll, unch, ipped, he \\
+ & -cream, and had lots of & y,  different,  sprink,  flavors,  them \\
+ & .Lily likes to play with her dolls. She has many & dresses,  clothes,  girls,  skirts,  rooms \\
+\midrule
+\multirow{5}{*}{\textbf{3 (0.204)}} & with her mom. One & day,  winter,  days,  months,  nights \\
+ & the park with her friends. One & day, ations, tops, Staff, Mal \\
+ & !" she said.  One & day, ations, ometers, apers, asers \\
+ & and they pretended it was a treasure.  One & day,  sunny,  summer,  winter, ations \\
+ & just made a loud noise. Timmy was confused and sad.  One & day, ations, ometers, sters,  Chips \\
+\midrule
+\multirow{5}{*}{\textbf{4 (0.109)}} & came up to him and asked, "What are & those,  these,  we,  your,  they \\
+ & very happy. Toot asked, "Why are & the,  we,  there,  all,  your \\
+ & in the car and drove to the vet. They did & not,  repairs,  does, ends,  sticky \\
+ & Benny asked, "What are & we,  those,  these,  they,  all \\
+ & for a walk and they passed by & a,  an,  trees,  buildings,  traffic \\
+\midrule
+\multirow{5}{*}{\textbf{5 (0.073)}} & happy." & <|endoftext|>, The, They, Tom, " \\
+ & it?" & The, ", Her, Tom, M \\
+ & me." & The, <|endoftext|>, ", Tom, L \\
+ & you want some?" & The, ", M, L, Her \\
+ & y with a bee." & The, ", <|endoftext|>, L, Tom \\
+\midrule
+\multirow{5}{*}{\textbf{6 (0.147)}} & , they got tired and sat down on the soft grass. They looked at each & other,  others,  of,  one,  another \\
+ & . Buzzy loved to fly around the big tree and play with the & leaves,  birds,  ball,  little,  bugs \\
+ & be scared. I won't hurt you. I just want to be your & friends,  sister,  brother,  daughter,  pet \\
+ & at the shell. They looked at their mom. They looked at each & others, .,  one, other,  another \\
+ & went to the park with her mom and saw her & dad,  uncle,  little,  new,  favorite \\
+\midrule
+\multirow{5}{*}{\textbf{7 (0.063)}} & .Once upon a time, there was a little girl named & Lucy,  Amy,  Sarah,  Emma,  Emily \\
+ & . The end.Once upon a time, there was a little boy named & Jack,  Max,  John,  Andy,  he \\
+ & ."Once upon a time, there was a boy named & Tim,  Jack,  Max,  Billy,  Will \\
+ & them disappear again.Once upon a time, there was a little girl named & Lucy,  Sarah,  Emma,  Amy,  Emily \\
+ & in the park.Once upon a time, there was a little girl named & Lucy,  Sarah,  Amy,  Emma,  Emily \\
+\midrule
+\multirow{5}{*}{\textbf{8 (0.097)}} & , Spot's owner, a little girl named & Lily,  Sally,  Emily,  Jane,  Emma \\
+ & Lily's little & brother, inning, bling, ator, ushing \\
+ & them disappear again.Once upon a time, there was a little girl named & Mia,  Sally,  Anna,  Amy,  Tim \\
+ & with a smile.Once upon a time, there was a little girl named & Mia,  Sally,  Amy,  Anna,  Jane \\
+ & .Once upon a time, there was a little girl named & Sally,  Mia,  Amy,  Anna,  Lucy \\
+\midrule
+\multirow{5}{*}{\textbf{9 (0.105)}} & , Lily said, & ", ime, iner, ayer, cher \\
+ & back. Timmy said, & ", apper, iner, overs, ime \\
+ & my said, & ", ime, ayer, appers, iner \\
+ & Lily nodded and said, & ", attered, cher, ayed, atter \\
+ & Ben smiled and said, & ", overs, ime, attered, ayer \\
+\midrule
+
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\end{document}

@@ -30,7 +30,7 @@ def compute_jacobian(eigenmodel, sample, feature_idx, device='cuda', has_token_d
         
         reconstruction = eigenmodel.add_to_network(coef * coefficients)
         # Use functional_call for inference with the reconstructed network
-        return functional_call(eigenmodel.model, reconstruction, sample.unsqueeze(0))
+        return functional_call(eigenmodel.model, reconstruction, sample.unsqueeze(0)).softmax(dim=-1)
 
     # Ensure `coef` is on the correct device and requires gradient
     coef = torch.tensor(0.0, requires_grad=True, device=device)
@@ -38,9 +38,9 @@ def compute_jacobian(eigenmodel, sample, feature_idx, device='cuda', has_token_d
 
     # Compute Jacobian efficiently using forward-mode differentiation
     if has_token_dim:
-        jacobian_fn = jacfwd(lambda c: wrapper_fn(eigenmodel, c, sample, feature_idx)[0, -1, ...])
+        jacobian_fn = jacfwd(lambda c: wrapper_fn(eigenmodel, c, sample, feature_idx)[0, -1, ...], randomness='same')
     else:
-        jacobian_fn = jacfwd(lambda c: wrapper_fn(eigenmodel, c, sample, feature_idx)[0, ...])
+        jacobian_fn = jacfwd(lambda c: wrapper_fn(eigenmodel, c, sample, feature_idx)[0, ...], randomness='same')
 
     # Compute Jacobian
     jacobian = jacobian_fn(coef)

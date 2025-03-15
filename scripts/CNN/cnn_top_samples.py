@@ -24,16 +24,29 @@ def main(args):
 
     # Define transformations for CIFAR-100
     transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Resize((224, 224), antialias=True)  # Resize to match ResNet input
+        transforms.Resize((224, 224), antialias=True),  # Resize to match ResNet input
+        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
     ])
 
+    transform_tensor = transforms.Compose([
+        transforms.ToTensor(),
+    ])
+    
     # Load CIFAR-100 dataset
-    dataset = torchvision.datasets.CIFAR100(root="./data", train=True, transform=transform, download=True)
+    dataset = torchvision.datasets.CIFAR100(root="./data", train=False, download=True, transform=transform_tensor)
+
+    random_indices = random.sample(range(len(dataset)), args.num_samples)
+    X_raw = ImageOnlyDataset(Subset(dataset, random_indices))
+    torch.save(torch.stack([(X_raw[i]) for i in range(len(X_raw))]), args.examples_output_file)
+
+    X_train = (torch.stack([transform(X_raw[i]) for i in range(len(X_raw))]))  # Stack images
+
 
     # Randomly select subset of images
-    random_indices = random.sample(range(len(dataset)), args.num_samples)
-    X_train = ImageOnlyDataset(Subset(dataset, random_indices))
+    del dataset, X_raw
+    
+    
+    dataset_raw = torchvision.datasets.CIFAR100(root="./data", train=False, download=True, transform=transform_tensor)
 
     # Create DataLoader
     dataloader = DataLoader(X_train, batch_size=args.batch_size, shuffle=False)
@@ -47,7 +60,6 @@ def main(args):
 
     # Save results
     torch.save(circuit_vals, args.attributions_output_file)
-    torch.save(X_ordered, args.examples_output_file)
     print("Saved results.")
 
 # Command-line arguments

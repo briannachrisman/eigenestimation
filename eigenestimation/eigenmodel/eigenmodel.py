@@ -59,6 +59,7 @@ class EigenModel(nn.Module):
         torch.cuda.empty_cache()
                 
     def compute_loss(self, x: torch.Tensor, param_dict) -> torch.Tensor:
+        self.model.eval()
         outputs: torch.Tensor = functional_call(self.model, param_dict, (x,))
         with torch.no_grad():
             truth: torch.Tensor = self.model0(outputs)
@@ -68,7 +69,6 @@ class EigenModel(nn.Module):
     def compute_gradients(self, x: torch.Tensor,chunk_size=None):
         with torch.no_grad():
             grads = torch.func.jacrev(self.compute_loss, argnums=-1, has_aux=False, chunk_size=chunk_size)(x, self.param_dict)
-            torch.cuda.empty_cache()
             torch.cuda.empty_cache()
             return grads
 
