@@ -33,8 +33,8 @@ squared_features_vs_loss = '/root/eigenestimation/figures/s11_squared_features_v
 
 top_images_eigenmodel = '/root/eigenestimation/figures/poster_top_images_feature_%i.svg'
 
-fav_circuits_cnn = '/root/eigenestimation/figures/favorite_cnn_circuits.pdf'
-all_circuits_cnn = '/root/eigenestimation/figures/100_cnn_circuits.pdf'
+fav_circuits_cnn = '/root/eigenestimation/figures/favorite_cnn_circuits'
+all_circuits_cnn = '/root/eigenestimation/figures/100_cnn_circuits'
 
-fav_circuits_transformer = '/root/eigenestimation/figures/favorite_transformer_circuits.pdf'
-all_circuits_transformer = '/root/eigenestimation/figures/100_transformer_circuits.pdf'
+fav_circuits_transformer = '/root/eigenestimation/figures/favorite_transformer_circuits'
+all_circuits_transformer = '/root/eigenestimation/figures/100_transformer_circuits'

@@ -1167,16 +1167,6 @@ INPUT /usr/share/texlive/texmf-dist/tex/generic/gettitlestring/gettitlestring.st
 INPUT /usr/share/texlive/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
 INPUT /usr/share/texlive/texmf-dist/tex/latex/kvoptions/kvoptions.sty
 INPUT /usr/share/texlive/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty
-INPUT ./writeup.out
-INPUT writeup.out
-INPUT ./writeup.out
-INPUT writeup.out
-INPUT ./writeup.out
-INPUT writeup.out
-INPUT ./writeup.out
-INPUT writeup.out
-INPUT ./writeup.out
-INPUT ./writeup.out
 OUTPUT writeup.out
 OUTPUT writeup.pdf
 INPUT /usr/share/texlive/texmf-dist/tex/latex/graphics/graphicx.sty
@@ -1216,6 +1206,7 @@ INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm5.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/adobe/times/ptmr7t.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/adobe/times/ptmr7t.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/adobe/times/ptmb7t.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/adobe/times/ptmri7t.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/vf/adobe/times/ptmr7t.vf
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/adobe/times/ptmr8r.tfm
 INPUT /var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map
@@ -1227,6 +1218,8 @@ INPUT /usr/share/texlive/texmf-dist/fonts/vf/adobe/times/ptmr7t.vf
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/adobe/times/ptmr8r.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/vf/adobe/times/ptmb7t.vf
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/adobe/times/ptmb8r.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/vf/adobe/times/ptmri7t.vf
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/adobe/times/ptmri8r.tfm
 INPUT ../figures/1b_jacobian_diagram.pdf
 INPUT ../figures/1b_jacobian_diagram.pdf
 INPUT ../figures/1b_jacobian_diagram.pdf
@@ -1307,9 +1300,11 @@ INPUT ../figures/4_tms_intervention.pdf
 INPUT ../figures/4_tms_intervention.pdf
 INPUT ../figures/4_tms_intervention.pdf
 INPUT ../figures/4_tms_intervention.pdf
-INPUT /usr/share/texlive/texmf-dist/fonts/tfm/adobe/times/ptmri7t.tfm
-INPUT /usr/share/texlive/texmf-dist/fonts/vf/adobe/times/ptmri7t.vf
-INPUT /usr/share/texlive/texmf-dist/fonts/tfm/adobe/times/ptmri8r.tfm
+INPUT ../figures/4_tms_intervention_mean.pdf
+INPUT ../figures/4_tms_intervention_mean.pdf
+INPUT ../figures/4_tms_intervention_mean.pdf
+INPUT ../figures/4_tms_intervention_mean.pdf
+INPUT ../figures/4_tms_intervention_mean.pdf
 INPUT ../figures/5_circuit_superposition_decomposition.pdf
 INPUT ../figures/5_circuit_superposition_decomposition.pdf
 INPUT ../figures/5_circuit_superposition_decomposition.pdf
@@ -1325,6 +1320,8 @@ INPUT ../figures/7_high_rank_decomposition.pdf
 INPUT ../figures/7_high_rank_decomposition.pdf
 INPUT ../figures/7_high_rank_decomposition.pdf
 INPUT ../figures/7_high_rank_decomposition.pdf
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/adobe/times/ptmb7t.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/adobe/times/ptmb7t.tfm
 INPUT ../figures/8_squared_subnetworks.pdf
 INPUT ../figures/8_squared_subnetworks.pdf
 INPUT ../figures/8_squared_subnetworks.pdf
@@ -1461,6 +1458,7 @@ INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb
+INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb

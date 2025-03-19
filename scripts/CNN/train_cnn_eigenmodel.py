@@ -171,7 +171,7 @@ def main(args, timer):
     ])
 
     # Load CIFAR-10 dataset
-    dataset = torchvision.datasets.CIFAR10(root="./data", train=True, transform=transform, download=True,)
+    dataset = torchvision.datasets.CIFAR100(root="./data", train=True, transform=transform, download=True,)
 
     # Randomly select 100 indices
     random_indices = torch.randperm(len(dataset))[:args.n_train_samples]

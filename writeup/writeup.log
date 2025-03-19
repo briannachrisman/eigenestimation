@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2025.2.13)  3 MAR 2025 23:04
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2025.2.13)  15 MAR 2025 01:27
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -741,7 +741,6 @@ Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 LaTeX Info: Redefining \ref on input line 67.
 LaTeX Info: Redefining \pageref on input line 67.
 LaTeX Info: Redefining \nameref on input line 67.
- (./writeup.out) (./writeup.out)
 \@outlinefile=\write4
 \openout4 = `writeup.out'.
 
@@ -763,6 +762,82 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) (/usr/share/texlive/texmf-dist/tex/latex/microtype/mt-msb.cfg
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
+
+Package natbib Warning: Citation `bereska2024mechanistic' on page 1 undefined on input line 124.
+
+
+Package natbib Warning: Citation `cunningham2023sparse' on page 1 undefined on input line 124.
+
+
+Package natbib Warning: Citation `bricken2023towards' on page 1 undefined on input line 124.
+
+
+Package natbib Warning: Citation `gao2024scaling' on page 1 undefined on input line 124.
+
+
+Package natbib Warning: Citation `engels2024not' on page 1 undefined on input line 129.
+
+
+Package natbib Warning: Citation `engels2024decomposing' on page 1 undefined on input line 129.
+
+
+Package natbib Warning: Citation `merullo2024talking' on page 1 undefined on input line 129.
+
+
+Package natbib Warning: Citation `lindsey2024sparse' on page 1 undefined on input line 129.
+
+
+Package natbib Warning: Citation `pascanu2013difficulty' on page 1 undefined on input line 129.
+
+
+Package natbib Warning: Citation `ho2020denoising' on page 1 undefined on input line 129.
+
+
+Package natbib Warning: Citation `sharkey2025open' on page 1 undefined on input line 131.
+
+
+Package natbib Warning: Citation `watanabe2000algebraic' on page 1 undefined on input line 136.
+
+
+Package natbib Warning: Citation `watanabe2005algebraic' on page 1 undefined on input line 136.
+
+
+Package natbib Warning: Citation `bushnaq2024using' on page 1 undefined on input line 136.
+
+
+Package natbib Warning: Citation `lau2023local' on page 1 undefined on input line 136.
+
+
+Package natbib Warning: Citation `wang2024loss' on page 1 undefined on input line 136.
+
+
+Package natbib Warning: Citation `hoogland2024developmental' on page 1 undefined on input line 136.
+
+
+Package natbib Warning: Citation `davies2023unifying' on page 1 undefined on input line 136.
+
+
+Package natbib Warning: Citation `wei2022deep' on page 1 undefined on input line 136.
+
+
+Package natbib Warning: Citation `watanabe2007almost' on page 1 undefined on input line 136.
+
+
+Package natbib Warning: Citation `nanda2023attribution' on page 1 undefined on input line 138.
+
+
+Package natbib Warning: Citation `kramar2024atp' on page 1 undefined on input line 138.
+
+
+Package natbib Warning: Citation `syed2023attribution' on page 1 undefined on input line 138.
+
+
+Package natbib Warning: Citation `turner2023steering' on page 1 undefined on input line 138.
+
+
+Package natbib Warning: Citation `subramani2022extracting' on page 1 undefined on input line 138.
+
+
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}
@@ -770,125 +845,357 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
 ]
+
+LaTeX Warning: Reference `subsec:parameter' on page 2 undefined on input line 142.
+
+
+Package natbib Warning: Citation `matena2023npeff' on page 2 undefined on input line 144.
+
+
+Package natbib Warning: Citation `braun2025interpretability' on page 2 undefined on input line 144.
+
+
+Package natbib Warning: Citation `braun2025interpretability' on page 2 undefined on input line 146.
+
+
+Package natbib Warning: Citation `matena2023npeff' on page 2 undefined on input line 146.
+
+
+Package natbib Warning: Citation `braun2025interpretability' on page 2 undefined on input line 146.
+
+
+Package natbib Warning: Citation `matena2023npeff' on page 2 undefined on input line 146.
+
+
+LaTeX Warning: Reference `sec:methods' on page 2 undefined on input line 150.
+
+
+Package natbib Warning: Citation `matena2023npeff' on page 2 undefined on input line 150.
+
+
+Package natbib Warning: Citation `braun2025interpretability' on page 2 undefined on input line 150.
+
+
+LaTeX Warning: Reference `subsec:divergences' on page 2 undefined on input line 152.
+
+
+LaTeX Warning: Reference `fig:1_jacobian_diagram' on page 2 undefined on input line 152.
+
+
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
 
 pdfTeX warning: pdflatex (file ../figures/1b_jacobian_diagram.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<../figures/1b_jacobian_diagram.pdf, id=89, 497.86pt x 286.06876pt>
+<../figures/1b_jacobian_diagram.pdf, id=18, 497.86pt x 286.06876pt>
 File: ../figures/1b_jacobian_diagram.pdf Graphic file (type pdf)
 <use ../figures/1b_jacobian_diagram.pdf>
-Package pdftex.def Info: ../figures/1b_jacobian_diagram.pdf  used on input line 161.
+Package pdftex.def Info: ../figures/1b_jacobian_diagram.pdf  used on input line 163.
 (pdftex.def)             Requested size: 164.41353pt x 94.47281pt.
-<../figures/1a_jacobian_diagram.pdf, id=90, 461.44395pt x 181.3977pt>
+<../figures/1a_jacobian_diagram.pdf, id=19, 461.44395pt x 181.3977pt>
 File: ../figures/1a_jacobian_diagram.pdf Graphic file (type pdf)
 <use ../figures/1a_jacobian_diagram.pdf>
-Package pdftex.def Info: ../figures/1a_jacobian_diagram.pdf  used on input line 165.
+Package pdftex.def Info: ../figures/1a_jacobian_diagram.pdf  used on input line 167.
 (pdftex.def)             Requested size: 234.8775pt x 92.33168pt.
-[2 <../figures/1b_jacobian_diagram.pdf> <../figures/1a_jacobian_diagram.pdf>] [3]
+
+LaTeX Warning: Reference `sec:setup' on page 2 undefined on input line 175.
+
+
+LaTeX Warning: Reference `sec:criteria' on page 2 undefined on input line 175.
+
+
+LaTeX Warning: Reference `sec:decomposition' on page 2 undefined on input line 175.
+
+
+LaTeX Warning: Reference `sec:training' on page 2 undefined on input line 175.
+
+
+LaTeX Warning: Reference `sec:intervention' on page 2 undefined on input line 175.
+
+[2 <../figures/1b_jacobian_diagram.pdf> <../figures/1a_jacobian_diagram.pdf>]
+
+LaTeX Warning: Reference `eq:divergence' on page 3 undefined on input line 213.
+
+
+Package natbib Warning: Citation `bussmann2024batchtopk' on page 3 undefined on input line 234.
+
+
+LaTeX Warning: Reference `sec:low_rank' on page 3 undefined on input line 237.
+
+[3]
+
+LaTeX Warning: Reference `tab:toy_models' on page 4 undefined on input line 299.
+
+
+LaTeX Warning: Reference `sec:toymodel_hyperparams' on page 4 undefined on input line 299.
+
+
+LaTeX Warning: Reference `sec:L3D_hyperparams' on page 4 undefined on input line 299.
+
 File: ../figures/2a_toy_models_setup.pdf Graphic file (type pdf)
 <use ../figures/2a_toy_models_setup.pdf>
-Package pdftex.def Info: ../figures/2a_toy_models_setup.pdf  used on input line 310.
-(pdftex.def)             Requested size: 58.53632pt x 84.72826pt.
+Package pdftex.def Info: ../figures/2a_toy_models_setup.pdf  used on input line 319.
+(pdftex.def)             Requested size: 58.53632pt x 51.1234pt.
 File: ../figures/2b_toy_models_setup.pdf Graphic file (type pdf)
 <use ../figures/2b_toy_models_setup.pdf>
-Package pdftex.def Info: ../figures/2b_toy_models_setup.pdf  used on input line 310.
+Package pdftex.def Info: ../figures/2b_toy_models_setup.pdf  used on input line 319.
 (pdftex.def)             Requested size: 97.563pt x 87.95517pt.
 
-Overfull \hbox (11.9985pt too wide) in paragraph at lines 310--310
+Overfull \hbox (11.9985pt too wide) in paragraph at lines 319--319
 []|[]| 
  []
 
 File: ../figures/2c_toy_models_setup.pdf Graphic file (type pdf)
 <use ../figures/2c_toy_models_setup.pdf>
-Package pdftex.def Info: ../figures/2c_toy_models_setup.pdf  used on input line 310.
+Package pdftex.def Info: ../figures/2c_toy_models_setup.pdf  used on input line 319.
 (pdftex.def)             Requested size: 97.563pt x 90.8391pt.
 
-Overfull \hbox (11.9985pt too wide) in paragraph at lines 310--310
+Overfull \hbox (11.9985pt too wide) in paragraph at lines 319--319
 []|[]| 
  []
 
 File: ../figures/2d_toy_models_setup.pdf Graphic file (type pdf)
 <use ../figures/2d_toy_models_setup.pdf>
-Package pdftex.def Info: ../figures/2d_toy_models_setup.pdf  used on input line 310.
+Package pdftex.def Info: ../figures/2d_toy_models_setup.pdf  used on input line 319.
 (pdftex.def)             Requested size: 97.563pt x 83.06334pt.
 
-Overfull \hbox (11.9985pt too wide) in paragraph at lines 310--310
+Overfull \hbox (11.9985pt too wide) in paragraph at lines 319--319
 []|[]| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 310--310
+Underfull \hbox (badness 10000) in paragraph at lines 319--319
 []|\OT1/ptm/m/n/10 (+20) Feature Su-per-po-si-
  []
 
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Package natbib Warning: Citation `elhage2022toy' on page 4 undefined on input line 328.
 
- [4]
-<../figures/3_tms_first_5_subnetworks.pdf, id=208, 722.7pt x 216.81pt>
+
+LaTeX Warning: Reference `fig:s2_tms_encoder_directions' on page 4 undefined on input line 328.
+
+[4]
+
+LaTeX Warning: Reference `fig:3_tms_subnetworks_first5' on page 5 undefined on input line 332.
+
+
+LaTeX Warning: Reference `tab:toy_models' on page 5 undefined on input line 332.
+
+/root/eigenestimation/writeup/writeup.tex:334: Undefined control sequence.
+l.334 ...inal encoding of each input (Figure \TODO
+                                                  {ADD NEW FIGURE IN}.  This...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+<../figures/3_tms_first_5_subnetworks.pdf, id=101, 1084.05pt x 130.086pt>
 File: ../figures/3_tms_first_5_subnetworks.pdf Graphic file (type pdf)
 <use ../figures/3_tms_first_5_subnetworks.pdf>
-Package pdftex.def Info: ../figures/3_tms_first_5_subnetworks.pdf  used on input line 329.
-(pdftex.def)             Requested size: 487.8225pt x 146.34705pt.
+Package pdftex.def Info: ../figures/3_tms_first_5_subnetworks.pdf  used on input line 338.
+(pdftex.def)             Requested size: 487.8225pt x 58.53815pt.
+
+LaTeX Warning: Reference `sec:finetuning' on page 5 undefined on input line 346.
+
+
+LaTeX Warning: Reference `subsec:intervention' on page 5 undefined on input line 346.
+
+
+LaTeX Warning: Reference `fig:4_tms_intervention' on page 5 undefined on input line 346.
+
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-<../figures/4_tms_intervention.pdf, id=211, 507.77142pt x 408.19913pt>
+<../figures/4_tms_intervention.pdf, id=102, 705.7989pt x 281.59013pt>
 File: ../figures/4_tms_intervention.pdf Graphic file (type pdf)
 <use ../figures/4_tms_intervention.pdf>
-Package pdftex.def Info: ../figures/4_tms_intervention.pdf  used on input line 341.
-(pdftex.def)             Requested size: 234.8775pt x 188.82028pt.
+Package pdftex.def Info: ../figures/4_tms_intervention.pdf  used on input line 350.
+(pdftex.def)             Requested size: 234.8775pt x 93.70702pt.
+<../figures/4_tms_intervention_mean.pdf, id=103, 1133.19356pt x 216.81pt>
+File: ../figures/4_tms_intervention_mean.pdf Graphic file (type pdf)
+<use ../figures/4_tms_intervention_mean.pdf>
+Package pdftex.def Info: ../figures/4_tms_intervention_mean.pdf  used on input line 356.
+(pdftex.def)             Requested size: 234.8775pt x 44.93594pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [5 <../figures/2a_toy_models_setup.pdf> <../figures/2b_toy_models_setup.pdf> <../figures/2c_toy_models_setup.pdf> <../figures/2d_toy_models_setup.pdf>]
-<../figures/5_circuit_superposition_decomposition.pdf, id=279, 1134.63902pt x 292.69351pt>
+
+LaTeX Warning: Reference `tab:toy_models' on page 6 undefined on input line 367.
+
+
+LaTeX Warning: Reference `fig:5_circuit_superposition_decomposition' on page 6 undefined on input line 373.
+
+<../figures/5_circuit_superposition_decomposition.pdf, id=171, 1134.63902pt x 292.69351pt>
 File: ../figures/5_circuit_superposition_decomposition.pdf Graphic file (type pdf)
 <use ../figures/5_circuit_superposition_decomposition.pdf>
-Package pdftex.def Info: ../figures/5_circuit_superposition_decomposition.pdf  used on input line 364.
+Package pdftex.def Info: ../figures/5_circuit_superposition_decomposition.pdf  used on input line 378.
 (pdftex.def)             Requested size: 487.8225pt x 125.83789pt.
-<../figures/6_circuit_superposition_coefficients.pdf, id=281, 335.65776pt x 205.29654pt>
+
+LaTeX Warning: Reference `fig:5_circuit_superposition_decomposition' on page 6 undefined on input line 391.
+
+<../figures/6_circuit_superposition_coefficients.pdf, id=172, 335.21556pt x 205.03055pt>
 File: ../figures/6_circuit_superposition_coefficients.pdf Graphic file (type pdf)
 <use ../figures/6_circuit_superposition_coefficients.pdf>
-Package pdftex.def Info: ../figures/6_circuit_superposition_coefficients.pdf  used on input line 383.
-(pdftex.def)             Requested size: 234.8775pt x 143.65646pt.
+Package pdftex.def Info: ../figures/6_circuit_superposition_coefficients.pdf  used on input line 397.
+(pdftex.def)             Requested size: 234.8775pt x 143.66429pt.
+
+LaTeX Warning: Reference `fig:s5_high_rank_circuits_loss_vs_rank' on page 6 undefined on input line 410.
+
+
+LaTeX Warning: Reference `fig:7_high_rank_decomposition' on page 6 undefined on input line 410.
+
+
+LaTeX Warning: Reference `fig:s6_high_rank_decompositions' on page 6 undefined on input line 410.
+
+
+Package natbib Warning: Citation `cunningham2023sparse' on page 6 undefined on input line 410.
+
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [6 <../figures/3_tms_first_5_subnetworks.pdf> <../figures/4_tms_intervention.pdf>]
-<../figures/7_high_rank_decomposition.pdf, id=487, 1806.75pt x 418.13184pt>
+ [6 <../figures/3_tms_first_5_subnetworks.pdf> <../figures/4_tms_intervention.pdf> <../figures/4_tms_intervention_mean.pdf>]
+<../figures/7_high_rank_decomposition.pdf, id=324, 1806.75pt x 418.13184pt>
 File: ../figures/7_high_rank_decomposition.pdf Graphic file (type pdf)
 <use ../figures/7_high_rank_decomposition.pdf>
-Package pdftex.def Info: ../figures/7_high_rank_decomposition.pdf  used on input line 401.
+Package pdftex.def Info: ../figures/7_high_rank_decomposition.pdf  used on input line 415.
 (pdftex.def)             Requested size: 487.8225pt x 112.8971pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [7 <../figures/5_circuit_superposition_decomposition.pdf> <../figures/6_circuit_superposition_coefficients.pdf>]
-<../figures/8_squared_subnetworks.pdf, id=554, 854.59277pt x 125.7498pt>
+
+Overfull \hbox (56.9575pt too wide) detected at line 429
+[][][]\OMS/cmsy/m/n/10 r[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 XW[]W[] \OT1/cmr/m/n/10 + \OML/cmm/m/it/10 b \OMS/cmsy/m/n/10 ^^@ \OML/cmm/m/it/10 X\OT1/cmr/m/n/10 )[] = (2(\OML/cmm/m/it/10 XW[]W[] \OT1/cmr/m/n/10 + \OML/cmm/m/it/10 b \OMS/cmsy/m/n/10 ^^@ \OML/cmm/m/it/10 X\OT1/cmr/m/n/10 )[]\OML/cmm/m/it/10 XW[]\OT1/cmr/m/n/10 )[]
+ []
+
+/root/eigenestimation/writeup/writeup.tex:430: Missing $ inserted.
+<inserted text> 
+                $
+l.430 ...vely far in parameter space (large \delta
+                                                   in Figure. \ref{fig:4_tms...
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+
+LaTeX Warning: Reference `fig:4_tms_intervention' on page 7 undefined on input line 430.
+
+/root/eigenestimation/writeup/writeup.tex:431: Missing $ inserted.
+<inserted text> 
+                $
+l.431 
+      
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+
+Underfull \hbox (badness 1259) in paragraph at lines 429--431
+\OT1/ptm/m/n/10 (+20) The gra-di-ent is lin-ear with re-spect to $\OML/cmm/m/it/10 W[]$\OT1/ptm/m/n/10 (+20) . With
+ []
+
+
+Underfull \hbox (badness 1603) in paragraph at lines 429--431
+\OT1/ptm/m/n/10 (+20) this gra-di-ent, we ex-pect lo-cal ap-prox-i-ma-tions to be
+ []
+
+
+Underfull \hbox (badness 2245) in paragraph at lines 429--431
+\OT1/ptm/m/n/10 (+20) un-til the Relu-induced dis-con-ti-nu-ities.) We should
+ []
+
+
+Overfull \hbox (660.56065pt too wide) in paragraph at lines 429--431
+\OML/cmm/m/it/10 ^^NinFigure:[]\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 andseewellbehavedeffectsonpredictions:However; wewantedtotestthelimitationsofaL\OT1/cmr/m/n/10 3\OML/cmm/m/it/10 Donamodelwithamorecomplexlosslandscape; especiallywhenitcomestointerveningwithasubnetwork:$ 
+ []
+
+
+LaTeX Warning: Reference `fig:8_squared_subnetworks' on page 7 undefined on input line 438.
+
+[7 <../figures/5_circuit_superposition_decomposition.pdf> <../figures/6_circuit_superposition_coefficients.pdf>]
+
+LaTeX Warning: Reference `fig:s11_squared_features_vs_loss' on page 8 undefined on input line 440.
+
+
+LaTeX Warning: Reference `fig:s10_squared_decompositions_features' on page 8 undefined on input line 440.
+
+<../figures/8_squared_subnetworks.pdf, id=384, 854.59277pt x 125.7498pt>
 File: ../figures/8_squared_subnetworks.pdf Graphic file (type pdf)
 <use ../figures/8_squared_subnetworks.pdf>
-Package pdftex.def Info: ../figures/8_squared_subnetworks.pdf  used on input line 428.
+Package pdftex.def Info: ../figures/8_squared_subnetworks.pdf  used on input line 444.
 (pdftex.def)             Requested size: 487.8225pt x 71.78174pt.
+
+LaTeX Warning: Reference `fig:9_squared_intervention' on page 8 undefined on input line 452.
+
+
+LaTeX Warning: Reference `fig:s7_squared_intervention_more_deltas' on page 8 undefined on input line 452.
+
+<../figures/9_squared_intervention.pdf, id=385, 705.7989pt x 281.13531pt>
+File: ../figures/9_squared_intervention.pdf Graphic file (type pdf)
+<use ../figures/9_squared_intervention.pdf>
+Package pdftex.def Info: ../figures/9_squared_intervention.pdf  used on input line 458.
+(pdftex.def)             Requested size: 487.8225pt x 194.31387pt.
+
+LaTeX Warning: Reference `fig:9_squared_intervention' on page 8 undefined on input line 463.
+
+
+LaTeX Warning: Reference `fig:s9_squared_intervention_multi_features' on page 8 undefined on input line 463.
+
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-<../figures/9_squared_intervention.pdf, id=557, 713.29567pt x 281.13531pt>
-File: ../figures/9_squared_intervention.pdf Graphic file (type pdf)
-<use ../figures/9_squared_intervention.pdf>
-Package pdftex.def Info: ../figures/9_squared_intervention.pdf  used on input line 443.
-(pdftex.def)             Requested size: 487.8225pt x 192.26765pt.
+
+
+LaTeX Warning: Reference `fig:9_squared_intervention' on page 8 undefined on input line 465.
+
+
+LaTeX Warning: Reference `fig:s8_squared_intervention_middle_weights' on page 8 undefined on input line 465.
+
+
+LaTeX Warning: Reference `fig:9_squared_intervention' on page 8 undefined on input line 465.
+
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [8 <../figures/7_high_rank_decomposition.pdf>] [9 <../figures/8_squared_subnetworks.pdf> <../figures/9_squared_intervention.pdf>]
-Underfull \vbox (badness 10000) has occurred while \output is active []
+
+Package natbib Warning: Citation `hanni2024mathematical' on page 10 undefined on input line 497.
+
+
+Package natbib Warning: Citation `bushnaq2024circuits' on page 10 undefined on input line 497.
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [10] [11
+
+
+LaTeX Warning: Reference `sec:finetuning' on page 10 undefined on input line 508.
+
+
+Package natbib Warning: Citation `engels2024decomposing' on page 10 undefined on input line 517.
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [10]
+
+Package natbib Warning: Citation `kawaguchi2016deep' on page 11 undefined on input line 519.
+
+
+Package natbib Warning: Citation `choromanska2015loss' on page 11 undefined on input line 519.
+
+
+Package natbib Warning: Citation `dauphin2014identifying' on page 11 undefined on input line 519.
+
+
+Package natbib Warning: Citation `soudry2017exponentially' on page 11 undefined on input line 519.
+
+
+Package natbib Warning: Citation `keskar2016large' on page 11 undefined on input line 519.
+
+
+Package natbib Warning: Citation `sagun2017empirical' on page 11 undefined on input line 519.
+
+[11
 
 ] [12
 
@@ -938,133 +1245,253 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
  [15
 
 ]
-<../figures/s1_high_rank_circuit_setup.pdf, id=736, 147.75468pt x 292.69351pt>
+Runaway argument?
+ f(X, W_0 + W_{ft} V^{out}_\mathcal {I})\\ \text {where} W_0 \in \mathcal \ETC.
+/root/eigenestimation/writeup/writeup.tex:625: Paragraph ended before \align was complete.
+<to be read again> 
+                   \par 
+l.625 
+      
+I suspect you've forgotten a `}', causing me to apply this
+control sequence to too much text. How can we recover?
+My plan is to forget the whole thing and hope for the best.
+
+/root/eigenestimation/writeup/writeup.tex:625: Missing $ inserted.
+<inserted text> 
+                $
+l.625 
+      
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+/root/eigenestimation/writeup/writeup.tex:625: Missing \endgroup inserted.
+<inserted text> 
+                \endgroup 
+l.625 
+      
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+/root/eigenestimation/writeup/writeup.tex:625: Display math should end with $$.
+<to be read again> 
+                   \tex_par:D 
+l.625 
+      
+The `$' that I just saw supposedly matches a previous `$$'.
+So I shall assume that you typed `$$' both times.
+
+/root/eigenestimation/writeup/writeup.tex:626: Misplaced \cr.
+\math@cr@@@ ->\cr 
+                  
+l.626 \end{align}
+                 
+I can't figure out why you would want to use a tab mark
+or \cr or \span just now. If something like a right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+/root/eigenestimation/writeup/writeup.tex:626: Misplaced \noalign.
+\math@cr@@ ... \iffalse }\fi \math@cr@@@ \noalign 
+                                                  {\vskip #1\relax }
+l.626 \end{align}
+                 
+I expect to see \noalign only after the \cr of
+an alignment. Proceed, and I'll ignore this case.
+
+/root/eigenestimation/writeup/writeup.tex:626: Misplaced \noalign.
+\black@ #1->\noalign 
+                     {\ifdim #1>\displaywidth \dimen@ \prevdepth \nointerlin...
+l.626 \end{align}
+                 
+I expect to see \noalign only after the \cr of
+an alignment. Proceed, and I'll ignore this case.
+
+
+Overfull \hbox (115.76335pt too wide) detected at line 626
+[]
+ []
+
+/root/eigenestimation/writeup/writeup.tex:626: Extra }, or forgotten \endgroup.
+\endalign ->\math@cr \black@ \totwidth@ \egroup 
+                                                \ifingather@ \restorealignst...
+l.626 \end{align}
+                 
+I've deleted a group-closing symbol because it seems to be
+spurious, as in `$x}$'. But perhaps the } is legitimate and
+you forgot something else, as in `\hbox{$x}'. In such cases
+the way to recover is to insert both the forgotten and the
+deleted material, e.g., by typing `I$}'.
+
+/root/eigenestimation/writeup/writeup.tex:626: Missing $ inserted.
+<inserted text> 
+                $
+l.626 \end{align}
+                 
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+/root/eigenestimation/writeup/writeup.tex:626: Display math should end with $$.
+<to be read again> 
+                   \endgroup 
+l.626 \end{align}
+                 
+The `$' that I just saw supposedly matches a previous `$$'.
+So I shall assume that you typed `$$' both times.
+
+<../figures/s1_high_rank_circuit_setup.pdf, id=572, 147.75468pt x 292.69351pt>
 File: ../figures/s1_high_rank_circuit_setup.pdf Graphic file (type pdf)
 <use ../figures/s1_high_rank_circuit_setup.pdf>
-Package pdftex.def Info: ../figures/s1_high_rank_circuit_setup.pdf  used on input line 619.
+Package pdftex.def Info: ../figures/s1_high_rank_circuit_setup.pdf  used on input line 643.
 (pdftex.def)             Requested size: 147.75432pt x 292.6928pt.
-<../figures/s2_tms_encoder_directions.pdf, id=737, 210.37973pt x 157.54044pt>
+<../figures/s2_tms_encoder_directions.pdf, id=573, 351.0007pt x 283.90819pt>
 File: ../figures/s2_tms_encoder_directions.pdf Graphic file (type pdf)
 <use ../figures/s2_tms_encoder_directions.pdf>
-Package pdftex.def Info: ../figures/s2_tms_encoder_directions.pdf  used on input line 628.
-(pdftex.def)             Requested size: 210.3792pt x 157.54004pt.
-<../figures/s3_tms_full_subnetworks.pdf, id=738, 574.54652pt x 570.93298pt>
+Package pdftex.def Info: ../figures/s2_tms_encoder_directions.pdf  used on input line 652.
+(pdftex.def)             Requested size: 350.99983pt x 283.90749pt.
+<../figures/s3_tms_full_subnetworks.pdf, id=574, 574.54652pt x 570.93298pt>
 File: ../figures/s3_tms_full_subnetworks.pdf Graphic file (type pdf)
 <use ../figures/s3_tms_full_subnetworks.pdf>
-Package pdftex.def Info: ../figures/s3_tms_full_subnetworks.pdf  used on input line 636.
+Package pdftex.def Info: ../figures/s3_tms_full_subnetworks.pdf  used on input line 660.
 (pdftex.def)             Requested size: 487.8225pt x 484.7639pt.
-<../figures/s4_tms_intervention_network1.pdf, id=739, 507.77142pt x 408.19913pt>
+<../figures/s4_tms_intervention_network1.pdf, id=575, 507.77142pt x 408.19913pt>
 File: ../figures/s4_tms_intervention_network1.pdf Graphic file (type pdf)
 <use ../figures/s4_tms_intervention_network1.pdf>
-Package pdftex.def Info: ../figures/s4_tms_intervention_network1.pdf  used on input line 653.
+Package pdftex.def Info: ../figures/s4_tms_intervention_network1.pdf  used on input line 677.
 (pdftex.def)             Requested size: 146.34824pt x 117.64597pt.
-<../figures/s4_tms_intervention_network2.pdf, id=740, 507.77142pt x 408.19913pt>
+<../figures/s4_tms_intervention_network2.pdf, id=576, 507.77142pt x 408.19913pt>
 File: ../figures/s4_tms_intervention_network2.pdf Graphic file (type pdf)
 <use ../figures/s4_tms_intervention_network2.pdf>
-Package pdftex.def Info: ../figures/s4_tms_intervention_network2.pdf  used on input line 658.
+Package pdftex.def Info: ../figures/s4_tms_intervention_network2.pdf  used on input line 682.
 (pdftex.def)             Requested size: 146.34824pt x 117.64597pt.
-<../figures/s4_tms_intervention_network3.pdf, id=741, 507.77142pt x 408.19913pt>
+<../figures/s4_tms_intervention_network3.pdf, id=577, 507.77142pt x 408.19913pt>
 File: ../figures/s4_tms_intervention_network3.pdf Graphic file (type pdf)
 <use ../figures/s4_tms_intervention_network3.pdf>
-Package pdftex.def Info: ../figures/s4_tms_intervention_network3.pdf  used on input line 663.
+Package pdftex.def Info: ../figures/s4_tms_intervention_network3.pdf  used on input line 687.
 (pdftex.def)             Requested size: 146.34824pt x 117.64597pt.
-<../figures/s4_tms_intervention_network4.pdf, id=742, 507.77142pt x 408.19913pt>
+<../figures/s4_tms_intervention_network4.pdf, id=578, 507.77142pt x 408.19913pt>
 File: ../figures/s4_tms_intervention_network4.pdf Graphic file (type pdf)
 <use ../figures/s4_tms_intervention_network4.pdf>
-Package pdftex.def Info: ../figures/s4_tms_intervention_network4.pdf  used on input line 669.
+Package pdftex.def Info: ../figures/s4_tms_intervention_network4.pdf  used on input line 693.
 (pdftex.def)             Requested size: 146.34824pt x 117.64597pt.
-<../figures/s4_tms_intervention_network5.pdf, id=743, 507.77142pt x 408.19913pt>
+<../figures/s4_tms_intervention_network5.pdf, id=579, 507.77142pt x 408.19913pt>
 File: ../figures/s4_tms_intervention_network5.pdf Graphic file (type pdf)
 <use ../figures/s4_tms_intervention_network5.pdf>
-Package pdftex.def Info: ../figures/s4_tms_intervention_network5.pdf  used on input line 675.
+Package pdftex.def Info: ../figures/s4_tms_intervention_network5.pdf  used on input line 699.
 (pdftex.def)             Requested size: 146.34824pt x 117.64597pt.
-<../figures/s5_high_rank_circuits_loss_vs_rank.pdf, id=744, 351.73402pt x 208.76369pt>
+<../figures/s5_high_rank_circuits_loss_vs_rank.pdf, id=580, 351.73402pt x 208.76369pt>
 File: ../figures/s5_high_rank_circuits_loss_vs_rank.pdf Graphic file (type pdf)
 <use ../figures/s5_high_rank_circuits_loss_vs_rank.pdf>
-Package pdftex.def Info: ../figures/s5_high_rank_circuits_loss_vs_rank.pdf  used on input line 687.
+Package pdftex.def Info: ../figures/s5_high_rank_circuits_loss_vs_rank.pdf  used on input line 711.
 (pdftex.def)             Requested size: 351.73315pt x 208.76315pt.
-<../figures/s6_high_rank_decompositions_rank1.pdf, id=745, 1134.63902pt x 328.8285pt>
+<../figures/s6_high_rank_decompositions_rank1.pdf, id=581, 1134.63902pt x 338.01282pt>
 File: ../figures/s6_high_rank_decompositions_rank1.pdf Graphic file (type pdf)
 <use ../figures/s6_high_rank_decompositions_rank1.pdf>
-Package pdftex.def Info: ../figures/s6_high_rank_decompositions_rank1.pdf  used on input line 701.
-(pdftex.def)             Requested size: 146.34824pt x 42.41302pt.
-<../figures/s6_high_rank_decompositions_rank2.pdf, id=746, 1134.63902pt x 328.8285pt>
+Package pdftex.def Info: ../figures/s6_high_rank_decompositions_rank1.pdf  used on input line 725.
+(pdftex.def)             Requested size: 146.34824pt x 43.59764pt.
+<../figures/s6_high_rank_decompositions_rank2.pdf, id=582, 1134.63902pt x 338.01282pt>
 File: ../figures/s6_high_rank_decompositions_rank2.pdf Graphic file (type pdf)
 <use ../figures/s6_high_rank_decompositions_rank2.pdf>
-Package pdftex.def Info: ../figures/s6_high_rank_decompositions_rank2.pdf  used on input line 706.
-(pdftex.def)             Requested size: 146.34824pt x 42.41302pt.
-<../figures/s6_high_rank_decompositions_rank3.pdf, id=747, 1134.63902pt x 328.8285pt>
+Package pdftex.def Info: ../figures/s6_high_rank_decompositions_rank2.pdf  used on input line 730.
+(pdftex.def)             Requested size: 146.34824pt x 43.59764pt.
+<../figures/s6_high_rank_decompositions_rank3.pdf, id=583, 1134.63902pt x 338.01282pt>
 File: ../figures/s6_high_rank_decompositions_rank3.pdf Graphic file (type pdf)
 <use ../figures/s6_high_rank_decompositions_rank3.pdf>
-Package pdftex.def Info: ../figures/s6_high_rank_decompositions_rank3.pdf  used on input line 711.
-(pdftex.def)             Requested size: 146.34824pt x 42.41302pt.
-<../figures/s6_high_rank_decompositions_rank4.pdf, id=748, 1134.63902pt x 328.8285pt>
+Package pdftex.def Info: ../figures/s6_high_rank_decompositions_rank3.pdf  used on input line 735.
+(pdftex.def)             Requested size: 146.34824pt x 43.59764pt.
+<../figures/s6_high_rank_decompositions_rank4.pdf, id=584, 1134.63902pt x 338.01282pt>
 File: ../figures/s6_high_rank_decompositions_rank4.pdf Graphic file (type pdf)
 <use ../figures/s6_high_rank_decompositions_rank4.pdf>
-Package pdftex.def Info: ../figures/s6_high_rank_decompositions_rank4.pdf  used on input line 716.
-(pdftex.def)             Requested size: 146.34824pt x 42.41302pt.
-<../figures/s6_high_rank_decompositions_rank5.pdf, id=749, 1134.63902pt x 328.8285pt>
+Package pdftex.def Info: ../figures/s6_high_rank_decompositions_rank4.pdf  used on input line 740.
+(pdftex.def)             Requested size: 146.34824pt x 43.59764pt.
+<../figures/s6_high_rank_decompositions_rank5.pdf, id=585, 1134.63902pt x 338.01282pt>
 File: ../figures/s6_high_rank_decompositions_rank5.pdf Graphic file (type pdf)
 <use ../figures/s6_high_rank_decompositions_rank5.pdf>
-Package pdftex.def Info: ../figures/s6_high_rank_decompositions_rank5.pdf  used on input line 721.
-(pdftex.def)             Requested size: 146.34824pt x 42.41302pt.
-<../figures/s7_squared_intervention_more_deltas.pdf, id=750, 713.29567pt x 784.13454pt>
+Package pdftex.def Info: ../figures/s6_high_rank_decompositions_rank5.pdf  used on input line 745.
+(pdftex.def)             Requested size: 146.34824pt x 43.59764pt.
+<../figures/s7_squared_intervention_more_deltas.pdf, id=586, 713.29567pt x 784.13454pt>
 File: ../figures/s7_squared_intervention_more_deltas.pdf Graphic file (type pdf)
 <use ../figures/s7_squared_intervention_more_deltas.pdf>
-Package pdftex.def Info: ../figures/s7_squared_intervention_more_deltas.pdf  used on input line 731.
+Package pdftex.def Info: ../figures/s7_squared_intervention_more_deltas.pdf  used on input line 755.
 (pdftex.def)             Requested size: 487.8225pt x 536.26746pt.
-<../figures/s8_squared_intervention_middle_weights.pdf, id=751, 713.29567pt x 784.13454pt>
+<../figures/s8_squared_intervention_middle_weights.pdf, id=587, 713.29567pt x 784.13454pt>
 File: ../figures/s8_squared_intervention_middle_weights.pdf Graphic file (type pdf)
 <use ../figures/s8_squared_intervention_middle_weights.pdf>
-Package pdftex.def Info: ../figures/s8_squared_intervention_middle_weights.pdf  used on input line 738.
+Package pdftex.def Info: ../figures/s8_squared_intervention_middle_weights.pdf  used on input line 762.
 (pdftex.def)             Requested size: 487.8225pt x 536.26746pt.
-<../figures/s9_squared_intervention_multi_features.pdf, id=752, 770.52419pt x 784.13454pt>
+<../figures/s9_squared_intervention_multi_features.pdf, id=588, 770.52419pt x 784.13454pt>
 File: ../figures/s9_squared_intervention_multi_features.pdf Graphic file (type pdf)
 <use ../figures/s9_squared_intervention_multi_features.pdf>
-Package pdftex.def Info: ../figures/s9_squared_intervention_multi_features.pdf  used on input line 746.
+Package pdftex.def Info: ../figures/s9_squared_intervention_multi_features.pdf  used on input line 770.
 (pdftex.def)             Requested size: 487.8225pt x 496.44823pt.
-<../figures/s10_squared_decompositions_feature3.pdf, id=753, 350.5095pt x 194.86613pt>
+<../figures/s10_squared_decompositions_feature3.pdf, id=589, 350.5095pt x 194.86613pt>
 File: ../figures/s10_squared_decompositions_feature3.pdf Graphic file (type pdf)
 <use ../figures/s10_squared_decompositions_feature3.pdf>
-Package pdftex.def Info: ../figures/s10_squared_decompositions_feature3.pdf  used on input line 763.
+Package pdftex.def Info: ../figures/s10_squared_decompositions_feature3.pdf  used on input line 787.
 (pdftex.def)             Requested size: 146.34824pt x 81.36151pt.
-<../figures/s10_squared_decompositions_feature5.pdf, id=754, 574.54652pt x 194.86613pt>
+<../figures/s10_squared_decompositions_feature5.pdf, id=590, 574.54652pt x 194.86613pt>
 File: ../figures/s10_squared_decompositions_feature5.pdf Graphic file (type pdf)
 <use ../figures/s10_squared_decompositions_feature5.pdf>
-Package pdftex.def Info: ../figures/s10_squared_decompositions_feature5.pdf  used on input line 768.
+Package pdftex.def Info: ../figures/s10_squared_decompositions_feature5.pdf  used on input line 792.
 (pdftex.def)             Requested size: 146.34824pt x 49.6352pt.
-<../figures/s10_squared_decompositions_feature10.pdf, id=755, 1134.63902pt x 194.86613pt>
+<../figures/s10_squared_decompositions_feature10.pdf, id=591, 1134.63902pt x 194.86613pt>
 File: ../figures/s10_squared_decompositions_feature10.pdf Graphic file (type pdf)
 <use ../figures/s10_squared_decompositions_feature10.pdf>
-Package pdftex.def Info: ../figures/s10_squared_decompositions_feature10.pdf  used on input line 773.
+Package pdftex.def Info: ../figures/s10_squared_decompositions_feature10.pdf  used on input line 797.
 (pdftex.def)             Requested size: 146.34824pt x 25.13426pt.
-<../figures/s10_squared_decompositions_feature15.pdf, id=756, 1694.73152pt x 194.86613pt>
+<../figures/s10_squared_decompositions_feature15.pdf, id=592, 1694.73152pt x 194.86613pt>
 File: ../figures/s10_squared_decompositions_feature15.pdf Graphic file (type pdf)
 <use ../figures/s10_squared_decompositions_feature15.pdf>
-Package pdftex.def Info: ../figures/s10_squared_decompositions_feature15.pdf  used on input line 778.
+Package pdftex.def Info: ../figures/s10_squared_decompositions_feature15.pdf  used on input line 802.
 (pdftex.def)             Requested size: 146.34824pt x 16.82654pt.
-<../figures/s11_squared_features_vs_loss.pdf, id=757, 421.86778pt x 208.76369pt>
+<../figures/s11_squared_features_vs_loss.pdf, id=593, 421.86778pt x 208.76369pt>
 File: ../figures/s11_squared_features_vs_loss.pdf Graphic file (type pdf)
 <use ../figures/s11_squared_features_vs_loss.pdf>
-Package pdftex.def Info: ../figures/s11_squared_features_vs_loss.pdf  used on input line 788.
+Package pdftex.def Info: ../figures/s11_squared_features_vs_loss.pdf  used on input line 812.
 (pdftex.def)             Requested size: 487.8225pt x 241.41425pt.
- [16] [17 <../figures/s1_high_rank_circuit_setup.pdf> <../figures/s2_tms_encoder_directions.pdf>] [18 <../figures/s3_tms_full_subnetworks.pdf>] [19 <../figures/s4_tms_intervention_network1.pdf> <../figures/s4_tms_intervention_network2.pdf> <../figures/s4_tms_intervention_network3.pdf> <../figures/s4_tms_intervention_network4.pdf> <../figures/s4_tms_intervention_network5.pdf>] [20 <../figures/s5_high_rank_circuits_loss_vs_rank.pdf> <../figures/s6_high_rank_decompositions_rank1.pdf> <../figures/s6_high_rank_decompositions_rank2.pdf> <../figures/s6_high_rank_decompositions_rank3.pdf> <../figures/s6_high_rank_decompositions_rank4.pdf> <../figures/s6_high_rank_decompositions_rank5.pdf>] [21 <../figures/s7_squared_intervention_more_deltas.pdf>] [22 <../figures/s8_squared_intervention_middle_weights.pdf>] [23 <../figures/s9_squared_intervention_multi_features.pdf>] [24 <../figures/s10_squared_decompositions_feature3.pdf> <../figures/s10_squared_decompositions_feature5.pdf> <../figures/s10_squared_decompositions_feature10.pdf> <../figures/s10_squared_decompositions_feature15.pdf> <../figures/s11_squared_features_vs_loss.pdf>] (./writeup.aux)
-Package rerunfilecheck Info: File `writeup.out' has not changed.
-(rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
+
+Package natbib Warning: There were undefined citations.
+
+[16] [17 <../figures/s1_high_rank_circuit_setup.pdf> <../figures/s2_tms_encoder_directions.pdf>] [18 <../figures/s3_tms_full_subnetworks.pdf>] [19 <../figures/s4_tms_intervention_network1.pdf> <../figures/s4_tms_intervention_network2.pdf> <../figures/s4_tms_intervention_network3.pdf> <../figures/s4_tms_intervention_network4.pdf> <../figures/s4_tms_intervention_network5.pdf>] [20 <../figures/s5_high_rank_circuits_loss_vs_rank.pdf> <../figures/s6_high_rank_decompositions_rank1.pdf> <../figures/s6_high_rank_decompositions_rank2.pdf> <../figures/s6_high_rank_decompositions_rank3.pdf> <../figures/s6_high_rank_decompositions_rank4.pdf> <../figures/s6_high_rank_decompositions_rank5.pdf>] [21 <../figures/s7_squared_intervention_more_deltas.pdf>] [22 <../figures/s8_squared_intervention_middle_weights.pdf>] [23 <../figures/s9_squared_intervention_multi_features.pdf>] [24 <../figures/s10_squared_decompositions_feature3.pdf> <../figures/s10_squared_decompositions_feature5.pdf> <../figures/s10_squared_decompositions_feature10.pdf> <../figures/s10_squared_decompositions_feature15.pdf> <../figures/s11_squared_features_vs_loss.pdf>] (./writeup.aux
+
+Package natbib Warning: Citation(s) may have changed.
+(natbib)                Rerun to get citations correct.
+
+)
+
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+
+Package rerunfilecheck Warning: File `writeup.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `writeup.out':
+(rerunfilecheck)             Before: <no file>
+(rerunfilecheck)             After:  D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 29035 strings out of 480247
- 554925 string characters out of 5896151
- 867829 words of memory out of 5000000
- 46068 multiletter control sequences out of 15000+600000
- 497306 words of font info for 209 fonts, out of 8000000 for 9000
+ 29108 strings out of 480247
+ 556116 string characters out of 5896151
+ 862039 words of memory out of 5000000
+ 46095 multiletter control sequences out of 15000+600000
+ 500288 words of font info for 239 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 94i,17n,94p,1519b,774s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on writeup.pdf (24 pages, 10872951 bytes).
+ 94i,19n,94p,1447b,772s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on writeup.pdf (24 pages, 10825539 bytes).
 PDF statistics:
- 2648 PDF objects out of 2984 (max. 8388607)
- 634 compressed objects within 7 object streams
- 141 named destinations out of 1000 (max. 500000)
- 44732 words of extra memory for PDF output out of 51595 (max. 10000000)
+ 2584 PDF objects out of 2984 (max. 8388607)
+ 567 compressed objects within 6 object streams
+ 146 named destinations out of 1000 (max. 500000)
+ 48833 words of extra memory for PDF output out of 51595 (max. 10000000)
 

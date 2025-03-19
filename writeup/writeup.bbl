@@ -7,7 +7,7 @@
 
 \bibitem[Bereska \& Gavves(2024)Bereska and Gavves]{bereska2024mechanistic}
 Bereska, L. and Gavves, E.
-\newblock Mechanistic interpretability for ai safety--a review.
+\newblock Mechanistic interpretability for {AI} safety--a review.
 \newblock \emph{arXiv preprint arXiv:2404.14082}, 2024.
 
 \bibitem[Braun et~al.(2025)Braun, Bushnaq, Heimersheim, Mendel, and
@@ -37,7 +37,7 @@ Bushnaq, L., Mendel, J., Heimersheim, S., Braun, D., Goldowsky-Dill, N.,
 \bibitem[Bussmann et~al.(2024)Bussmann, Leask, and
   Nanda]{bussmann2024batchtopk}
 Bussmann, B., Leask, P., and Nanda, N.
-\newblock Batchtopk sparse autoencoders.
+\newblock {BatchTopK} sparse autoencoders.
 \newblock \emph{arXiv preprint arXiv:2412.06410}, 2024.
 
 \bibitem[Choromanska et~al.(2015)Choromanska, Henaff, Mathieu, Arous, and
@@ -127,8 +127,8 @@ Keskar, N.~S., Mudigere, D., Nocedal, J., Smelyanskiy, M., and Tang, P. T.~P.
 \bibitem[Kram{\'a}r et~al.(2024)Kram{\'a}r, Lieberum, Shah, and
   Nanda]{kramar2024atp}
 Kram{\'a}r, J., Lieberum, T., Shah, R., and Nanda, N.
-\newblock Atp*: An efficient and scalable method for localizing llm behaviour
-  to components.
+\newblock {AtP*}: An efficient and scalable method for localizing {LLM}
+  behaviour to components.
 \newblock \emph{arXiv preprint arXiv:2403.00745}, 2024.
 
 \bibitem[Lindsey et~al.(2024)Lindsey, Templeton, Marcus, Conerly, Batson, and
